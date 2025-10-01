@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useAuth } from "@/providers/auth-provider"
 import { useIsMobile } from "@/components/ui/use-mobile"
 import { Header } from "./header"
@@ -14,11 +14,12 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { user, loading } = useAuth()
+  const { user, loading } = useAuth();
   const isMobile = useIsMobile()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  if (loading) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

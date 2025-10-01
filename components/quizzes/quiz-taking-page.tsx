@@ -59,7 +59,7 @@ export function QuizTakingPage({ quizId, attemptId }: QuizTakingPageProps) {
 
         if (attemptId) {
           const attempts = await quizService.getQuizAttempt(quizId, user?.user_id)
-          const currentAttempt = attempts.find((a) => a.quizAttempt_id === Number(attemptId))
+          const currentAttempt = attempts.find((a: any) => a.quizAttempt_id === Number(attemptId))
 
           console.log('Current attempt: ', currentAttempt);
 
@@ -217,7 +217,7 @@ export function QuizTakingPage({ quizId, attemptId }: QuizTakingPageProps) {
           <p className="text-muted-foreground">{quiz.course}</p>
         </div>
         <div className="flex items-center gap-4">
-          <Badge variant={timeRemaining > 300 ? "default" : "destructive"} className="text-lg px-3 py-1">
+          <Badge variant={timeRemaining > 180 ? "default" : "destructive"} className="text-lg px-3 py-1">
             <Clock className="h-4 w-4 mr-2" />
             {formatTime(timeRemaining)}
           </Badge>
@@ -277,7 +277,7 @@ export function QuizTakingPage({ quizId, attemptId }: QuizTakingPageProps) {
         </div>
 
         {isLastQuestion ? (
-          <Button onClick={handleSubmitQuiz} disabled={submitting} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={handleSubmitQuiz} disabled={submitting} className="bg-green-600 hover:bg-green-700 cursor-pointer">
             <Send className="h-4 w-4 mr-2" />
             {submitting ? "Submitting..." : "Submit Quiz"}
           </Button>

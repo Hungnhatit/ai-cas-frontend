@@ -11,18 +11,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Search, MoreHorizontal, Mail, MessageSquare, Award, TrendingUp } from "lucide-react"
 import { api, type Student } from "@/services/api"
+import { studentService } from "@/services/studentService"
+import { useAuth } from "@/providers/auth-provider"
 
 export function StudentsManagement() {
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [sortBy, setSortBy] = useState("name")
+  const [sortBy, setSortBy] = useState("name");
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const data = await api.getStudents()
-        setStudents(data)
+        const res = await studentService.getStudentByInstructorId(user?.user_id);
+        setStudents(res.data.instructor.students)
       } catch (error) {
         console.error("Failed to fetch students:", error)
       } finally {
@@ -31,7 +34,9 @@ export function StudentsManagement() {
     }
 
     fetchStudents()
-  }, [])
+  }, []);
+
+  console.log(students)
 
   const filteredStudents = students
     .filter(
@@ -106,7 +111,7 @@ export function StudentsManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {students.reduce((sum, student) => sum + student.enrolledCourses, 0)}
+              {students?.reduce((sum, student) => sum + student.enrolledCourses, 0)}
             </div>
             <p className="text-xs text-muted-foreground">Course enrollments</p>
           </CardContent>
@@ -118,7 +123,7 @@ export function StudentsManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {students.reduce((sum, student) => sum + student.completedCourses, 0)}
+              {students?.reduce((sum, student) => sum + student.completedCourses, 0)}
             </div>
             <p className="text-xs text-muted-foreground">Courses completed</p>
           </CardContent>
@@ -158,7 +163,7 @@ export function StudentsManagement() {
         <CardContent>
           <div className="space-y-4">
             {filteredStudents.map((student) => (
-              <div key={student.id} className="flex items-center justify-between p-4 border rounded-lg">
+              <div key={student.student_id} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-12 w-12">
                     <AvatarImage src={student.avatar || "/placeholder.svg"} alt={student.name} />

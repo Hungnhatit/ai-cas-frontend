@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Plus, Edit, Trash2, Eye, Users, Clock, Trophy, Copy } from "lucide-react"
+import { Plus, Edit, Trash2, Eye, Users, Clock, Trophy, Copy, Earth, Lock, NotebookPen } from "lucide-react"
 import { type Quiz, type QuizQuestion, type Course } from "@/services/api"
 import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
@@ -497,6 +497,12 @@ export function QuizManagementPage() {
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
                         {quiz.quiz_questions.length} questions
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {quiz.visibility === 'public' && <Earth className="h-4 w-4" />}
+                        {quiz.visibility === 'private' && <Lock className="h-4 w-4" />}
+                        {quiz.visibility === 'assigned' && <NotebookPen className="h-4 w-4" />}
+                        {capitalizeFirstLetter(quiz.visibility)}
                       </div>
                     </div>
 

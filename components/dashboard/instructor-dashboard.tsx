@@ -1,15 +1,23 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import QuizIcon from '@/assets/icons/quiz.png'
+import TestIcon from '@/assets/icons/exam.png';
+import StudentIcon from '@/assets/icons/student.png'
+import AssignmentIcon from '@/assets/icons/assignment.png'
+
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { BookOpen, Users, MessageSquare, BarChart3, Plus, Clock } from "lucide-react"
+import { BookOpen, Users, MessageSquare, BarChart3, Plus, Clock, Notebook, NotebookTabs, NotebookTabsIcon, NotepadTextIcon } from "lucide-react"
 import { useCourses } from "@/hooks/use-courses"
 import { useAuth } from "@/providers/auth-provider"
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function InstructorDashboard() {
   const { courses, loading } = useCourses()
-  const { user } = useAuth()
+  const { user } = useAuth();
+  const router = useRouter();
 
   const myCourses = courses.filter((course) => course.instructor === user?.name)
   const totalStudents = myCourses.reduce((sum, course) => sum + course.students, 0)
@@ -92,6 +100,60 @@ export function InstructorDashboard() {
             <p className="text-xs text-muted-foreground">Course ratings</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* quick access */}
+      <div>
+        <div>
+          <h1 className="text-2xl font-bold">Quiz access</h1>
+          <p className="text-muted-foreground">Manage your courses and students</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card onClick={() => router.push('/create-quizzes')} className="hover:bg-gray-100 transition cursor-pointer">
+            <CardHeader className="">
+              <div className="flex items-center justify-center mb-4">
+                <Image src={QuizIcon} alt="quiz-logo" width={32} height={32} />
+              </div>
+              <div>
+                <CardTitle className="text-center mb-2">Create a quiz</CardTitle>
+                <CardDescription className="text-center">Quickly build a custom quiz with questions and answers</CardDescription>
+              </div>
+            </CardHeader>
+          </Card>
+          <Card onClick={() => router.push('/assignments/create')} className="hover:bg-gray-100 transition cursor-pointer">
+            <CardHeader className="">
+              <div className="flex items-center justify-center mb-4">
+                <Image src={AssignmentIcon} alt="quiz-logo" width={32} height={32} />
+              </div>
+              <div>
+                <CardTitle className="text-center mb-2">Create an assignment</CardTitle>
+                <CardDescription className="text-center">Assign tasks or homework to students</CardDescription>
+              </div>
+            </CardHeader>
+          </Card>
+          <Card onClick={() => router.push('/')} className="hover:bg-gray-100 transition cursor-pointer">
+            <CardHeader className="">
+              <div className="flex items-center justify-center mb-4">
+                <Image src={TestIcon} alt="quiz-logo" width={32} height={32} />
+              </div>
+              <div>
+                <CardTitle className="text-center mb-2">Find a test</CardTitle>
+                <CardDescription className="text-center">Search and access available tests in the system</CardDescription>
+              </div>
+            </CardHeader>
+          </Card>
+          <Card onClick={() => router.push('/')} className="hover:bg-gray-100 transition cursor-pointer">
+            <CardHeader className="">
+              <div className="flex items-center justify-center mb-4">
+                <Image src={StudentIcon} alt="quiz-logo" width={32} height={32} />
+              </div>
+              <div>
+                <CardTitle className="text-center mb-2">Add a student</CardTitle>
+                <CardDescription className="text-center">Enroll a new student into your class or course</CardDescription>
+              </div>
+            </CardHeader>
+          </Card>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

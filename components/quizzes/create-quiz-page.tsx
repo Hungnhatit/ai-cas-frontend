@@ -141,7 +141,6 @@ const CreateQuizzes = () => {
     )
   }
 
-
   return (
 
     <div className=" overflow-y-auto mb-4">

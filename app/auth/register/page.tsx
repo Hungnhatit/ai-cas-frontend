@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAuth } from "@/providers/auth-provider"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
+import toast from "react-hot-toast"
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -52,7 +53,8 @@ export default function RegisterPage() {
 
     try {
       await register(formData.email, formData.password, formData.name, formData.role)
-      router.push("/dashboard")
+      
+      router.push("/dashboard");
     } catch (err) {
       setError("Registration failed. Please try again.")
     } finally {

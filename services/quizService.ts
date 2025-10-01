@@ -135,6 +135,22 @@ export const quizService = {
       console.log('Error when restoring quiz: ', error.res?.data || error.message);
       throw error;
     }
+  },
+
+  // assign quiz to students
+  assignQuiz: async (quiz_id: number, student_ids: any) => {
+    try {
+      const res = await api.post(`/quizzes/${quiz_id}/assign`, { student_ids }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return res.data;
+    } catch (error) {
+      console.log(`Error when assign quiz to student: ${error}`)
+    }
   }
+
+
 
 }

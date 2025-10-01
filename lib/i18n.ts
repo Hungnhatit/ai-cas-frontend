@@ -14,6 +14,7 @@ export interface Translations {
   profile: string
   settings: string
   logout: string
+  dashboard: string
 
   // Common
   language: string
@@ -36,6 +37,7 @@ export const translations: Record<Language, Translations> = {
     profile: "Profile",
     settings: "Settings",
     logout: "Log out",
+    dashboard: 'Dashboard',
 
     // Common
     language: "Language",
@@ -56,6 +58,7 @@ export const translations: Record<Language, Translations> = {
     profile: "Hồ sơ",
     settings: "Cài đặt",
     logout: "Đăng xuất",
+    dashboard: 'Bảng điều khiển',
 
     // Common
     language: "Ngôn ngữ",

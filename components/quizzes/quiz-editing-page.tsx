@@ -2,11 +2,11 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
-import { ArrowLeft, Plus, Save, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, Plus, Save, Trash2 } from 'lucide-react';
 import { Question, QuizSetup as QuizSetupType } from '@/types/quiz';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
-import { Course, Quiz, QuizQuestion } from '@/services/api';
+import { Course, Quiz, QuizQuestion, Student } from '@/services/api';
 
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
@@ -17,6 +17,9 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/auth-provider'
 import { quizService } from '@/services/quizService';
+import { studentService } from '@/services/studentService';
+import { Checkbox } from '@radix-ui/react-checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
 interface QuizEditorProp {
   quiz_id: number,
@@ -27,6 +30,9 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [search, setSearch] = useState("")
   const [quizStatus, setQuizStatus] = useState('');
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -40,6 +46,11 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
     description: "",
     duration: 30,
     attempts: 3,
+  });
+
+  const [newStudent, setNewStudent] = useState({
+    student_id: '',
+    name: ''
   })
 
   const [questions, setQuestions] = useState<Partial<QuizQuestion>[]>([])
@@ -54,7 +65,11 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
           ...question,
           options: typeof question.options === 'string' ? JSON.parse(question.options) : question.options,
           correctAnwer: question.correctAnswer !== undefined ? Number(question.correctAnswer) : undefined
-        }))
+        }));
+
+        const res = await studentService.getStudentByInstructorId(user?.user_id);
+
+        setStudents(res.data.instructor.students);
 
         setQuizzes(data);
         setNewQuiz({
@@ -73,8 +88,6 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
     }
     fetchData()
   }, [id]);
-
-  console.log(quizzes?.quiz_questions?.[0]?.options);
 
   const addQuestion = () => {
     setQuestions([
@@ -103,6 +116,43 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
     setQuestions(questions.filter((_, i) => i !== index))
   }
 
+  // handle select student
+  const handleSelectStudent = (student_id: string) => {
+    const student = students.find((s) => s.student_id.toString() === student_id)
+    if (student) {
+      setNewStudent({
+        student_id: student.student_id.toString(),
+        name: student.name,
+      })
+    }
+  }
+
+  console.log(selectedStudents)
+
+  const toggleStudent = (id: string) => {
+    setSelectedStudents((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+    )
+  }
+
+  const selectAll = () => {
+    if (selectedStudents.length === students.length) {
+      setSelectedStudents([]) // clear
+    } else {
+      setSelectedStudents(students.map((s) => s.student_id)) // chọn all
+    }
+  }
+
+  const filtered = students.filter((s) =>
+    s.name.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const placeholder =
+    selectedStudents.length === 0
+      ? "Select students..."
+      : selectedStudents.length === students.length
+        ? "All students selected"
+        : `${selectedStudents.length} students selected`
 
   // handle create quiz when submit
   const handleCreateQuiz = async () => {
@@ -147,7 +197,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
       console.log("[v0] Updating quiz:", updatedData);
 
       const res = await quizService.updateQuiz(quiz_id, updatedData);
-
+      await quizService.assignQuiz(quiz_id, selectedStudents);
       setIsCreateDialogOpen(false)
       setNewQuiz({
         title: "",
@@ -201,8 +251,6 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
       </div>
     )
   }
-
-
   const handleSetupChange = (setup: QuizSetupType) => {
     setQuizzes(prev => ({ ...prev, setup }));
   };
@@ -265,7 +313,6 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
                 <p className="text-sm text-gray-500">
                   {quizzes?.quiz_questions?.length} question{quizzes?.quiz_questions?.length !== 1 ? 's' : ''} • {totalPoints} points total
                 </p>
-
               </div>
             </div>
 
@@ -302,7 +349,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="quiz-title">Quiz Title</Label>
+              <Label htmlFor="quiz-title" className='mb-2'>Quiz Title</Label>
               <Input
                 id="quiz-title"
                 value={newQuiz.title}
@@ -311,7 +358,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
               />
             </div>
             <div>
-              <Label htmlFor="quiz-course">Course</Label>
+              <Label htmlFor="quiz-course" className='mb-2'>Course</Label>
               <Select value={newQuiz.course} onValueChange={(value) => setNewQuiz({ ...newQuiz, course: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select course" />
@@ -328,7 +375,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
           </div>
 
           <div>
-            <Label htmlFor="quiz-description">Description</Label>
+            <Label htmlFor="quiz-description" className='mb-2'>Description</Label>
             <Textarea
               id="quiz-description"
               value={newQuiz.description}
@@ -339,7 +386,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="quiz-duration">Duration (minutes)</Label>
+              <Label htmlFor="quiz-duration" className='mb-2'>Duration (minutes)</Label>
               <Input
                 id="quiz-duration"
                 type="number"
@@ -350,7 +397,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
               />
             </div>
             <div>
-              <Label htmlFor="quiz-attempts">Attempts Allowed</Label>
+              <Label htmlFor="quiz-attempts" className='mb-2'>Attempts Allowed</Label>
               <Input
                 id="quiz-attempts"
                 type="number"
@@ -362,6 +409,54 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* assign quiz section */}
+      <div className='bg-card p-4 rounded-sm mb-4 border border-gray-300'>
+        <div className="flex items-center justify-between mb-3">
+          <Label className='text-xl font-bold'>Assign to</Label>
+        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="w-3xs justify-between cursor-pointer">
+              {placeholder}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-3xs p-2 space-y-2">
+            {/* Search box */}
+            <Input
+              placeholder="Type a name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+
+            {/* Select All */}
+            <div
+              className="cursor-pointer flex items-center justify-between px-2 hover:bg-gray-100 rounded"
+              onClick={selectAll}
+            >
+              <span className="font-medium">Select All</span>
+              {selectedStudents.length === students.length && <Check size={16} />}
+            </div>
+
+            {/* Students list */}
+            <div className="max-h-[200px] overflow-y-auto space-y-1">
+              {filtered.map((student) => (
+                <div
+                  key={student.student_id}
+                  className={cn(
+                    "cursor-pointer flex items-center justify-between p-2 hover:bg-gray-100 rounded transition",
+                    selectedStudents.includes(student.student_id) && 'bg-gray-200'
+                  )}
+                  onClick={() => toggleStudent(student.student_id)}
+                >
+                  <span>{student.name} ({student.email})</span>
+                  {selectedStudents.includes(student.student_id) && <Check size={16} className='ml-2' />}
+                </div>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* question section */}

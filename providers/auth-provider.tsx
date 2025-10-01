@@ -62,18 +62,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const register = async (email: string, password: string, name: string, role: string) => {
-    // setLoading(true)
-    // // Mock registration - replace with real API
-    // const mockUser: User = {
-    //   user_id: Date.now().toString(),
-    //   email,
-    //   name,
-    //   role: role as "student" | "instructor" | "admin",
-    //   avatar: `/placeholder.svg?height=40&width=40&query=avatar`,
-    // }
-    // setUser(mockUser)
-    // localStorage.setItem("lms-user", JSON.stringify(mockUser))
-    // setLoading(false)
+    setLoading(true);
+    try {
+      const res = await authService.register({
+        email,
+        password,
+        name,
+        role: role as 'student' | 'instructor' | 'admin'
+      });
+
+      const { user, token } = res;
+      setUser(user);
+      localStorage.setItem("lms-user", JSON.stringify(user))
+      localStorage.setItem("lms-token", token);
+      return user;
+    } catch (error) {
+      setLoading(false)
+    }
   }
 
   const logout = () => {

@@ -16,7 +16,7 @@ export interface Course {
 }
 
 export interface Student {
-  id: string
+  student_id: number
   name: string
   email: string
   avatar: string
@@ -24,6 +24,7 @@ export interface Student {
   completedCourses: number
   progress: number
   joinDate: string
+  instructor_id?: string
 }
 
 export interface Assignment {
@@ -54,7 +55,8 @@ export interface Quiz {
   totalPoints: number
   quiz_questions: QuizQuestion[]
   attempts: number
-  status: "active" | "draft" | "archived"
+  status: "active" | "draft" | "archived",
+  visibility: string,
   dueDate: string
 }
 
@@ -64,8 +66,8 @@ export interface QuizAttempt {
   studentId: string
   answers: Record<string, string | number>
   score?: number
-  startTime: string
-  endTime?: string
+  start_time: string
+  end_time?: string
   status: "in-progress" | "completed" | "submitted"
 }
 
@@ -120,7 +122,7 @@ const mockCourses: Course[] = [
 
 const mockStudents: Student[] = [
   {
-    id: "1",
+    student_id: "1",
     name: "Alice Johnson",
     email: "alice@example.com",
     avatar: "/student-avatar.png",
@@ -130,7 +132,7 @@ const mockStudents: Student[] = [
     joinDate: "2024-01-15",
   },
   {
-    id: "2",
+    student_id: "2",
     name: "Bob Smith",
     email: "bob@example.com",
     avatar: "/student-avatar.png",
@@ -162,78 +164,78 @@ const mockAssignments: Assignment[] = [
 ]
 
 const mockQuizzes: Quiz[] = [
-  {
-    id: "1",
-    title: "React Fundamentals Quiz",
-    course: "Introduction to React",
-    description: "Test your knowledge of React basics including components, props, and state",
-    duration: 30,
-    totalPoints: 100,
-    attempts: 3,
-    status: "active",
-    dueDate: "2024-12-31",
-    quiz_questions: [
-      {
-        quizQuestion_id: "q1",
-        question: "What is JSX?",
-        type: "multiple-choice",
-        options: ["A JavaScript extension syntax", "A CSS framework", "A database query language", "A testing library"],
-        correctAnswer: 0,
-        points: 10,
-      },
-      {
-        quizQuestion_id: "q2",
-        question: "React components must return a single parent element.",
-        type: "true-false",
-        correctAnswer: 1,
-        points: 10,
-      },
-      {
-        quizQuestion_id: "q3",
-        question: "What hook is used to manage state in functional components?",
-        type: "short-answer",
-        correctAnswer: "useState",
-        points: 15,
-      },
-    ],
-  },
-  {
-    id: "2",
-    title: "JavaScript Advanced Concepts",
-    course: "Advanced JavaScript",
-    description: "Advanced JavaScript concepts including closures, promises, and async/await",
-    duration: 45,
-    totalPoints: 150,
-    attempts: 2,
-    status: "active",
-    dueDate: "2024-12-28",
-    quiz_questions: [
-      {
-        quizQuestion_id: "q1",
-        question: "What is a closure in JavaScript?",
-        type: "multiple-choice",
-        options: [
-          "A function that has access to variables in its outer scope",
-          "A way to close browser windows",
-          "A method to end loops",
-          "A type of error handling",
-        ],
-        correctAnswer: 0,
-        points: 20,
-      },
-    ],
-  },
+  // {
+  //   id: "1",
+  //   title: "React Fundamentals Quiz",
+  //   course: "Introduction to React",
+  //   description: "Test your knowledge of React basics including components, props, and state",
+  //   duration: 30,
+  //   totalPoints: 100,
+  //   attempts: 3,
+  //   status: "active",
+  //   dueDate: "2024-12-31",
+  //   quiz_questions: [
+  //     {
+  //       quizQuestion_id: "q1",
+  //       question: "What is JSX?",
+  //       type: "multiple-choice",
+  //       options: ["A JavaScript extension syntax", "A CSS framework", "A database query language", "A testing library"],
+  //       correctAnswer: 0,
+  //       points: 10,
+  //     },
+  //     {
+  //       quizQuestion_id: "q2",
+  //       question: "React components must return a single parent element.",
+  //       type: "true-false",
+  //       correctAnswer: 1,
+  //       points: 10,
+  //     },
+  //     {
+  //       quizQuestion_id: "q3",
+  //       question: "What hook is used to manage state in functional components?",
+  //       type: "short-answer",
+  //       correctAnswer: "useState",
+  //       points: 15,
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "2",
+  //   title: "JavaScript Advanced Concepts",
+  //   course: "Advanced JavaScript",
+  //   description: "Advanced JavaScript concepts including closures, promises, and async/await",
+  //   duration: 45,
+  //   totalPoints: 150,
+  //   attempts: 2,
+  //   status: "active",
+  //   dueDate: "2024-12-28",
+  //   quiz_questions: [
+  //     {
+  //       quizQuestion_id: "q1",
+  //       question: "What is a closure in JavaScript?",
+  //       type: "multiple-choice",
+  //       options: [
+  //         "A function that has access to variables in its outer scope",
+  //         "A way to close browser windows",
+  //         "A method to end loops",
+  //         "A type of error handling",
+  //       ],
+  //       correctAnswer: 0,
+  //       points: 20,
+  //     },
+  //   ],
+  // },
 ]
 
 const mockQuizAttempts: QuizAttempt[] = [
-  {
-    id: "1",
-    quizId: "1",
-    studentId: "current-user",
-    answers: {},
-    startTime: new Date().toISOString(),
-    status: "in-progress",
-  },
+  // {
+  //   id: "1",
+  //   quizId: "1",
+  //   studentId: "current-user",
+  //   answers: {},
+  //   startTime: new Date().toISOString(),
+  //   status: "in-progress",
+  // },
 ]
 
 // API functions
@@ -280,7 +282,7 @@ export const api = {
 
   getStudent: async (id: string): Promise<Student | null> => {
     await new Promise((resolve) => setTimeout(resolve, 300))
-    return mockStudents.find((student) => student.id === id) || null
+    return mockStudents.find((student) => student.student_id === id) || null
   },
 
   // Assignments

@@ -83,9 +83,9 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
   }
 
   const getTimeTaken = () => {
-    if (!attempt?.startTime || !attempt?.endTime) return "N/A"
-    const start = new Date(attempt.startTime).getTime()
-    const end = new Date(attempt.endTime).getTime()
+    if (!attempt?.start_time || !attempt?.end_time) return "N/A"
+    const start = new Date(attempt.start_time).getTime()
+    const end = new Date(attempt.end_time).getTime()
     const seconds = Math.floor((end - start) / 1000)
     return formatTime(seconds)
   }
@@ -111,8 +111,9 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
     if (!quiz || !attempt) return 0
     let correct = 0
     quiz.quiz_questions.forEach((question) => {
-      const userAnswer = attempt?.answers[question.quizQuestion_id]
-      if (userAnswer === question.correctAnswer) {
+      const userAnswer = JSON.parse(attempt?.answers)[question.quizQuestion_id];
+      console.log(userAnswer)
+      if (userAnswer.toString() === question.correctAnswer) {
         correct++
       }
     })
@@ -123,10 +124,6 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
   const renderQuestionResult = (question: QuizQuestion, index: number) => {
     const userAnswer = JSON.parse(attempt?.answers)[question.quizQuestion_id]
     const isCorrect = userAnswer.toString() === question.correctAnswer
-
-    // console.log(attempt);
-    // console.log('question', question.correctAnswer);
-    // console.log('userAnswer', userAnswer);
 
     return (
       <Card key={question.quizQuestion_id} className={`border-l-4 ${isCorrect ? "border-l-sky-600" : "border-l-red-500"} gap-0.5 py-4`}>
@@ -155,9 +152,7 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
             <div className="space-y-2">
               {JSON.parse(question.options).map((option, optionIndex) => {
                 const isUserAnswer = userAnswer === optionIndex
-                const isCorrectAnswer = question.correctAnswer === optionIndex.toString()
-
-                console.log('isCorrectAnswer: ', isCorrectAnswer)
+                const isCorrectAnswer = question.correctAnswer === optionIndex.toString();
                 return (
                   <div
                     key={optionIndex}

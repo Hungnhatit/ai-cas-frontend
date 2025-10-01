@@ -193,7 +193,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           variant="ghost"
           size="icon"
           onClick={() => setCollapsed(!collapsed)}
-          className="h-8 w-8 text-sidebar-foreground hover:bg-sidebar-accent"
+          className="h-8 w-8 text-sidebar-foreground hover:bg-sidebar-accent cursor-pointer"
         >
           <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />
         </Button>

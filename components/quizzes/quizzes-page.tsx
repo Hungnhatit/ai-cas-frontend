@@ -84,7 +84,7 @@ export function QuizzesPage() {
   console.log('attempts: ', attempts);
 
   const getQuizStats = () => {
-    const total = quizzes.length
+    const total = quizzes.length;
     const completed = attempts.filter((a) => a.status === "submitted").length
     const inProgress = attempts.filter((a) => a.status === "in-progress").length
     const averageScore =
@@ -153,12 +153,12 @@ export function QuizzesPage() {
 
       <Tabs defaultValue="available" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="available" className="cursor-pointer">Available Quizzes</TabsTrigger>
-          <TabsTrigger value="completed" className="cursor-pointer">Completed</TabsTrigger>
+          <TabsTrigger value="available" className="cursor-pointer">Available Quizzes ({stats.total})</TabsTrigger>
+          <TabsTrigger value="completed" className="cursor-pointer">Completed ({stats.completed})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="available" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {quizzes
               .filter((quiz) => !attempts.some((a) => a.quiz_id === quiz.id && a.status === "submitted"))
               .map((quiz) => (
