@@ -20,8 +20,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar, Clock, FileText, CheckCircle, AlertCircle, Upload, Eye, Download, MessageSquare } from "lucide-react"
-import { api, type Assignment } from "@/services/api"
+
 import { useAuth } from "@/providers/auth-provider"
+import { assignmentService } from "@/services/assignmentService"
+import { Assignment } from "@/types/interfaces/assignment"
+import { useRouter } from "next/navigation"
+import { api } from "@/services/api"
 
 export function AssignmentsPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([])
@@ -29,13 +33,14 @@ export function AssignmentsPage() {
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null)
   const [submissionText, setSubmissionText] = useState("")
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
-  const { user } = useAuth()
+  const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
-        const data = await api.getAssignments()
-        setAssignments(data)
+        const res = await assignmentService.fetchAssignmentsForStudent(user?.ma_nguoi_dung);
+        setAssignments(res.data);
       } catch (error) {
         console.error("Failed to fetch assignments:", error)
       } finally {
@@ -44,11 +49,13 @@ export function AssignmentsPage() {
     }
 
     fetchAssignments()
-  }, [])
+  }, []);
 
-  const pendingAssignments = assignments.filter((a) => a.status === "pending")
-  const submittedAssignments = assignments.filter((a) => a.status === "submitted")
-  const gradedAssignments = assignments.filter((a) => a.status === "graded")
+  console.log(assignments);
+
+  const pendingAssignments = assignments?.filter((a) => a.status === "pending")
+  const submittedAssignments = assignments?.filter((a) => a.status === "submitted")
+  const gradedAssignments = assignments?.filter((a) => a.status === "graded")
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
@@ -147,7 +154,7 @@ export function AssignmentsPage() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{assignments.length}</div>
+            <div className="text-2xl font-bold">{assignments?.length}</div>
           </CardContent>
         </Card>
 
@@ -157,7 +164,7 @@ export function AssignmentsPage() {
             <AlertCircle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingAssignments.length}</div>
+            <div className="text-2xl font-bold">{pendingAssignments?.length}</div>
           </CardContent>
         </Card>
 
@@ -167,7 +174,7 @@ export function AssignmentsPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{submittedAssignments.length}</div>
+            <div className="text-2xl font-bold">{submittedAssignments?.length}</div>
           </CardContent>
         </Card>
 
@@ -178,11 +185,11 @@ export function AssignmentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {gradedAssignments.length > 0
+              {gradedAssignments?.length > 0
                 ? Math.round(
-                    gradedAssignments.reduce((sum, assignment) => sum + (assignment.grade || 0), 0) /
-                      gradedAssignments.length,
-                  )
+                  gradedAssignments.reduce((sum, assignment) => sum + (assignment.grade || 0), 0) /
+                  gradedAssignments?.length,
+                )
                 : 0}
               %
             </div>
@@ -191,15 +198,41 @@ export function AssignmentsPage() {
       </div>
 
       {/* Assignment Tabs */}
-      <Tabs defaultValue="pending" className="space-y-4">
+      <Tabs defaultValue="all-assignments" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="pending">Pending ({pendingAssignments.length})</TabsTrigger>
-          <TabsTrigger value="submitted">Submitted ({submittedAssignments.length})</TabsTrigger>
-          <TabsTrigger value="graded">Graded ({gradedAssignments.length})</TabsTrigger>
+          <TabsTrigger value="all-assignments">All ({assignments?.length})</TabsTrigger>
+          <TabsTrigger value="pending">Pending ({pendingAssignments?.length})</TabsTrigger>
+          <TabsTrigger value="submitted">Submitted ({submittedAssignments?.length})</TabsTrigger>
+          <TabsTrigger value="graded">Graded ({gradedAssignments?.length})</TabsTrigger>
         </TabsList>
 
+        <TabsContent value='all-assignments'>
+          {
+            assignments?.length > 0 && assignments.map((assignment, index) => (
+              <Card key={index} className="flex-row items-center justify-between mb-3">
+                <CardHeader className="w-full">
+                  <div className="space-y-1">
+                    <CardTitle className="mb-2">
+                      {assignment.title}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-2">{assignment.description}</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Button className="cursor-pointer" onClick={() => router.push(`/assignments/${assignment.assignment_id}/detail`)}>
+                      <Eye />
+                      View detail
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          }
+        </TabsContent>
+
         <TabsContent value="pending" className="space-y-4">
-          {pendingAssignments.length === 0 ? (
+          {pendingAssignments?.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
                 <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
@@ -208,10 +241,10 @@ export function AssignmentsPage() {
               </CardContent>
             </Card>
           ) : (
-            pendingAssignments.map((assignment) => {
+            pendingAssignments?.map((assignment) => {
               const daysUntilDue = getDaysUntilDue(assignment.dueDate)
               return (
-                <Card key={assignment.id}>
+                <Card key={assignment.assignment_id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
@@ -243,7 +276,7 @@ export function AssignmentsPage() {
                     <div className="flex items-center justify-between">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" className="cursor-pointer">
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </Button>
@@ -374,7 +407,7 @@ export function AssignmentsPage() {
         </TabsContent>
 
         <TabsContent value="submitted" className="space-y-4">
-          {submittedAssignments.length === 0 ? (
+          {submittedAssignments?.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
                 <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -383,8 +416,8 @@ export function AssignmentsPage() {
               </CardContent>
             </Card>
           ) : (
-            submittedAssignments.map((assignment) => (
-              <Card key={assignment.id}>
+            submittedAssignments?.map((assignment) => (
+              <Card key={assignment.assignment_id}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
@@ -427,7 +460,7 @@ export function AssignmentsPage() {
         </TabsContent>
 
         <TabsContent value="graded" className="space-y-4">
-          {gradedAssignments.length === 0 ? (
+          {gradedAssignments?.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
                 <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -436,8 +469,8 @@ export function AssignmentsPage() {
               </CardContent>
             </Card>
           ) : (
-            gradedAssignments.map((assignment) => (
-              <Card key={assignment.id}>
+            gradedAssignments?.map((assignment) => (
+              <Card key={assignment.assignment_id}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">

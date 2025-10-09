@@ -23,8 +23,8 @@ export function CourseManagement() {
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
 
-  // Filter courses based on user role
-  const userCourses = user?.role === "admin" ? courses : courses.filter((course) => course.instructor === user?.name)
+  // Filter courses based on user vai_tro
+  const userCourses = user?.vai_tro === "admin" ? courses : courses.filter((course) => course.instructor === user?.name)
 
   const filteredCourses = userCourses.filter((course) => {
     const matchesSearch =

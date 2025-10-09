@@ -77,12 +77,12 @@ const CreateQuizzes = () => {
   // handle create quiz when submit
   const handleCreateQuiz = async () => {
     try {
-      const totalPoints = questions.reduce((sum, q) => sum + (q.points || 0), 0)
+      const total_points = questions.reduce((sum, q) => sum + (q.points || 0), 0)
       const quizData = {
         ...newQuiz,
-        instructor_id: user?.user_id,
+        ma_giang_vien: user?.user_id,
         questions: questions as QuizQuestion[],
-        totalPoints,
+        total_points,
         status: "draft" as const,
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 7 days from now
       }
@@ -149,9 +149,9 @@ const CreateQuizzes = () => {
         <ArrowLeft />
         Back
       </Button>
-      <header className='mb-4'>
-        <h1 className='text-2xl font-bold'>Create New Quiz</h1>
-        <div>Set up a new quiz for your students</div>
+      <header className='mb-4 bg-[#232f3e] p-4'>
+        <h1 className='text-2xl font-bold mb-2 text-white'>Create New Quiz</h1>
+        <div className='text-white'>Set up a new quiz for your students</div>
       </header>
       <div className='bg-card p-4 rounded-sm mb-4 border border-gray-300'>
         <div className="space-y-6">
@@ -360,7 +360,7 @@ const CreateQuizzes = () => {
           disabled={!newQuiz.title || !newQuiz.course || questions.length === 0}
           className='cursor-pointer'
         >
-          Create Quiz
+          Create quiz
         </Button>
       </div>
 

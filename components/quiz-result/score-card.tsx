@@ -4,13 +4,13 @@ import { Trophy, Target, TrendingUp } from 'lucide-react';
 
 interface ScoreCardProps {
   score: number;
-  totalPoints: number;
+  total_points: number;
   percentage: number;
   passingPercentage: number;
   classAverage: number;
 }
 
-export default function ScoreCard({ score, totalPoints, percentage, passingPercentage, classAverage }: ScoreCardProps) {
+export default function ScoreCard({ score, total_points, percentage, passingPercentage, classAverage }: ScoreCardProps) {
   const isPassed = percentage >= passingPercentage;
   const performanceLevel = percentage >= 90 ? 'Excellent' : percentage >= 80 ? 'Good' : percentage >= 70 ? 'Average' : 'Needs Improvement';
 
@@ -25,7 +25,7 @@ export default function ScoreCard({ score, totalPoints, percentage, passingPerce
       <CardContent className="space-y-4 sm:space-y-6">
         <div className="text-center">
           <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-            {score}<span className="text-xl sm:text-2xl text-muted-foreground">/{totalPoints}</span>
+            {score}<span className="text-xl sm:text-2xl text-muted-foreground">/{total_points}</span>
           </div>
           <div className={`text-xl sm:text-2xl font-semibold ${isPassed ? 'text-green-600' : 'text-red-600'}`}>
             {percentage}%

@@ -86,8 +86,8 @@ export function QuizTakingPage({ quizId, attemptId }: QuizTakingPageProps) {
     fetchData()
   }, [quizId, attemptId, router])
 
-  const handleAnswerChange = async (questionId: number, answer: string | number) => {
-    const newAnswers = { ...answers, [questionId]: answer } // object
+  const handleAnswerChange = async (question_id: number, answer: string | number) => {
+    const newAnswers = { ...answers, [question_id]: answer } // object
     setAnswers(newAnswers)
 
     if (attemptId) {

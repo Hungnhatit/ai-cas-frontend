@@ -115,7 +115,7 @@ const QuizResultDetail = ({ quiz_id, quizAttempt_id }: QuizResultDetailProps) =>
   const skippedQuestions = totalQuestions - correctAnswers - incorrectAnswers;
 
   const score = attempt.score || 0;
-  const percentage = Math.round((score / quiz.totalPoints) * 100);
+  const percentage = Math.round((score / quiz.total_points) * 100);
   const passingPercentage = 70;
   const isPassed = percentage >= passingPercentage;
 
@@ -374,7 +374,7 @@ const QuizResultDetail = ({ quiz_id, quizAttempt_id }: QuizResultDetailProps) =>
                 <div className="space-y-6">
                   <ScoreCard
                     score={score}
-                    totalPoints={quiz.totalPoints}
+                    total_points={quiz.total_points}
                     percentage={percentage}
                     passingPercentage={passingPercentage}
                     classAverage={76}

@@ -1,8 +1,8 @@
 import { api } from '@/lib/axios';
 import axios from 'axios';
 export const authService = {
-  login: async (email: string, password: string) => {
-    const res = await api.post(`/auth/login`, { email, password });
+  login: async (email: string, mat_khau: string) => {
+    const res = await api.post(`/auth/login`, { email, mat_khau });
     console.log(res);
     return res.data;
   },

@@ -1,15 +1,18 @@
 export interface Assignment {
-  asignment_id: number
+  assignment_id: number
   title: string
   course_id: number
-  instructor_id: number
+  ma_giang_vien: number
   student_ids: number
   description: string
   dueDate: string
   status: "pending" | "submitted" | "graded"
   grade?: number
   submissionDate?: string,
-  attachments?: []
+  attachments?: [],
+  total_points: number
+  submissionsCount: number,
+  courseCode: string
   feedback?: string
   createdAt: string
   updatedAt: string
@@ -18,7 +21,7 @@ export interface Assignment {
 export interface AssignmentFormData {
   title: string
   course_id: number
-  instructor_id: number
+  ma_giang_vien: number
   student_ids: number[]
   description: string
   dueDate: string

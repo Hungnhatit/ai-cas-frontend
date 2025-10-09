@@ -13,7 +13,7 @@ interface QuestionCardProps {
   question: Question;
   questionIndex: number;
   onQuestionChange: (question: Question) => void;
-  onDeleteQuestion: (questionId: string) => void;
+  onDeleteQuestion: (question_id: string) => void;
 }
 
 export default function QuestionCard({

@@ -8,15 +8,16 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Save } from 'lucide-react';
-import { Question, Test } from '@/types/test';
+import { Test } from '@/types/test';
 import React, { useEffect } from 'react'
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { api, Course, Quiz, QuizQuestion } from '@/services/api'
 import { useRouter } from 'next/navigation'
-import { quizService } from '@/services/quizService'
 import { useAuth } from '@/providers/auth-provider'
-import toast from 'react-hot-toast'
+import toast from 'react-hot-toast';
+import { TestQuestion } from '@/types/interface/test';
+import { testService } from '@/services/test/testService';
 
 const CreateTestPage = () => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([])
@@ -31,8 +32,18 @@ const CreateTestPage = () => {
     description: "",
     duration: 30,
     attempts: 3,
+  });
+
+  const [newTest, setNewTest] = useState({
+    tieu_de: '',
+    mo_ta: '',
+    thoi_luong: 30,
+    tong_diem: 0,
+    so_lan_lam_toi_da: 1,
+    do_kho: '',
+    trang_thai: '',
   })
-  const [questions, setQuestions] = useState<Partial<QuizQuestion>[]>([])
+  const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([])
   const router = useRouter();
 
   useEffect(() => {
@@ -55,17 +66,17 @@ const CreateTestPage = () => {
     setQuestions([
       ...questions,
       {
-        id: `q${questions.length + 1}`,
-        question: "",
-        type: "multiple-choice",
-        options: ["", "", "", ""],
-        correctAnswer: 0,
-        points: 10,
+        ma_cau_hoi: questions.length + 1,
+        cau_hoi: "",
+        loai: "trac_nghiem",
+        lua_chon: ["", "", "", ""],
+        dap_an_dung: 0,
+        diem: 10,
       },
     ])
   }
 
-  const updateQuestion = (index: number, updates: Partial<QuizQuestion>) => {
+  const updateQuestion = (index: number, updates: Partial<TestQuestion>) => {
     setQuestions(questions.map((q, i) => (
       i === index
         ? { ...q, ...updates }
@@ -77,27 +88,38 @@ const CreateTestPage = () => {
   }
 
   // handle create quiz when submit
-  const handleCreateQuiz = async () => {
+  const handleCreateTest = async () => {
     try {
-      const total_points = questions.reduce((sum, q) => sum + (q.points || 0), 0)
-      const quizData = {
-        ...newQuiz,
-        instructor_id: user?.user_id,
-        questions: questions as QuizQuestion[],
-        total_points,
-        status: "draft" as const,
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 7 days from now
+      const total_points = questions.reduce((sum, q) => sum + (q.diem || 0), 0)
+      // const quizData = {
+      //   ...newQuiz,
+      //   ma_giang_vien: user?.ma_nguoi_dung,
+      //   tong_diem,
+      //   status: "draft" as const,
+      //   dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 7 days from now
+      // }
+
+      const testData = {
+        ...newTest,
+        ma_giang_vien: user?.ma_nguoi_dung,
+        cau_hoi: questions as TestQuestion[],
+        tong_diem: total_points,
+        trang_thai: 'ban_nhap' as const,
+        ngay_ket_thuc: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')
       }
 
-      console.log("[v0] Creating quiz:", quizData)
-      const res = await quizService.createQuiz(quizData);
-      // In a real app, you would call api.createQuiz(quizData)
+      // console.log("[v0] Creating quiz:", quizData)
+      console.log("[v0] Creating test:", testData)
+      const res = await testService.createTest(testData);
+      console.log(res);
 
-      setIsCreateDialogOpen(false)
-      setNewQuiz({ title: "", course: "", description: "", duration: 30, attempts: 3 })
-      setQuestions([]);
-      toast.success('Quiz has been created successfully!');
-      router.push('/quizzes');
+      if (res.status) {
+        setIsCreateDialogOpen(false)
+        setNewTest({ ...newTest, tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 });
+        setQuestions([]);
+        toast.success('Test has been created successfully!');
+        window.history.back();
+      }
     } catch (error) {
       console.error("Failed to create quiz:", error)
     }
@@ -147,7 +169,7 @@ const CreateTestPage = () => {
 
     <div className=" overflow-y-auto mb-4">
       {/* new quizz section */}
-      <Button onClick={() => router.push('/manage-quizzes')} className='mb-4 cursor-pointer'>
+      <Button onClick={() => window.history.back()} className='mb-4 cursor-pointer'>
         <ArrowLeft />
         Back
       </Button>
@@ -162,15 +184,15 @@ const CreateTestPage = () => {
               <Label className='mb-2' htmlFor="quiz-title">Test Title</Label>
               <Input
                 id="quiz-title"
-                value={newQuiz.title}
-                onChange={(e) => setNewQuiz({ ...newQuiz, title: e.target.value })}
+                value={newTest.tieu_de}
+                onChange={(e) => setNewTest({ ...newTest, tieu_de: e.target.value })}
                 placeholder="Enter test title"
                 className="rounded-sm h-12 text-base border-gray-300 shadow-none"
               />
             </div>
-            <div>
+            {/* <div>
               <Label className='mb-2' htmlFor="quiz-course">Course</Label>
-              <Select value={newQuiz.course} onValueChange={(value) => setNewQuiz({ ...newQuiz, course: value })}>
+              <Select value={newTest.course} onValueChange={(value) => setNewTest({ ...newTest, course: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select course" />
                 </SelectTrigger>
@@ -182,15 +204,15 @@ const CreateTestPage = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
           </div>
 
           <div>
             <Label className='mb-2' htmlFor="quiz-description">Description</Label>
             <Textarea
               id="quiz-description"
-              value={newQuiz.description}
-              onChange={(e) => setNewQuiz({ ...newQuiz, description: e.target.value })}
+              value={newTest.mo_ta}
+              onChange={(e) => setNewTest({ ...newTest, mo_ta: e.target.value })}
               placeholder="Describe what this quiz covers"
               className="rounded-sm text-base border-gray-300 shadow-none"
             />
@@ -202,8 +224,8 @@ const CreateTestPage = () => {
               <Input
                 id="quiz-duration"
                 type="number"
-                value={newQuiz.duration}
-                onChange={(e) => setNewQuiz({ ...newQuiz, duration: Number.parseInt(e.target.value) })}
+                value={newTest.thoi_luong}
+                onChange={(e) => setNewTest({ ...newTest, thoi_luong: Number.parseInt(e.target.value) })}
                 min="5"
                 max="180"
                 className="rounded-sm h-12 text-base border-gray-300 shadow-none"
@@ -214,8 +236,8 @@ const CreateTestPage = () => {
               <Input
                 id="quiz-attempts"
                 type="number"
-                value={newQuiz.attempts}
-                onChange={(e) => setNewQuiz({ ...newQuiz, attempts: Number.parseInt(e.target.value) })}
+                value={newTest.so_lan_lam_toi_da}
+                onChange={(e) => setNewTest({ ...newTest, so_lan_lam_toi_da: Number.parseInt(e.target.value) })}
                 min="1"
                 max="10"
                 className="rounded-sm h-12 text-base border-gray-300 shadow-none"
@@ -263,8 +285,8 @@ const CreateTestPage = () => {
               <div>
                 <Label className="mb-3">Question Text</Label>
                 <Textarea
-                  value={question.question}
-                  onChange={(e) => updateQuestion(index, { question: e.target.value })}
+                  value={question.cau_hoi}
+                  onChange={(e) => updateQuestion(index, { cau_hoi: e.target.value })}
                   placeholder="Enter your question"
                   className="rounded-sm text-base border-gray-300 shadow-none"
                 />
@@ -274,11 +296,11 @@ const CreateTestPage = () => {
                 <div>
                   <Label className='mb-3'>Question Type</Label>
                   <Select
-                    value={question.type}
+                    value={question.loai}
                     onValueChange={(value) =>
                       updateQuestion(index, {
-                        type: value as QuizQuestion["type"],
-                        options: value === "multiple-choice" ? ["", "", "", ""] : undefined,
+                        loai: value as TestQuestion["loai"],
+                        lua_chon: value === "trac_nghiem" ? ["", "", "", ""] : undefined,
                       })
                     }
                   >
@@ -286,9 +308,9 @@ const CreateTestPage = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
-                      <SelectItem value="true-false">True/False</SelectItem>
-                      <SelectItem value="short-answer">Short Answer</SelectItem>
+                      <SelectItem value="trac_nghiem">Multiple Choice</SelectItem>
+                      <SelectItem value="dung_sai">True/False</SelectItem>
+                      <SelectItem value="tra_loi_ngan">Short Answer</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -296,8 +318,8 @@ const CreateTestPage = () => {
                   <Label className='mb-3'>Points</Label>
                   <Input
                     type="number"
-                    value={question.points}
-                    onChange={(e) => updateQuestion(index, { points: Number.parseInt(e.target.value) })}
+                    value={question.diem}
+                    onChange={(e) => updateQuestion(index, { diem: Number.parseInt(e.target.value) })}
                     min="1"
                     max="50"
                     className="rounded-sm h-12 text-base border-gray-300 shadow-none"
@@ -305,21 +327,21 @@ const CreateTestPage = () => {
                 </div>
               </div>
 
-              {question.type === "multiple-choice" && (
+              {question.loai === "trac_nghiem" && (
                 <div>
                   <Label className='mb-3'>Answer Options</Label>
                   <div className="space-y-2">
                     <RadioGroup
-                      value={question.correctAnswer?.toString()}
+                      value={question.dap_an_dung?.toString()}
                       onValueChange={(value) =>
-                        updateQuestion(index, { correctAnswer: Number.parseInt(value) })
+                        updateQuestion(index, { dap_an_dung: Number.parseInt(value) })
                       }
                     >
-                      {question.options?.map((option, optionIndex) => {
-                        const isSelected = question.correctAnswer === optionIndex;
+                      {question.lua_chon?.map((option, optionIndex) => {
+                        const isSelected = question.dap_an_dung === optionIndex;
                         return (
                           <div key={optionIndex} className={`flex items-center space-x-2 rounded-md cursor-pointer`}
-                            onClick={() => updateQuestion(index, { correctAnswer: optionIndex })}
+                            onClick={() => updateQuestion(index, { dap_an_dung: optionIndex })}
                           >
                             <RadioGroupItem
                               value={optionIndex.toString()}
@@ -327,12 +349,12 @@ const CreateTestPage = () => {
                             <Input
                               value={option}
                               onChange={(e) => {
-                                const newOptions = [...(question.options || [])]
+                                const newOptions = [...(question.lua_chon || [])]
                                 newOptions[optionIndex] = e.target.value
-                                updateQuestion(index, { options: newOptions })
+                                updateQuestion(index, { lua_chon: newOptions })
                               }}
                               placeholder={`Option ${optionIndex + 1}`}
-                              className={`flex-1 rounded-sm h-12 text-black border-gray-300 shadow-none cursor-pointer ${isSelected ? "bg-blue-100 border border-blue-500" : "border border-gray-300"}`}
+                              className={`flex-1 rounded-sm h-12 text-black border-gray-300 shadow-none cursor-pointer ${isSelected ? "bg-blue-50 border border-blue-500" : "border border-gray-300"}`}
                             />
                             {isSelected && (
                               <span className="ml-2 text-sm font-semibold text-sky-600">
@@ -347,13 +369,13 @@ const CreateTestPage = () => {
                 </div>
               )}
 
-              {question.type === "true-false" && (
+              {question.loai === "dung_sai" && (
                 <div>
                   <Label className='mb-3'>Correct Answer</Label>
                   <RadioGroup
-                    value={question.correctAnswer?.toString()}
+                    value={question.dap_an_dung?.toString()}
                     onValueChange={(value) =>
-                      updateQuestion(index, { correctAnswer: Number.parseInt(value) })
+                      updateQuestion(index, { dap_an_dung: Number.parseInt(value) })
                     }
                   >
                     <div className="flex items-center space-x-2">
@@ -368,12 +390,12 @@ const CreateTestPage = () => {
                 </div>
               )}
 
-              {question.type === "short-answer" && (
+              {question.loai === "tra_loi_ngan" && (
                 <div>
                   <Label className='mb-3'>Correct Answer</Label>
                   <Input
-                    value={question.correctAnswer?.toString()}
-                    onChange={(e) => updateQuestion(index, { correctAnswer: e.target.value })}
+                    value={question.dap_an_dung?.toString()}
+                    onChange={(e) => updateQuestion(index, { dap_an_dung: e.target.value })}
                     placeholder="Enter the correct answer"
                   />
                 </div>
@@ -388,11 +410,11 @@ const CreateTestPage = () => {
           Cancel
         </Button>
         <Button
-          onClick={handleCreateQuiz}
-          disabled={!newQuiz.title || !newQuiz.course || questions.length === 0}
+          onClick={handleCreateTest}
+          disabled={!newTest.tieu_de || questions.length === 0}
           className='cursor-pointer'
         >
-          Create quiz
+          Create test
         </Button>
       </div>
     </div>

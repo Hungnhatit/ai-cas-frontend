@@ -182,7 +182,7 @@ export function QuizzesPage() {
                       </div>
                       <div className="flex items-center gap-1">
                         <Trophy className="h-4 w-4" />
-                        {quiz.totalPoints} pts
+                        {quiz.total_points} pts
                       </div>
                     </div>
 
@@ -215,7 +215,7 @@ export function QuizzesPage() {
 
                 if (!quiz) return null
 
-                const scorePercentage = attempt.score ? Math.round((attempt.score / quiz.totalPoints) * 100) : 0
+                const scorePercentage = attempt.score ? Math.round((attempt.score / quiz.total_points) * 100) : 0
 
                 return (
                   <Card key={attempt.quizAttempt_id} className="hover:shadow-md transition-shadow">
@@ -232,7 +232,7 @@ export function QuizzesPage() {
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Score:</span>
                         <span className="font-medium">
-                          {attempt.score}/{quiz.totalPoints} points
+                          {attempt.score}/{quiz.total_points} points
                         </span>
                       </div>
 

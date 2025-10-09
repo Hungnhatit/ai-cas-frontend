@@ -119,7 +119,7 @@ export function CoursesPage() {
       </div>
 
       {/* Enrolled Courses */}
-      {user?.role === "student" && enrolledCourses.length > 0 && (
+      {user?.vai_tro === "student" && enrolledCourses.length > 0 && (
         <div>
           <h2 className="text-xl font-semibold mb-4">My Courses</h2>
           zsdfzd
@@ -164,7 +164,7 @@ export function CoursesPage() {
       {/* Available Courses */}
       <div>
         <h2 className="text-xl font-semibold mb-4">
-          {user?.role === "student" ? "Discover More Courses" : "All Courses"}
+          {user?.vai_tro === "student" ? "Discover More Courses" : "All Courses"}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredCourses.map((course) => (

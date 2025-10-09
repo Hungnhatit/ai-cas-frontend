@@ -8,7 +8,7 @@ interface User {
   user_id: number
   email: string
   name: string
-  role: "student" | "instructor" | "admin"
+  vai_tro: "student" | "instructor" | "admin"
   avatar?: string
 }
 
@@ -16,7 +16,7 @@ interface AuthContextType {
   user: User | null
   login: (email: string, password: string) => Promise<void>
   logout: () => void
-  register: (email: string, password: string, name: string, role: string) => Promise<void>
+  register: (email: string, password: string, name: string, vai_tro: string) => Promise<void>
   loading: boolean
 }
 
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     //   user_id: "1",
     //   email,
     //   name: email.split("@")[0],
-    //   role: email.includes("admin") ? "admin" : email.includes("instructor") ? "instructor" : "student",
+    //   vai_tro: email.includes("admin") ? "admin" : email.includes("instructor") ? "instructor" : "student",
     //   avatar: `/placeholder.svg?height=40&width=40&query=avatar`,
     // }
     // setUser(mockUser)
@@ -61,14 +61,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const register = async (email: string, password: string, name: string, role: string) => {
+  const register = async (email: string, mat_khau: string, ten: string, vai_tro: string) => {
     setLoading(true);
     try {
       const res = await authService.register({
         email,
-        password,
-        name,
-        role: role as 'student' | 'instructor' | 'admin'
+        mat_khau,
+        ten,
+        vai_tro: vai_tro as 'student' | 'instructor' | 'admin'
       });
 
       const { user, token } = res;

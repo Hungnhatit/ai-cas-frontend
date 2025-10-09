@@ -18,7 +18,6 @@ import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/auth-provider'
 import { quizService } from '@/services/quizService';
 import { studentService } from '@/services/studentService';
-import { Checkbox } from '@radix-ui/react-checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
 interface QuizEditorProp {
@@ -157,12 +156,12 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
   // handle create quiz when submit
   const handleCreateQuiz = async () => {
     try {
-      const totalPoints = questions.reduce((sum, q) => sum + (q.points || 0), 0)
+      const total_points = questions.reduce((sum, q) => sum + (q.points || 0), 0)
       const quizData = {
         ...newQuiz,
-        instructor_id: user?.user_id,
+        ma_giang_vien: user?.user_id,
         questions: questions as QuizQuestion[],
-        totalPoints,
+        total_points,
         status: "draft" as const,
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 7 days from now
       }
@@ -183,12 +182,12 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
 
   const handleUpdateQuiz = async () => {
     try {
-      const totalPoints = quizzes.quiz_questions.reduce((sum, q) => sum + (q.points || 0), 0)
+      const total_points = quizzes.quiz_questions.reduce((sum, q) => sum + (q.points || 0), 0)
       const updatedData = {
         ...newQuiz,
-        instructor_id: user?.user_id,
+        ma_giang_vien: user?.user_id,
         questions: questions as QuizQuestion[],
-        totalPoints,
+        total_points,
         status: 'active',
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
           .toISOString().split('T')[0]
@@ -278,25 +277,25 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
   //   }
   // };
 
-  const totalPoints = quizzes?.quiz_questions?.reduce((sum, question) => sum + (question.points || 0), 0);
+  const total_points = quizzes?.quiz_questions?.reduce((sum, question) => sum + (question.points || 0), 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border py-2 border-gray-300 sticky top-0 z-10 mb-4">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-[#232f3e] border py-2 border-gray-300 sticky top-0 z-10 mb-4">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8  py-2">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className='cursor-pointer'
+              <Button variant="ghost" size="sm" className='cursor-pointer flex items-center justify-center hover:bg-gray-600'
                 // handle cancel
                 onClick={() => router.push('/manage-quizzes')}
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                <ArrowLeft className="h-4 w-4 mr-2" color='white' />
+                <span className='text-white'>Back</span>
               </Button>
               <div>
                 <div className='flex items-center'>
-                  <h1 className="text-xl font-semibold text-gray-900 mr-2">{quizzes?.title}</h1>
+                  <h1 className="text-xl font-semibold text-white mr-2">{quizzes?.title}</h1>
                   {quizzes.status === 'active'
                     ? (
                       <Badge className={cn('bg-blue-500')}>
@@ -310,8 +309,8 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
                     )}
 
                 </div>
-                <p className="text-sm text-gray-500">
-                  {quizzes?.quiz_questions?.length} question{quizzes?.quiz_questions?.length !== 1 ? 's' : ''} • {totalPoints} points total
+                <p className="text-sm text-white">
+                  {quizzes?.quiz_questions?.length} question{quizzes?.quiz_questions?.length !== 1 ? 's' : ''} • {total_points} points total
                 </p>
               </div>
             </div>
@@ -345,7 +344,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
       </div>
 
       {/* quiz info */}
-      <div className='bg-card p-4 rounded-sm mb-4 border border-gray-300'>
+      <div className='bg-card p-4 rounded-xs shadow-sm mb-4 border border-gray-300'>
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -355,6 +354,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
                 value={newQuiz.title}
                 onChange={(e) => setNewQuiz({ ...newQuiz, title: e.target.value })}
                 placeholder="Enter quiz title"
+                className="rounded-sm h-12 text-base border-gray-400/70 shadow-none"
               />
             </div>
             <div>
@@ -381,6 +381,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
               value={newQuiz.description}
               onChange={(e) => setNewQuiz({ ...newQuiz, description: e.target.value })}
               placeholder="Describe what this quiz covers"
+              className="rounded-sm h-12 text-base border-gray-400/70 shadow-none"
             />
           </div>
 
@@ -394,6 +395,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
                 onChange={(e) => setNewQuiz({ ...newQuiz, duration: Number.parseInt(e.target.value) })}
                 min="5"
                 max="180"
+                className="rounded-sm h-12 text-base border-gray-400/80 shadow-none"
               />
             </div>
             <div>
@@ -405,6 +407,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
                 onChange={(e) => setNewQuiz({ ...newQuiz, attempts: Number.parseInt(e.target.value) })}
                 min="1"
                 max="10"
+                className="rounded-sm h-12 text-base border-gray-400/80 shadow-none"
               />
             </div>
           </div>
@@ -412,7 +415,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
       </div>
 
       {/* assign quiz section */}
-      <div className='bg-card p-4 rounded-sm mb-4 border border-gray-300'>
+      <div className='bg-card p-4 rounded-xs shadow-sm mb-4 border border-gray-300'>
         <div className="flex items-center justify-between mb-3">
           <Label className='text-xl font-bold'>Assign to</Label>
         </div>
@@ -460,7 +463,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
       </div>
 
       {/* question section */}
-      <div className='bg-card p-4 rounded-sm mb-4 border border-gray-300'>
+      <div className='bg-card p-4 rounded-xs shadow-sm mb-4 border border-gray-300'>
         <div className="flex items-center justify-between">
           <Label className='text-xl font-bold'>Questions</Label>
           <Button type="button" variant="outline" onClick={addQuestion} className='cursor-pointer'>
@@ -472,7 +475,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
         <div className="space-y-4 mt-3">
           <div className='grid lg:grid-cols-2 gap-4'>
             {questions.map((question, index) => (
-              <Card key={index} className='gap-4'>
+              <Card key={index} className='gap-4 shadow-none border-gray-300'>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">Question {index + 1}</CardTitle>
@@ -521,6 +524,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
                         onChange={(e) => updateQuestion(index, { points: Number.parseInt(e.target.value) })}
                         min="1"
                         max="50"
+
                       />
                     </div>
                   </div>

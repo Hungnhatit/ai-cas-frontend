@@ -37,8 +37,8 @@ export const quizService = {
     return res.data.data;
   },
 
-  getQuizByInstructorId: async (instructor_id: number) => {
-    const res = await api.get(`/quizzes/instructor/${instructor_id}`, {
+  getQuizByInstructorId: async (ma_giang_vien: number) => {
+    const res = await api.get(`/quizzes/instructor/${ma_giang_vien}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

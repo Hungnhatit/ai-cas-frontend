@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const { user } = useAuth()
 
   const renderDashboard = () => {
-    switch (user?.role) {
+    switch (user?.vai_tro) {
       case "admin":
         return <AdminDashboard />
       case "instructor":

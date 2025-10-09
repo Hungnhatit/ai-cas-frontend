@@ -19,6 +19,7 @@ import {
   Award,
   Video,
   HelpCircle,
+  BookType,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -68,6 +69,11 @@ const navItems: NavItem[] = [
     icon: MessageSquare,
   },
   {
+    title: 'Test',
+    href: '/tests',
+    icon: BookType
+  },
+  {
     title: "Assignments",
     href: "/assignments",
     icon: FileText,
@@ -82,6 +88,7 @@ const navItems: NavItem[] = [
     title: "Quizzes",
     href: "/quizzes",
     icon: HelpCircle,
+    roles: ['student', 'admin'] //temporary hide quizzes for instructor
   },
   {
     title: "Manage Quizzes",
@@ -124,7 +131,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const { user } = useAuth()
   const isMobile = useIsMobile()
 
-  const filteredNavItems = navItems.filter((item) => !item.roles || item.roles.includes(user?.role || "student"))
+  const filteredNavItems = navItems.filter((item) => !item.roles || item.roles.includes(user?.vai_tro || "student"))
 
   const NavigationContent = () => (
     <nav className="flex-1 px-2 py-4">

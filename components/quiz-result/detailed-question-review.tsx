@@ -30,12 +30,12 @@ interface DetailedQuestionReviewProps {
 export default function DetailedQuestionReview({ questions, showExplanations }: DetailedQuestionReviewProps) {
   const [openQuestions, setOpenQuestions] = useState<Set<number>>(new Set());
 
-  const toggleQuestion = (questionId: number) => {
+  const toggleQuestion = (question_id: number) => {
     const newOpenQuestions = new Set(openQuestions);
-    if (newOpenQuestions.has(questionId)) {
-      newOpenQuestions.delete(questionId);
+    if (newOpenQuestions.has(question_id)) {
+      newOpenQuestions.delete(question_id);
     } else {
-      newOpenQuestions.add(questionId);
+      newOpenQuestions.add(question_id);
     }
     setOpenQuestions(newOpenQuestions);
   };

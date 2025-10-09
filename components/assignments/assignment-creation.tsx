@@ -1,4 +1,5 @@
 'use client'
+import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,30 +9,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Calendar, CalendarDays, FileText, GraduationCap, User, Users, Upload, AlertCircle, Check, ChevronDown } from 'lucide-react'
-import FormField from './assignment-form-field'
-
-import { AssignmentFormData } from '@/types/interfaces/assignment';
+import { AssignmentFormData } from '@/types/interface/assignment';
 import { useAuth } from '@/providers/auth-provider'
-import { api, Student } from '@/services/api'
+import { Student } from '@/types/interface/model';
 import { studentService } from '@/services/studentService'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
-import { cn } from '@/lib/utils';
-import toast from 'react-hot-toast'
 import { assignmentService } from '@/services/assignmentService'
+import FormField from './assignment-form-field'
+import toast from 'react-hot-toast'
+import { fileService } from '@/services/fileService';
+import { useRouter } from 'next/navigation';
 
 const AssignmentForm = () => {
   const [formData, setFormData] = useState<AssignmentFormData>({
-    title: '',
-    course_id: 0,
-    instructor_id: 0,
-    student_ids: [],
-    description: '',
-    dueDate: '',
-    status: 'pending',
-    grade: undefined,
-    submissionDate: '',
-    attachments: [],
-    feedback: ''
+    tieu_de: '',
+    ma_khoa_hoc: 0,
+    ma_giang_vien: 0,
+    danh_sach_ma_hoc_vien: [],
+    mo_ta: '',
+    han_nop: '',
+    trang_thai: 'pending',
+    tong_diem: 0,
+    ngay_nop: '',
+    dinh_kem: [],
+    phan_hoi: ''
   })
 
   const [errors, setErrors] = useState<Partial<Record<keyof AssignmentFormData, string>>>({})
@@ -40,36 +41,41 @@ const AssignmentForm = () => {
   const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
   const [searchStudent, setSearchStudent] = useState('');
   const { user } = useAuth(); // get user from auth provider
-  console.log(formData)
+
+  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<FileList | null>(null);
+  const [result, setResult] = useState<any>(null);
+  const router = useRouter();
+
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof AssignmentFormData, string>> = {}
 
-    if (!formData.title.trim()) {
-      newErrors.title = 'Assignment title is required'
+    if (!formData.tieu_de.trim()) {
+      newErrors.tieu_de = 'Assignment title is required'
     }
 
-    if (formData.course_id <= 0) {
-      newErrors.course_id = 'Course ID must be a positive number'
+    if (formData.ma_khoa_hoc <= 0) {
+      newErrors.ma_khoa_hoc = 'Course ID must be a positive number'
     }
 
-    if (formData.instructor_id <= 0) {
-      newErrors.instructor_id = 'Instructor ID must be a positive number'
+    if (formData.ma_giang_vien <= 0) {
+      newErrors.ma_giang_vien = 'Instructor ID must be a positive number'
     }
 
     // if (formData.student_id <= 0) {
     //   newErrors.student_id = 'Student ID must be a positive number'
     // }
 
-    if (!formData.description.trim()) {
-      newErrors.description = 'Assignment description is required'
+    if (!formData.mo_ta.trim()) {
+      newErrors.mo_ta = 'Assignment description is required'
     }
 
-    if (!formData.dueDate) {
-      newErrors.dueDate = 'Due date is required'
+    if (!formData.han_nop) {
+      newErrors.han_nop = 'Due date is required'
     }
 
-    if (formData.status === 'graded' && (formData.grade === undefined || formData.grade < 0 || formData.grade > 100)) {
-      newErrors.grade = 'Grade must be between 0 and 100 when status is graded'
+    if (formData.trang_thai === 'graded' && (formData.tong_diem === undefined || formData.tong_diem < 0 || formData.tong_diem > 100)) {
+      newErrors.tong_diem = 'Grade must be between 0 and 100 when status is graded'
     }
 
     setErrors(newErrors)
@@ -96,9 +102,10 @@ const AssignmentForm = () => {
     const fetchStudent = async () => {
       try {
         const [getStudents] = await Promise.all([
-          studentService.getStudentByInstructorId(user?.user_id)
+          studentService.getStudentByInstructorId(user?.ma_nguoi_dung)
         ]);
-        setStudents(getStudents.data.instructor.students);
+        console.log(getStudents);
+        setStudents(getStudents.data.instructor.hoc_vien);
       } catch (error) {
         console.log(error);
       }
@@ -107,8 +114,10 @@ const AssignmentForm = () => {
 
   }, [user?.user_id]);
 
+  console.log(students);
+
   useEffect(() => {
-    handleInputChange('student_id', selectedStudents);
+    handleInputChange('danh_sach_ma_hoc_vien', selectedStudents);
   }, [selectedStudents]);
 
   const toggleStudent = (id: number) => {
@@ -121,7 +130,7 @@ const AssignmentForm = () => {
     if (selectedStudents.length === students.length) {
       setSelectedStudents([]); // clear
     } else {
-      setSelectedStudents(students.map((s) => s.student_id))
+      setSelectedStudents(students.map((s) => s.ma_hoc_vien))
     }
   }
 
@@ -131,8 +140,8 @@ const AssignmentForm = () => {
     )
   }
 
-  const filtered = students.filter((s) =>
-    s.name.toLowerCase().includes(searchStudent.toLowerCase())
+  const filtered = students?.filter((s) =>
+    s.ten.toLowerCase().includes(searchStudent.toLowerCase())
   )
 
   const placeholder =
@@ -145,54 +154,84 @@ const AssignmentForm = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     setAttachments(files)
-    handleInputChange('attachments', files)
+    handleInputChange('dinh_kem', files)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('handle submit');
+    e.preventDefault();
+
     try {
       if (!validateForm()) {
-        toast.error(`Please fix the errors in the form: ${errors}`);
-        console.log(errors)
-        return
+        toast.error("Please fix the errors in the form.");
+        return;
       }
 
-      const now = new Date().toISOString()
+      // 1. Upload files trước nếu có
+      let uploadedFiles: {
+        url: string;
+        name: string
+      }[] = []
+      if (attachments.length > 0) {
+        uploadedFiles = await Promise.all(
+          attachments.map(async (file) => {
+            try {
+              const res = await fileService.fileUploadService(file);
+              console.log(res.data)
+              return {
+                url: res.data.url,
+                name: res.data.name || file.name
+              };
+            } catch (err) {
+              console.error("File upload failed:", err);
+              toast.error(`Failed to upload file: ${file.name}`);
+              return null;
+            }
+          })
+        );
+        // filter error upload files
+        uploadedFiles = uploadedFiles.filter((f): f is { url: string; name: string } => f !== null);
+      }
+
+      const now = new Date().toISOString();
       const assignment = {
         ...formData,
-        asignment_id: Date.now(), // Generate a temporary ID
-        createdAt: now,
-        updatedAt: now,
-        attachments: attachments
+        ma_bai_tap: Date.now(), // Generate a temporary ID
+        ngay_tao: now,
+        ngay_cap_nhat: now,
+        ma_sinh_vien: selectedStudents, // đảm bảo gửi đúng student_ids array
+        dinh_kem: uploadedFiles, // đã convert sang url
+      };
+
+      const res = await assignmentService.createAssignment(assignment);
+      if (res.success) {
+        toast.success("Assignment created successfully!");
+        // reset form data
+        setFormData({
+          tieu_de: "",
+          ma_khoa_hoc: 0,
+          ma_giang_vien: 0,
+          danh_sach_ma_hoc_vien: [],
+          mo_ta: "",
+          han_nop: "",
+          trang_thai: "pending",
+          tong_diem: 0,
+          ngay_nop: "",
+          dinh_kem: [],
+          phan_hoi: "",
+        });
+        setAttachments([]);
+        setSelectedStudents([]);
+        router.push('/manage-assignments');
+      } else {
+        toast.error(res.message || "Failed to create assignment.");
       }
-
-      console.log(assignment);
-
-      const res = await assignmentService.createAssignment(assignment)
-      console.log('Assignment created:', assignment)
-      res.success && toast.success('Assignment created successfully!')
-
-      // Reset form
-      setFormData({
-        title: '',
-        course_id: 0,
-        instructor_id: 0,
-        student_ids: [],
-        description: '',
-        dueDate: '',
-        status: 'pending',
-        grade: undefined,
-        submissionDate: '',
-        attachments: [],
-        feedback: ''
-      })
-      setAttachments([]);
-      setSelectedStudents([]);
     } catch (error) {
-      toast.error(`Error when creating assignment: ${error}`);
+      console.error("Create assignment error:", error);
+      toast.error(
+        `Error: ${error instanceof Error ? error.message : JSON.stringify(error)}`
+      );
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -231,19 +270,19 @@ const AssignmentForm = () => {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <FormField label="Assignment Title" required error={errors.title}>
+                <FormField label="Assignment Title" required error={errors.tieu_de}>
                   <Input
                     placeholder="Enter assignment title (e.g., 'Final Project Proposal')"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    value={formData.tieu_de}
+                    onChange={(e) => handleInputChange('tieu_de', e.target.value)}
                     className="rounded-sm h-12 text-base border-gray-400 shadow-none"
                   />
                 </FormField>
 
-                <FormField label="Assignment Status" required error={errors.status}>
+                <FormField label="Assignment Status" required error={errors.trang_thai}>
                   <Select
-                    value={formData.status}
-                    onValueChange={(value) => handleInputChange('status', value as 'pending' | 'submitted' | 'graded')}
+                    value={formData.trang_thai}
+                    onValueChange={(value) => handleInputChange('trang_thai', value as 'pending' | 'submitted' | 'graded')}
                   >
                     <SelectTrigger className="!h-12 cursor-pointer border-gray-300 rounded-sm shadow-none" >
                       <SelectValue placeholder="Select assignment status" />
@@ -283,28 +322,28 @@ const AssignmentForm = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <FormField label="Course ID" required error={errors.course_id}>
+                <FormField label="Course ID" required error={errors.ma_khoa_hoc}>
                   <div className="relative">
                     <FileText className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
                     <Input
                       type="number"
                       placeholder="e.g., 101"
-                      value={formData.course_id || ''}
-                      onChange={(e) => handleInputChange('course_id', parseInt(e.target.value) || 0)}
+                      value={formData.ma_khoa_hoc || ''}
+                      onChange={(e) => handleInputChange('ma_khoa_hoc', parseInt(e.target.value) || 0)}
                       className="rounded-sm pl-10 h-12 border-gray-400 shadow-none"
                       min="1"
                     />
                   </div>
                 </FormField>
 
-                <FormField label="Instructor ID" required error={errors.instructor_id}>
+                <FormField label="Instructor ID" required error={errors.ma_giang_vien}>
                   <div className="relative">
                     <User className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
                     <Input
                       type="number"
                       placeholder="e.g., 2001"
-                      value={formData.instructor_id || ''}
-                      onChange={(e) => handleInputChange('instructor_id', parseInt(e.target.value) || 0)}
+                      value={formData.ma_giang_vien || ''}
+                      onChange={(e) => handleInputChange('ma_giang_vien', parseInt(e.target.value) || 0)}
                       className="rounded-sm pl-10 h-12 border-gray-400 shadow-none"
                       min="1"
                     />
@@ -332,21 +371,21 @@ const AssignmentForm = () => {
                         onClick={selectAll}
                       >
                         <span className='font-medium'>Selected all</span>
-                        {selectedStudents.length === students.length && <Check size={16} />}
+                        {selectedStudents.length === students?.length && <Check size={16} />}
                       </div>
 
                       <div className='w-full max-h-[200px] overflow-y-auto space-y-1'>
-                        {filtered.map((student) => (
+                        {filtered?.map((student) => (
                           <div
-                            key={student.student_id}
+                            key={student.ma_hoc_vien}
                             className={cn(
                               "cursor-pointer flex items-center justify-between p-2 hover:bg-gray-100 rounded transition",
-                              selectedStudents.includes(student.student_id) && 'bg-gray-200'
+                              selectedStudents.includes(student.ma_hoc_vien) && 'bg-gray-200'
                             )}
-                            onClick={() => toggleStudent(student.student_id)}
+                            onClick={() => toggleStudent(student.ma_hoc_vien)}
                           >
-                            <span>{student.name} ({student.email})</span>
-                            {selectedStudents.includes(student.student_id) && <Check size={16} className='ml-2' />}
+                            <span>{student.ten} ({student.email})</span>
+                            {selectedStudents.includes(student.ma_hoc_vien) && <Check size={16} className='ml-2' />}
                           </div>
                         ))}
                       </div>
@@ -363,7 +402,7 @@ const AssignmentForm = () => {
                       type="number"
                       placeholder="e.g., 12345"
                       value={formData.student_id || ''}
-                      onChange={(e) => handleInputChange('student_id', parseInt(e.target.value) || 0)}
+                      onChange={(e) => handleInputChange('student_ids', parseInt(e.target.value) || 0)}
                       className="pl-10 h-12"
                       min="1"
                     />
@@ -409,11 +448,11 @@ const AssignmentForm = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Assignment Details</h3>
               </div>
 
-              <FormField label="Assignment Description" required error={errors.description}>
+              <FormField label="Assignment Description" required error={errors.mo_ta}>
                 <Textarea
                   placeholder="Provide comprehensive instructions, requirements, and expectations for this assignment..."
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  value={formData.mo_ta}
+                  onChange={(e) => handleInputChange('mo_ta', e.target.value)}
                   className="min-h-[150px] resize-none text-base border-gray-400 shadow-none"
                 />
               </FormField>
@@ -429,26 +468,26 @@ const AssignmentForm = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField label="Due Date & Time" required error={errors.dueDate}>
+                <FormField label="Due Date & Time" required error={errors.han_nop}>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
                     <Input
                       type="datetime-local"
-                      value={formData.dueDate}
-                      onChange={(e) => handleInputChange('dueDate', e.target.value)}
+                      value={formData.han_nop}
+                      onChange={(e) => handleInputChange('han_nop', e.target.value)}
                       className="rounded-sm pl-10 h-12 border-gray-400 shadow-none"
                     />
                   </div>
                 </FormField>
 
-                {formData.status === 'submitted' && (
+                {formData.trang_thai === 'submitted' && (
                   <FormField label="Submission Date & Time">
                     <div className="relative">
                       <CalendarDays className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
                       <Input
                         type="datetime-local"
-                        value={formData.submissionDate || ''}
-                        onChange={(e) => handleInputChange('submissionDate', e.target.value)}
+                        value={formData.ngay_nop || ''}
+                        onChange={(e) => handleInputChange('ngay_nop', e.target.value)}
                         className="rounded-sm pl-10 h-12 border-gray-400 shadow-none"
                       />
                     </div>
@@ -458,7 +497,7 @@ const AssignmentForm = () => {
             </div>
 
             {/* Grading Section - Only show when status is graded */}
-            {formData.status === 'graded' && (
+            {formData.trang_thai === 'graded' && (
               <>
                 <Separator />
                 <div className="space-y-6">
@@ -468,12 +507,12 @@ const AssignmentForm = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField label="Grade (0-100)" error={errors.grade}>
+                    <FormField label="Grade (0-100)" error={errors.tong_diem}>
                       <Input
                         type="number"
                         placeholder="Enter grade (0-100)"
-                        value={formData.grade || ''}
-                        onChange={(e) => handleInputChange('grade', parseInt(e.target.value) || undefined)}
+                        value={formData.tong_diem || ''}
+                        onChange={(e) => handleInputChange('tong_diem', parseInt(e.target.value) || undefined)}
                         min="0"
                         max="100"
                         className="rounded-sm h-12 text-base border-gray-400 shadow-none"
@@ -496,8 +535,8 @@ const AssignmentForm = () => {
               <FormField label="Feedback & Comments (Optional)">
                 <Textarea
                   placeholder="Provide feedback, additional instructions, or comments for this assignment..."
-                  value={formData.feedback || ''}
-                  onChange={(e) => handleInputChange('feedback', e.target.value)}
+                  value={formData.phan_hoi || ''}
+                  onChange={(e) => handleInputChange('phan_hoi', e.target.value)}
                   className="min-h-[120px] resize-none text-base border-gray-400 shadow-none"
                 />
               </FormField>
@@ -538,7 +577,7 @@ const AssignmentForm = () => {
                 type="submit"
                 className="w-full md:w-auto cursor-pointer px-6 py-5 text-white rounded-lg transition-all duration-200 hover:shadow-xl text-base"
               >
-                Create ssignment
+                Create assignment
               </Button>
             </div>
           </form>

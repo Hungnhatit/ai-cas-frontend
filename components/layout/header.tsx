@@ -127,7 +127,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                       <p className="text-sm font-medium leading-none">{user?.name}</p>
                       <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                       <Badge variant="secondary" className="w-fit mt-1 capitalize">
-                        {user?.role}
+                        {user?.vai_tro}
                       </Badge>
                     </div>
                   </DropdownMenuLabel>

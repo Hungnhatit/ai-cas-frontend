@@ -33,8 +33,8 @@ export default function QuestionSection({ questions, onQuestionsChange }: Questi
     onQuestionsChange(updatedQuestions);
   };
 
-  const deleteQuestion = (questionId: string) => {
-    const updatedQuestions = questions.filter(q => q.id !== questionId);
+  const deleteQuestion = (question_id: string) => {
+    const updatedQuestions = questions.filter(q => q.id !== question_id);
     onQuestionsChange(updatedQuestions);
   };
 

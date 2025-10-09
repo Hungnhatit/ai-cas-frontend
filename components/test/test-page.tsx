@@ -1,9 +1,9 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
-import { api } from '@/services/testService';
+import { testService } from '@/services/test/testService';
 import Layout from './layout/layout';
 import ProgressBar from '../ui/ProgressBar';
-import { Test, TestSession, UserAnswer } from '@/types/test';
+import { TestSession, UserAnswer } from '@/types/test';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Clock, Send } from 'lucide-react';
@@ -13,9 +13,14 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import ConfirmModal from '../ui/ConfirmModal';
+import { useParams } from 'next/navigation';
+import { Test } from '@/types/interface/test';
 
+interface TestPageProps {
+  test_id: number
+}
 
-const TestPage = () => {
+const TestPage = ({ test_id }: TestPageProps) => {
   const [test, setTest] = useState<Test | null>(null);
   const [session, setSession] = useState<TestSession | null>(null);
   const [answers, setAnswers] = useState<{ [question_id: string]: string | number }>({});
@@ -23,31 +28,32 @@ const TestPage = () => {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const questionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const { id } = useParams();
 
   useEffect(() => {
     const loadTest = async () => {
       try {
         // Get test ID from URL params
         const urlParams = new URLSearchParams(window.location.search);
-        const test_id = urlParams.get('id') || 'test-1';
+        // const ma_bai_kiem_tra = urlParams.get('id') || 'test-1';
 
         // Check for custom tests first
         const customTests = JSON.parse(localStorage.getItem('customTests') || '[]');
-        let testData = customTests.find((t: Test) => t.test_id === test_id);
+        let testData = customTests.find((t: Test) => t.ma_bai_kiem_tra === id);
 
         if (!testData) {
-          testData = await api.getTest(test_id);
+          testData = await testService.getTestById(parseInt(id));
         }
 
         if (!testData) {
           throw new Error('Test not found');
         }
 
-        setTest(testData);
+        setTest(testData.data);
         setTimeRemaining(testData.duration * 60);
 
         const newSession: TestSession = {
-          test_id: testData.id,
+          ma_bai_kiem_tra: testData.id,
           startTime: new Date(),
           answers: [],
           currentQuestionIndex: 0,
@@ -63,6 +69,8 @@ const TestPage = () => {
 
     loadTest();
   }, []);
+
+  console.log(test?.cau_hoi[0].lua_chon);
 
   useEffect(() => {
     if (timeRemaining <= 0 || !session || session.isCompleted) return;
@@ -80,7 +88,7 @@ const TestPage = () => {
     return () => clearInterval(timer);
   }, [timeRemaining, session]);
 
-  const handleAnswerChange = (question_id: string, answer: string | number) => {
+  const handleAnswerChange = (question_id: number, answer: string | number) => {
     setAnswers(prev => ({
       ...prev,
       [question_id]: answer
@@ -97,8 +105,8 @@ const TestPage = () => {
         timeSpent: 0
       }));
 
-      const timeSpent = (test.duration * 60) - timeRemaining;
-      const result = await api.submitTest(test.test_id, userAnswers, timeSpent);
+      const timeSpent = (test.thoi_luong * 60) - timeRemaining;
+      const result = await testService.submitTest(test.ma_bai_kiem_tra, userAnswers, timeSpent);
 
       localStorage.setItem('testResult', JSON.stringify(result));
       window.location.href = '/results';
@@ -107,7 +115,7 @@ const TestPage = () => {
     }
   };
 
-  const scrollToQuestion = (question_id: string) => {
+  const scrollToQuestion = (question_id: number) => {
     const element = questionRefs.current[question_id];
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -131,7 +139,8 @@ const TestPage = () => {
     );
   }
 
-  if (!test || !session) {
+  // if (!test || !session) {
+  if (!test) {
     return (
       <Layout currentPage="test" title="Test Not Found">
         <div className="text-center py-12">
@@ -161,8 +170,8 @@ const TestPage = () => {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="text-2xl">{test.name}</CardTitle>
-                  <p className="text-gray-600 mt-2">{test.description}</p>
+                  <CardTitle className="text-2xl">{test.tieu_de}</CardTitle>
+                  <p className="text-gray-600 mt-2">{test.mo_ta}</p>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2 bg-red-50 px-3 py-2 rounded-lg">
@@ -172,7 +181,7 @@ const TestPage = () => {
                     </span>
                   </div>
                   <Badge variant="secondary">
-                    {test.total_points} Total Points
+                    {test.tong_diem} Total Points
                   </Badge>
                 </div>
               </div>
@@ -180,7 +189,7 @@ const TestPage = () => {
             <CardContent>
               <ProgressBar
                 current={getAnsweredCount()}
-                total={test.questions.length}
+                total={test?.cau_hoi?.length}
                 label="Questions Answered"
               />
             </CardContent>
@@ -188,20 +197,20 @@ const TestPage = () => {
 
           {/* All Questions */}
           <div className="space-y-6">
-            {test.questions.map((question, index) => (
+            {test?.cau_hoi?.map((question, index) => (
               <Card
-                key={question.test_id}
+                key={question.ma_cau_hoi}
                 className="relative"
-                ref={(el) => { questionRefs.current[question.test_id] = el; }}
+                ref={(el) => { questionRefs.current[question.ma_cau_hoi] = el; }}
               >
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-lg">
-                      Question {index + 1} of {test.questions.length}
+                      Question {index + 1} of {test?.cau_hoi?.length}
                     </CardTitle>
                     <div className="flex items-center space-x-2">
-                      <Badge variant="outline">{question.points} points</Badge>
-                      {answers[question.test_id] !== undefined && (
+                      <Badge variant="outline">{question.diem} points</Badge>
+                      {answers[question.ma_cau_hoi] !== undefined && (
                         <Badge variant="default" className="bg-green-100 text-green-800">
                           Answered
                         </Badge>
@@ -212,20 +221,20 @@ const TestPage = () => {
 
                 <CardContent className="space-y-4">
                   <div className="text-gray-900 leading-relaxed font-medium">
-                    {question.question}
+                    {question.cau_hoi}
                   </div>
 
-                  {question.type === 'multiple-choice' && question.options && (
+                  {question.loai === 'trac_nghiem' && question.lua_chon && (
                     <RadioGroup
-                      value={answers[question.test_id]?.toString() || ''}
-                      onValueChange={(value) => handleAnswerChange(question.test_id, parseInt(value))}
+                      value={answers[question.ma_cau_hoi]?.toString() || ''}
+                      onValueChange={(value) => handleAnswerChange(question.ma_cau_hoi, parseInt(value))}
                       className="space-y-3"
                     >
-                      {question.options.map((option, optionIndex) => (
+                      {question.lua_chon.map((option, optionIndex) => (
                         <div key={optionIndex} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-gray-50">
-                          <RadioGroupItem value={optionIndex.toString()} id={`${question.test_id}-option-${optionIndex}`} />
+                          <RadioGroupItem value={optionIndex.toString()} id={`${question.ma_cau_hoi}-option-${optionIndex}`} />
                           <Label
-                            htmlFor={`${question.test_id}-option-${optionIndex}`}
+                            htmlFor={`${question.ma_cau_hoi}-option-${optionIndex}`}
                             className="flex-1 cursor-pointer text-sm leading-relaxed"
                           >
                             {option}
@@ -235,20 +244,20 @@ const TestPage = () => {
                     </RadioGroup>
                   )}
 
-                  {question.type === 'essay' && (
+                  {question.loai === 'tu_luan' && (
                     <div className="space-y-2">
-                      <Label htmlFor={`essay-${question.test_id}`} className="text-sm font-medium">
+                      <Label htmlFor={`essay-${question.ma_cau_hoi}`} className="text-sm font-medium">
                         Your Answer:
                       </Label>
                       <Textarea
-                        id={`essay-${question.test_id}`}
+                        id={`essay-${question.ma_cau_hoi}`}
                         placeholder="Type your answer here..."
-                        value={answers[question.test_id]?.toString() || ''}
-                        onChange={(e) => handleAnswerChange(question.test_id, e.target.value)}
+                        value={answers[question.ma_cau_hoi]?.toString() || ''}
+                        onChange={(e) => handleAnswerChange(question.ma_cau_hoi, e.target.value)}
                         className="min-h-[120px] resize-none"
                       />
                       <div className="text-xs text-gray-500">
-                        {(answers[question.test_id]?.toString() || '').length} characters
+                        {(answers[question.ma_cau_hoi]?.toString() || '').length} characters
                       </div>
                     </div>
                   )}
@@ -262,7 +271,7 @@ const TestPage = () => {
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
                 <div className="text-sm text-gray-600">
-                  You have answered {getAnsweredCount()} out of {test.questions.length} questions
+                  You have answered {getAnsweredCount()} out of {test?.cau_hoi?.length} questions
                 </div>
                 <Button
                   onClick={() => setShowSubmitModal(true)}
@@ -278,22 +287,22 @@ const TestPage = () => {
         </div>
 
         {/* Question Navigation Grid - Right Sidebar */}
-        <div className="w-64 sticky top-6 h-fit">
+        <div className=" sticky top-6 h-fit">
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Question Navigation</CardTitle>
               <p className="text-sm text-gray-600">
-                {getAnsweredCount()}/{test.questions.length} answered
+                {getAnsweredCount()}/{test?.cau_hoi?.length} answered
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-5 gap-2">
-                {test.questions.map((question, index) => {
-                  const isAnswered = answers[question.test_id] !== undefined;
+                {test?.cau_hoi?.map((question, index) => {
+                  const isAnswered = answers[question.ma_cau_hoi] !== undefined;
 
                   return (
                     <Button
-                      key={question.test_id}
+                      key={question.ma_cau_hoi}
                       variant={isAnswered ? "default" : "outline"}
                       size="sm"
                       className={cn(
@@ -302,7 +311,7 @@ const TestPage = () => {
                           ? "bg-green-600 hover:bg-green-700 text-white"
                           : "hover:bg-gray-100"
                       )}
-                      onClick={() => scrollToQuestion(question.test_id)}
+                      onClick={() => scrollToQuestion(question.ma_cau_hoi)}
                     >
                       {index + 1}
                     </Button>
@@ -323,14 +332,14 @@ const TestPage = () => {
                     <div className="w-3 h-3 border border-gray-300 rounded"></div>
                     <span>Unanswered</span>
                   </div>
-                  <span>{test.questions.length - getAnsweredCount()}</span>
+                  <span>{test?.cau_hoi?.length - getAnsweredCount()}</span>
                 </div>
               </div>
 
               <div className="pt-3 border-t">
                 <Button
                   onClick={() => setShowSubmitModal(true)}
-                  className="w-full bg-green-600 hover:bg-green-700"
+                  className="w-full bg-green-600 hover:bg-green-700 cursor-pointer"
                   size="sm"
                 >
                   <Send className="h-4 w-4 mr-2" />
@@ -348,7 +357,7 @@ const TestPage = () => {
         onClose={() => setShowSubmitModal(false)}
         onConfirm={handleSubmitTest}
         title="Submit Test"
-        description={`Are you sure you want to submit your test? You have answered ${getAnsweredCount()} out of ${test.questions.length} questions. This action cannot be undone.`}
+        description={`Are you sure you want to submit your test? You have answered ${getAnsweredCount()} out of ${test?.cau_hoi?.length} questions. This action cannot be undone.`}
         confirmText="Submit Test"
         cancelText="Continue Test"
       />

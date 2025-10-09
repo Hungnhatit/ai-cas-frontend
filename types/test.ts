@@ -1,6 +1,6 @@
 export interface Test {
   test_id: string;
-  instructor_id: number
+  ma_giang_vien: number
   title: string
   description: string;
   name: string;
@@ -88,7 +88,7 @@ export interface TestAssignment {
   testAssignment_id: number;
   test_id: number;
   student_id: number;
-  assigned_by: number; // instructor_id
+  assigned_by: number; // ma_giang_vien
   assigned_at: string; // ISO Date string
   status: TestAssignmentStatus;
   createdAt: string;

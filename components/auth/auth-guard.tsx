@@ -26,7 +26,7 @@ export function AuthGuard({ children, requiredRole, redirectTo = "/auth/login" }
 
       if (requiredRole && user.role !== requiredRole) {
         // Redirect based on user role
-        switch (user.role) {
+        switch (user.vai_tro) {
           case "admin":
             router.push("/admin")
             break

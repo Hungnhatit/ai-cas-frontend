@@ -190,7 +190,7 @@ export function SettingsPage() {
                   <p className="text-sm text-muted-foreground">Your access level and permissions</p>
                 </div>
                 <Badge variant="default" className="capitalize">
-                  {user?.role}
+                  {user?.vai_tro}
                 </Badge>
               </div>
             </CardContent>

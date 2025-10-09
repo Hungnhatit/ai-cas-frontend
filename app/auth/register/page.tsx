@@ -52,8 +52,7 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      await register(formData.email, formData.password, formData.name, formData.role)
-      
+      await register(formData.email, formData.password, formData.name, formData.role);
       router.push("/dashboard");
     } catch (err) {
       setError("Registration failed. Please try again.")

@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Plus, Edit, Trash2, Eye, Users, Clock, Trophy, Copy, Earth, Lock, NotebookPen } from "lucide-react"
+import { Plus, Edit, Trash2, Eye, Users, Clock, Trophy, Copy, Earth, Lock, NotebookPen, Play } from "lucide-react"
 import { type Quiz, type QuizQuestion, type Course } from "@/services/api"
 import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
@@ -21,14 +21,16 @@ import { useAuth } from "@/providers/auth-provider"
 import { courseService } from "@/services/courseService"
 import ConfirmModal from "../modals/confirm-modal";
 import { capitalizeFirstLetter } from "@/utils/string"
+import { BaiTracNghiem } from "@/types/interface/model"
 
 export function QuizManagementPage() {
-  const [quizzes, setQuizzes] = useState<Quiz[]>([])
+  const [quizzes, setQuizzes] = useState<BaiTracNghiem[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const { user } = useAuth();
+  console.log(user);
   const [newQuiz, setNewQuiz] = useState({
     title: "",
     course: "",
@@ -43,12 +45,13 @@ export function QuizManagementPage() {
     const fetchData = async () => {
       try {
         // const [quizzesData, coursesData] = await Promise.all([api.getQuizzes(), api.getCourses()]);
-        const [quizzesData, coursesData] = await Promise.all([
-          quizService.getQuizByInstructorId(user?.user_id),
-          courseService.getCourseByUser(user?.user_id)
+        const [quizzesData, ] = await Promise.all([
+          quizService.getQuizByInstructorId(user?.ma_nguoi_dung),
+          
         ]);
+        console.log('hello')
+        console.log('quizzesData: ', quizzesData)
         setQuizzes(quizzesData)
-        setCourses(coursesData.data)
       } catch (error) {
         console.error("Failed to fetch data:", error)
       } finally {
@@ -58,8 +61,7 @@ export function QuizManagementPage() {
 
     fetchData()
   }, []);
-
-  console.log('Quiz: ', quizzes);
+  
 
   const addQuestion = () => {
     setQuestions([
@@ -85,12 +87,12 @@ export function QuizManagementPage() {
 
   const handleCreateQuiz = async () => {
     try {
-      const totalPoints = questions.reduce((sum, q) => sum + (q.points || 0), 0)
+      const total_points = questions.reduce((sum, q) => sum + (q.points || 0), 0)
       const quizData = {
         ...newQuiz,
         questions: questions as QuizQuestion[],
-        totalPoints,
-        status: "draft" as const,
+        total_points,
+        trang_thai: "draft" as const,
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 7 days from now
       }
 
@@ -107,6 +109,19 @@ export function QuizManagementPage() {
     }
   }
 
+  const handleStartQuiz = async (ma_bai_trac_nghiem: number, student_id: number) => {
+    try {
+      const data = await quizService.startQuizAttempt(ma_bai_trac_nghiem, student_id);
+      if (data.success) {
+        const attempt_id = data.attempt.quizAttempt_id
+        router.push(`/quizzes/${ma_bai_trac_nghiem}/take?attempt=${attempt_id}`)
+      }
+      console.log(ma_bai_trac_nghiem, student_id);
+    } catch (error) {
+      console.error("Failed to start quiz:", error)
+    }
+  }
+
   const duplicateQuiz = async (quiz: Quiz) => {
     try {
       console.log("[v0] Duplicating quiz:", quiz.id)
@@ -116,15 +131,15 @@ export function QuizManagementPage() {
     }
   }
 
-  const deleteQuiz = async (quiz_id: number) => {
+  const deleteQuiz = async (ma_bai_trac_nghiem: number) => {
     try {
-      console.log("[v0] Deleting quiz:", quiz_id)
-      await quizService.deleteQuiz(quiz_id);
-      // setQuizzes((prev) => prev.filter((q) => q.quiz_id !== quiz_id));
+      console.log("[v0] Deleting quiz:", ma_bai_trac_nghiem)
+      await quizService.deleteQuiz(ma_bai_trac_nghiem);
+      // setQuizzes((prev) => prev.filter((q) => q.ma_bai_trac_nghiem !== ma_bai_trac_nghiem));
       setQuizzes((prev) =>
         prev.map((q) =>
-          q.quiz_id === quiz_id
-            ? { ...q, status: 'archived' }
+          q.ma_bai_trac_nghiem === ma_bai_trac_nghiem
+            ? { ...q, trang_thai: 'luu_tru' }
             : q
         )
       )
@@ -134,23 +149,23 @@ export function QuizManagementPage() {
     }
   }
 
-  const forceDeleteQuiz = async (quiz_id: number) => {
+  const forceDeleteQuiz = async (ma_bai_trac_nghiem: number) => {
     try {
-      await quizService.deleteQuiz(quiz_id, true);
-      setQuizzes((prev) => prev.filter((q) => q.quiz_id !== quiz_id));
+      await quizService.deleteQuiz(ma_bai_trac_nghiem, true);
+      setQuizzes((prev) => prev.filter((q) => q.ma_bai_trac_nghiem !== ma_bai_trac_nghiem));
       toast.success('Quiz has been deleted permanently!');
     } catch (error) {
       toast.error(`Failed to force delete quiz: ${error}`);
     }
   }
 
-  const restoreQuiz = async (quiz_id: number) => {
+  const restoreQuiz = async (ma_bai_trac_nghiem: number) => {
     try {
-      await quizService.restoreQuiz(quiz_id);
+      await quizService.restoreQuiz(ma_bai_trac_nghiem);
       setQuizzes((prev) =>
         prev.map((q) =>
-          q.quiz_id === quiz_id
-            ? { ...q, status: 'draft' }
+          q.ma_bai_trac_nghiem === ma_bai_trac_nghiem
+            ? { ...q, trang_thai: 'ban_nhap' }
             : q
         )
       )
@@ -160,9 +175,9 @@ export function QuizManagementPage() {
     }
   }
 
-  const handleEditQuiz = async (quiz_id: number) => {
+  const handleEditQuiz = async (ma_bai_trac_nghiem: number) => {
     try {
-      router.push(`/quizzes/${quiz_id}/edit`);
+      router.push(`/quizzes/${ma_bai_trac_nghiem}/edit`);
     } catch (error) {
       console.log(error)
     }
@@ -170,9 +185,9 @@ export function QuizManagementPage() {
 
   const getQuizStats = () => {
     const total = quizzes.length
-    const active = quizzes.filter((q) => q.status === "active").length
-    const draft = quizzes.filter((q) => q.status === "draft").length
-    const archived = quizzes.filter((q) => q.status === "archived").length
+    const active = quizzes.filter((q) => q.trang_thai === "hoat_dong").length
+    const draft = quizzes.filter((q) => q.trang_thai === "ban_nhap").length
+    const archived = quizzes.filter((q) => q.trang_thai === "luu_tru").length
 
     return { total, active, draft, archived }
   }
@@ -189,16 +204,16 @@ export function QuizManagementPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-[#232f3e] shadow-lg p-5">
         <div>
-          <h1 className="text-3xl font-bold">Quiz Management</h1>
-          <p className="text-muted-foreground">Create and manage quizzes for your courses</p>
+          <h1 className="text-3xl mb-2 font-bold text-white">Quiz Management</h1>
+          <p className="text-white">Create and manage quizzes for your courses</p>
         </div>
         {/* <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}> */}
         <Dialog open={isCreateDialogOpen}>
           <Button onClick={() => router.push('/create-quizzes')} className="cursor-pointer">
             <Plus className="h-4 w-4 mr-2" />
-            Create Quiz
+            Create new quiz
           </Button>
 
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -418,39 +433,38 @@ export function QuizManagementPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+        {/* -------------------------------Quiz trang_thai--------------------------------- */}
+        <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Quizzes</CardTitle>
-            <Trophy className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-md font-medium">Total Quizzes</CardTitle>
+            <Trophy className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
           </CardContent>
         </Card>
-
-        {/* -------------------------------Quiz status--------------------------------- */}
-        <Card>
+        <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active</CardTitle>
-            <Eye className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-md font-medium">Active</CardTitle>
+            <Eye className="h-5 w-5 text-green-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.active}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Draft</CardTitle>
-            <Edit className="h-4 w-4 text-yellow-500" />
+            <CardTitle className="text-md font-medium">Draft</CardTitle>
+            <Edit className="h-5 w-5 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.draft}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Archived</CardTitle>
-            <Trash2 className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-md font-medium">Archived</CardTitle>
+            <Trash2 className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.archived}</div>
@@ -468,46 +482,46 @@ export function QuizManagementPage() {
         </TabsList>
 
         <TabsContent value="active" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4">
             {quizzes
-              .filter((quiz) => quiz.status === "active")
+              .filter((quiz) => quiz.trang_thai === "hoat_dong")
               .map((quiz) => (
-                <Card key={quiz.quiz_id} className="hover:shadow-md transition-shadow">
+                <Card key={quiz.ma_bai_trac_nghiem} className="hover:shadow-md transition-shadow gap-2 py-4">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
-                        <CardTitle className="text-lg">{quiz.title}</CardTitle>
-                        <CardDescription>{quiz.course}</CardDescription>
+                        <CardTitle className="text-lg">{quiz.tieu_de}</CardTitle>
+                        <CardDescription>{quiz.ma_khoa_hoc}</CardDescription>
                       </div>
-                      <Badge variant="default">{capitalizeFirstLetter(quiz.status)}</Badge>
+                      <Badge variant="default">{capitalizeFirstLetter(quiz.trang_thai)}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground line-clamp-2">{quiz.description}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-2">{quiz.mo_ta}</p>
 
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        {quiz.duration} min
+                        {quiz.thoi_luong} min
                       </div>
                       <div className="flex items-center gap-1">
                         <Trophy className="h-4 w-4" />
-                        {quiz.totalPoints} pts
+                        {quiz.tong_diem} pts
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        {quiz.quiz_questions.length} questions
+                        {quiz?.cau_hoi_trac_nghiem?.length} questions
                       </div>
                       <div className="flex items-center gap-1">
-                        {quiz.visibility === 'public' && <Earth className="h-4 w-4" />}
-                        {quiz.visibility === 'private' && <Lock className="h-4 w-4" />}
-                        {quiz.visibility === 'assigned' && <NotebookPen className="h-4 w-4" />}
-                        {capitalizeFirstLetter(quiz.visibility)}
+                        {quiz.che_do_hien_thi === 'public' && <Earth className="h-4 w-4" />}
+                        {quiz.che_do_hien_thi === 'private' && <Lock className="h-4 w-4" />}
+                        {quiz.che_do_hien_thi === 'assigned' && <NotebookPen className="h-4 w-4" />}
+                        {capitalizeFirstLetter(quiz.che_do_hien_thi)}
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
-                      <Button className="cursor-pointer" variant="outline" size="sm" onClick={() => router.push(`/quizzes/${quiz.quiz_id}/preview`)}>
+                    <div className="flex items-center gap-2">
+                      <Button className="cursor-pointer" variant="outline" size="sm" onClick={() => router.push(`/quizzes/${quiz.ma_bai_trac_nghiem}/preview`)}>
                         <Eye className="h-4 w-4 mr-1" />
                         Preview
                       </Button>
@@ -515,9 +529,13 @@ export function QuizManagementPage() {
                         <Copy className="h-4 w-4 mr-1" />
                         Duplicate
                       </Button>
-                      <Button onClick={() => handleEditQuiz(quiz.quiz_id)} className="cursor-pointer" variant="outline" size="sm">
+                      <Button onClick={() => handleEditQuiz(quiz.ma_bai_trac_nghiem)} className="cursor-pointer" variant="outline" size="sm">
                         <Edit className="h-4 w-4 mr-1" />
                         Edit
+                      </Button>
+                      <Button className="cursor-pointer" variant="outline" size="sm" onClick={() => handleStartQuiz(quiz.ma_bai_trac_nghiem, user?.ma_nguoi_dung)}>
+                        <Play />
+                        Test
                       </Button>
                     </div>
                   </CardContent>
@@ -530,16 +548,16 @@ export function QuizManagementPage() {
         <TabsContent value="draft" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {quizzes
-              .filter((quiz) => quiz.status === "draft")
+              .filter((quiz) => quiz.trang_thai === "ban_nhap")
               .map((quiz) => (
-                <Card key={quiz.quiz_id} className="hover:shadow-md transition-shadow">
+                <Card key={quiz.ma_bai_trac_nghiem} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <CardTitle className="text-lg">{quiz.title}</CardTitle>
                         <CardDescription>{quiz.course}</CardDescription>
                       </div>
-                      <Badge variant="secondary">{quiz.status}</Badge>
+                      <Badge variant="secondary">{quiz.trang_thai}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -552,7 +570,7 @@ export function QuizManagementPage() {
                       </div>
                       <div className="flex items-center gap-1">
                         <Trophy className="h-4 w-4" />
-                        {quiz.totalPoints} pts
+                        {quiz.total_points} pts
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
@@ -561,11 +579,11 @@ export function QuizManagementPage() {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button size="sm" className="cursor-pointer" onClick={() => handleEditQuiz(quiz.quiz_id)}>
+                      <Button size="sm" className="cursor-pointer" onClick={() => handleEditQuiz(quiz.ma_bai_trac_nghiem)}>
                         <Edit className="h-4 w-4 mr-1" />
                         Continue Editing
                       </Button>
-                      <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => deleteQuiz(parseInt(quiz.quiz_id))}>
+                      <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => deleteQuiz(quiz.ma_bai_trac_nghiem)}>
                         <Trash2 className="h-4 w-4 mr-1" />
                         Delete
                       </Button>
@@ -579,16 +597,16 @@ export function QuizManagementPage() {
         <TabsContent value="archived" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {quizzes
-              .filter((quiz) => quiz.status === "archived")
+              .filter((quiz) => quiz.trang_thai === "archived")
               .map((quiz) => (
-                <Card key={quiz.quiz_id} className="hover:shadow-md transition-shadow opacity-75">
+                <Card key={quiz.ma_bai_trac_nghiem} className="hover:shadow-md transition-shadow opacity-75">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <CardTitle className="text-lg">{quiz.title}</CardTitle>
                         <CardDescription>{quiz.course}</CardDescription>
                       </div>
-                      <Badge variant="outline">{quiz.status}</Badge>
+                      <Badge variant="outline">{quiz.trang_thai}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -601,7 +619,7 @@ export function QuizManagementPage() {
                       </div>
                       <div className="flex items-center gap-1">
                         <Trophy className="h-4 w-4" />
-                        {quiz.totalPoints} pts
+                        {quiz.total_points} pts
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
@@ -610,11 +628,11 @@ export function QuizManagementPage() {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button onClick={() => restoreQuiz(quiz.quiz_id)} variant="outline" size="sm" className="cursor-pointer">
+                      <Button onClick={() => restoreQuiz(quiz.ma_bai_trac_nghiem)} variant="outline" size="sm" className="cursor-pointer">
                         Restore
                       </Button>
                       <ConfirmModal
-                        onConfirm={() => forceDeleteQuiz(quiz.quiz_id)}
+                        onConfirm={() => forceDeleteQuiz(quiz.ma_bai_trac_nghiem)}
                         title="Are you sure to delete this quiz permantly? This action can't be undone!"
                         description='Delete permantly quiz'
                       >
@@ -630,6 +648,7 @@ export function QuizManagementPage() {
           </div>
         </TabsContent>
       </Tabs>
+
     </div>
   )
 }

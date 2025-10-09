@@ -264,8 +264,8 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
   }
 
   const score = attempt?.score || 0
-  const totalPoints = quiz.totalPoints
-  const percentage = Math.round((score / totalPoints) * 100)
+  const total_points = quiz.total_points
+  const percentage = Math.round((score / total_points) * 100)
   const correctAnswers = getCorrectAnswers()
   const totalQuestions = quiz.quiz_questions.length
   const timeTaken = getTimeTaken()
@@ -302,10 +302,10 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
           <CardDescription className="text-base">{quiz.course}</CardDescription>
           <div className="flex items-center justify-center gap-4 mt-4">
             <Badge variant={percentage >= 70 ? "default" : "destructive"} className="text-lg px-4 py-2">
-              {percentage}% ({getGradeLetter(score, totalPoints)})
+              {percentage}% ({getGradeLetter(score, total_points)})
             </Badge>
             <Badge variant="outline" className="text-base px-3 py-1">
-              {score}/{totalPoints} points
+              {score}/{total_points} points
             </Badge>
           </div>
         </CardHeader>
@@ -319,11 +319,11 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${getScoreColor(score, totalPoints)}`}>
-              {score}/{totalPoints}
+            <div className={`text-2xl font-bold ${getScoreColor(score, total_points)}`}>
+              {score}/{total_points}
             </div>
             <p className="text-xs text-muted-foreground">
-              {percentage}% ({getGradeLetter(score, totalPoints)} Grade)
+              {percentage}% ({getGradeLetter(score, total_points)} Grade)
             </p>
           </CardContent>
         </Card>
@@ -388,7 +388,7 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
               <div className="space-y-1 text-muted-foreground">
                 <p>• Course: {quiz.course}</p>
                 <p>• Total Questions: {totalQuestions}</p>
-                <p>• Total Points: {totalPoints}</p>
+                <p>• Total Points: {total_points}</p>
                 <p>• Time Limit: {quiz.duration} minutes</p>
               </div>
             </div>
@@ -399,7 +399,7 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
                   • Correct Answers: {correctAnswers}/{totalQuestions}
                 </p>
                 <p>
-                  • Points Earned: {score}/{totalPoints}
+                  • Points Earned: {score}/{total_points}
                 </p>
                 <p>• Time Used: {timeTaken}</p>
                 <p>• Completion Date: {new Date(attempt?.endTime || "").toLocaleDateString()}</p>

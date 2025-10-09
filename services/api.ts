@@ -24,7 +24,7 @@ export interface Student {
   completedCourses: number
   progress: number
   joinDate: string
-  instructor_id?: string
+  ma_giang_vien?: string
 }
 
 export interface Assignment {
@@ -52,7 +52,7 @@ export interface Quiz {
   course: string
   description: string
   duration: number // in minutes
-  totalPoints: number
+  total_points: number
   quiz_questions: QuizQuestion[]
   attempts: number
   status: "active" | "draft" | "archived",
@@ -170,7 +170,7 @@ const mockQuizzes: Quiz[] = [
   //   course: "Introduction to React",
   //   description: "Test your knowledge of React basics including components, props, and state",
   //   duration: 30,
-  //   totalPoints: 100,
+  //   total_points: 100,
   //   attempts: 3,
   //   status: "active",
   //   dueDate: "2024-12-31",
@@ -205,7 +205,7 @@ const mockQuizzes: Quiz[] = [
   //   course: "Advanced JavaScript",
   //   description: "Advanced JavaScript concepts including closures, promises, and async/await",
   //   duration: 45,
-  //   totalPoints: 150,
+  //   total_points: 150,
   //   attempts: 2,
   //   status: "active",
   //   dueDate: "2024-12-28",
@@ -331,11 +331,11 @@ export const api = {
     return attempt
   },
 
-  submitQuizAnswer: async (attemptId: number, questionId: string, answer: string | number): Promise<boolean> => {
+  submitQuizAnswer: async (attemptId: number, question_id: string, answer: string | number): Promise<boolean> => {
     await new Promise((resolve) => setTimeout(resolve, 200))
     const attempt = mockQuizAttempts.find((a) => a.id === attemptId.toString())
     if (attempt) {
-      attempt.answers[questionId] = answer
+      attempt.answers[question_id] = answer
       return true
     }
     return false
