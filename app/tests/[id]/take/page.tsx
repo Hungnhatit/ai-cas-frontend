@@ -5,12 +5,13 @@ import React from 'react'
 
 interface TestTakePageProps {
   params: { id: number }
+  searchParams: { attempt?: number }
 }
 
-const TestTakePage = ({ params }: TestTakePageProps) => {
+const TestTakePage = ({ params , searchParams}: TestTakePageProps) => {
   return (
     <AuthGuard>
-      <TestPage test_id={params.id} />
+      <TestPage test_id={params.id} attempt_id={searchParams.attempt} />
     </AuthGuard>
   )
 }
