@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { testService } from '@/services/test/testService';
 import Layout from './layout/layout';
 import ProgressBar from '../ui/ProgressBar';
-import { TestSession, UserAnswer } from '@/types/test';
+import { TestSession, UserAnswer } from '@/types/interfaces/test';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Clock, Send } from 'lucide-react';
@@ -13,33 +13,36 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import ConfirmModal from '../ui/ConfirmModal';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Test } from '@/types/interface/test';
+import { testAttemptService } from '@/services/test/testAttemptService';
 
 interface TestPageProps {
-  test_id: number
+  test_id: number,
+  attempt_id?: number
 }
 
-const TestPage = ({ test_id }: TestPageProps) => {
+const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
   const [test, setTest] = useState<Test | null>(null);
   const [session, setSession] = useState<TestSession | null>(null);
-  const [answers, setAnswers] = useState<{ [question_id: string]: string | number }>({});
+  const [answers, setAnswers] = useState<Record<string, string | number>>({})
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const questionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { id } = useParams();
+  const router = useRouter();
 
   useEffect(() => {
     const loadTest = async () => {
       try {
         // Get test ID from URL params
         const urlParams = new URLSearchParams(window.location.search);
-        // const ma_bai_kiem_tra = urlParams.get('id') || 'test-1';
+        // const ma_kiem_tra = urlParams.get('id') || 'test-1';
 
         // Check for custom tests first
         const customTests = JSON.parse(localStorage.getItem('customTests') || '[]');
-        let testData = customTests.find((t: Test) => t.ma_bai_kiem_tra === id);
+        let testData = customTests.find((t: Test) => t.m === id);
 
         if (!testData) {
           testData = await testService.getTestById(parseInt(id));
@@ -53,7 +56,7 @@ const TestPage = ({ test_id }: TestPageProps) => {
         setTimeRemaining(testData.duration * 60);
 
         const newSession: TestSession = {
-          ma_bai_kiem_tra: testData.id,
+          ma_kiem_tra: testData.id,
           startTime: new Date(),
           answers: [],
           currentQuestionIndex: 0,
@@ -88,11 +91,20 @@ const TestPage = ({ test_id }: TestPageProps) => {
     return () => clearInterval(timer);
   }, [timeRemaining, session]);
 
-  const handleAnswerChange = (question_id: number, answer: string | number) => {
-    setAnswers(prev => ({
-      ...prev,
-      [question_id]: answer
-    }));
+  const handleAnswerChange = async(question_id: number, answer: string | number) => {
+    const newAnswers = { ...answers, [question_id]: answer } // object
+    // setAnswers(prev => ({
+    //   ...prev,
+    //   [question_id]: answer
+    // }));
+    setAnswers(newAnswers);
+    if (attempt_id) {
+      try {
+        await testAttemptService.submitTestAnswers(attempt_id, newAnswers)
+      } catch (error) {
+        console.log('Failed to save answer: ', error)
+      }
+    }
   };
 
   const handleSubmitTest = async () => {
@@ -106,10 +118,10 @@ const TestPage = ({ test_id }: TestPageProps) => {
       }));
 
       const timeSpent = (test.thoi_luong * 60) - timeRemaining;
-      const result = await testService.submitTest(test.ma_bai_kiem_tra, userAnswers, timeSpent);
-
+      const result = await testAttemptService.submitTestAttempt(Number(attempt_id));
+      router.push(`/tests/${id}/result-overview?attempt=${attempt_id}`)
       localStorage.setItem('testResult', JSON.stringify(result));
-      window.location.href = '/results';
+
     } catch (error) {
       console.error('Failed to submit test:', error);
     }
@@ -129,7 +141,7 @@ const TestPage = ({ test_id }: TestPageProps) => {
   if (loading) {
     return (
       <Layout currentPage="test" title="Loading Test...">
-        <div className="flex items-center justify-center h-64">
+        <div className="text-center py-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Loading test...</p>

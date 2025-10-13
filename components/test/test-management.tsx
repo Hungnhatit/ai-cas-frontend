@@ -36,7 +36,7 @@ const TestManagement = () => {
   const [selectedtest, setSelectedtest] = useState<string | null>(null);
   const [tests, setTests] = useState<Test[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
   const router = useRouter();
   const { user } = useAuth();
 
@@ -82,6 +82,15 @@ const TestManagement = () => {
     } catch (error) {
       toast.error(`Failed when starting test: ${error}`)
     }
+  }
+
+  const handleViewResultDetail = async (test_id: number) => {
+    // router.push(`/tests/${test_id}/result-detail?attempt=${attempt_id}`)
+    router.push(`/tests/${test_id}/results`);
+  }
+
+  const handleEditingPage = async (test_id: number) => {
+    router.push(`/tests/${test_id}/edit`);
   }
 
   return (
@@ -213,7 +222,11 @@ const TestManagement = () => {
                       </Button>
                     </div>
                     <div className="flex gap-2 w-full">
-                      <Button variant="outline" size="sm" className="flex-1 cursor-pointer">
+                      <Button variant="outline" size="sm" className="flex-1 cursor-pointer"
+                        onClick={() => {
+                          handleViewResultDetail(test.ma_kiem_tra)
+                        }}
+                      >
                         Results
                       </Button>
                       <Button variant="outline" size="sm" className="flex-1 cursor-pointer">
@@ -224,7 +237,7 @@ const TestManagement = () => {
                         size="sm"
                         className="text-red-600 hover:text-red-700 cursor-pointer"
                         onClick={() => {
-                          setSelectedtest(test.ma_kiem_tra);
+                          setSelectedtest(test.ma_kiem_tra.toString());
                           setShowDeleteDialog(true);
                         }}
                       >
@@ -265,15 +278,15 @@ const TestManagement = () => {
                           {test.trang_thai.charAt(0).toUpperCase() + test.trang_thai.slice(1)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm">{test?.cau_hoi.length}</td>
+                      <td className="px-6 py-4 text-sm">{test?.cau_hoi?.length}</td>
                       <td className="px-6 py-4 text-sm">{test.so_lan_lam_toi_da}</td>
                       <td className="px-6 py-4 text-sm font-medium">{test.avgScore}%</td>
                       <td className="px-6 py-4 text-sm">{test.passRate}%</td>
                       <td className="px-6 py-4 text-sm text-gray-500">{test.ngay_cap_nhat}</td>
                       <td className="px-6 py-4">
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" className='cursor-pointer'>Edit</Button>
-                          <Button variant="ghost" size="sm" className='cursor-pointer'>Results</Button>
+                          <Button onClick={()=>handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Edit</Button>
+                          <Button onClick={() => handleViewResultDetail(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Results</Button>
                           <Button variant="ghost" size="sm" className='cursor-pointer text-red-600'>Delete</Button>
                         </div>
                       </td>

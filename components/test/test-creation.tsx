@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Save } from 'lucide-react';
-import { Test } from '@/types/test';
+import { Test } from '@/types/interfaces/test';
 import React, { useEffect } from 'react'
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
