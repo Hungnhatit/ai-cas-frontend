@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
 import { ArrowLeft, Check, Plus, Save, Trash2 } from 'lucide-react';
-import { Question, QuizSetup as QuizSetupType } from '@/types/quiz';
+import { Question, QuizSetup as QuizSetupType } from '@/types/interfaces/quiz';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { Course, Quiz, QuizQuestion, Student } from '@/services/api';
