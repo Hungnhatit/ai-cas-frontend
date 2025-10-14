@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
-import { Question } from '@/types/quiz';
+import { Question } from '@/types/interfaces/quiz';
 import QuestionCard from './question-card';
 
 interface QuestionSectionProps {
