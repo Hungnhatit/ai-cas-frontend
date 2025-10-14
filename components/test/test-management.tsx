@@ -62,7 +62,6 @@ const TestManagement = () => {
 
   console.log(tests)
 
-
   const handleCreatePage = () => {
     router.push('/tests/create');
   }
@@ -278,14 +277,14 @@ const TestManagement = () => {
                           {test.trang_thai.charAt(0).toUpperCase() + test.trang_thai.slice(1)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm">{test?.cau_hoi?.length}</td>
+                      <td className="px-6 py-4 text-sm">{test?.cau_hoi_kiem_tra?.length}</td>
                       <td className="px-6 py-4 text-sm">{test.so_lan_lam_toi_da}</td>
                       <td className="px-6 py-4 text-sm font-medium">{test.avgScore}%</td>
                       <td className="px-6 py-4 text-sm">{test.passRate}%</td>
                       <td className="px-6 py-4 text-sm text-gray-500">{test.ngay_cap_nhat}</td>
                       <td className="px-6 py-4">
                         <div className="flex gap-1">
-                          <Button onClick={()=>handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Edit</Button>
+                          <Button onClick={() => handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Edit</Button>
                           <Button onClick={() => handleViewResultDetail(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Results</Button>
                           <Button variant="ghost" size="sm" className='cursor-pointer text-red-600'>Delete</Button>
                         </div>

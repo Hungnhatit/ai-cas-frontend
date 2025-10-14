@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Question, UserAnswer } from '@/types/test';
+import { Question, UserAnswer } from '@/types/interfaces/test';
 
 interface QuestionCardProps {
   question: Question;

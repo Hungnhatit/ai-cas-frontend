@@ -42,7 +42,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header onMobileMenuToggle={() => setMobileMenuOpen(true)} />
         <main className="flex-1 overflow-y-auto">
-          <div className=" mx-auto px-4 py-4 md:py-6">{children}</div>
+          <div className="mx-auto px-4 py-4 md:py-6">{children}</div>
         </main>
         <Footer />
       </div>

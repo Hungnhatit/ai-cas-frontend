@@ -190,6 +190,8 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
           .toISOString().split('T')[0]
       }
 
+      console.log(updatedData);
+
       console.log("[v0] Updating test:", updatedData);
 
       const res = await testService.updateTest(test_id, updatedData);
@@ -401,7 +403,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                 id="test-attempts"
                 type="number"
                 value={newTest.so_lan_lam_toi_da}
-                onChange={(e) => setNewTest({ ...newTest, so_lan_lam_toi_da: Number.parseInt(e.target.value) })}
+                onChange={(e) => setNewTest({ ...newTest, so_lan_lam_toi_da: Number(e.target.value) })}
                 min="1"
                 max="10"
                 className="rounded-sm h-12 text-base border-gray-400/80 shadow-none"
@@ -502,14 +504,14 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                             lua_chon: value === "trac_nghiem" ? ["", "", "", ""] : undefined,
                           })
                         }
-                      >
+                      >                      
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
-                          <SelectItem value="true-false">True/False</SelectItem>
-                          <SelectItem value="short-answer">Short Answer</SelectItem>
+                          <SelectItem value="trac_nghiem">Trắc nghiệm</SelectItem>
+                          <SelectItem value="dung_sai">Đúng/Sai</SelectItem>
+                          <SelectItem value="tra_loi_ngan">Trả lời ngắn</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
