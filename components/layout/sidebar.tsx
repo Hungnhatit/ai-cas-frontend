@@ -69,9 +69,16 @@ const navItems: NavItem[] = [
     icon: MessageSquare,
   },
   {
-    title: 'Test',
+    title: 'Manage tests',
     href: '/tests',
-    icon: BookType
+    icon: BookType,
+    roles: ['instructor']
+  },
+  {
+    title: 'Tests',
+    href: '/tests',
+    icon: BookType,
+    roles: ['student']
   },
   {
     title: "Assignments",
