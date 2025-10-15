@@ -54,4 +54,33 @@ export const testService = {
     }
   },
 
+  deleteTest: async (test_id: number, force = false) => {
+    try {
+      const res = await api.delete(`/test/remove/${test_id}${force ? 'force=true' : ''}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      return res.data;
+    } catch (error: any) {
+      console.log('Delete test error: ', error.res?.data || error.message);
+      throw error;
+    }
+  },
+
+  restoreTest: async (test_id: number) => {
+    try {
+      const res = await api.patch(`/test/${test_id}/restore`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return res.data;
+    } catch (error: any) {
+      console.log('Error when restoring test: ', error.res?.data || error.message);
+      throw error;
+    }
+  }
+
 }
