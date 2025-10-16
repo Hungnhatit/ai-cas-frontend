@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Assignment } from '@/types/interfaces/assignment';
+import { Assignment } from '@/types/interfacess/assignment';
 import { ArrowUpDown, Award, BookOpen, Calendar, Users } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import AssignmentTable from './assignment-table';

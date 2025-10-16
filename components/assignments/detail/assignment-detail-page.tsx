@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, ArrowLeft, BookOpen, Calendar, FileText } from 'lucide-react';
-import { Assignment } from '@/types/interfaces/assignment'
+import { Assignment } from '@/types/interfacess/assignment'
 import AssignmentHeader from './assignment-header';
 import AssignmentInfo from './assignment-info'
 import SubmissionSection from './assignment-submission';

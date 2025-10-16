@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Assignment } from '@/types/interfaces/assignment'
+import { Assignment } from '@/types/interfacess/assignment'
 import { Upload, FileText, X, Send, CheckCircle, AlertCircle } from 'lucide-react'
 
 interface SubmissionSectionProps {

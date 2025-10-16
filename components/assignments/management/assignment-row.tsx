@@ -1,5 +1,5 @@
 'use client'
-import { Assignment } from '@/types/interface/assignment';
+import { Assignment } from '@/types/interfaces/assignment';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { TableCell, TableRow } from '@/components/ui/table';
@@ -13,11 +13,11 @@ interface AssignmentRowProps {
 const AssignmentRow = ({ assignment, onViewDetails }: AssignmentRowProps) => {
   const getStatusColor = (status: Assignment['trang_thai']) => {
     switch (status) {
-      case 'pending':
+      case 'cho_xu_ly':
         return 'bg-yellow-100 text-yellow-800 border-yellow-400';
-      case 'submitted':
+      case 'da_nop':
         return 'bg-blue-100 text-blue-800 border-blue-400';
-      case 'graded':
+      case 'da_cham':
         return 'bg-green-100 text-green-800 border-green-400';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-400';
@@ -37,7 +37,7 @@ const AssignmentRow = ({ assignment, onViewDetails }: AssignmentRowProps) => {
       <TableCell className="font-medium px-4 py-4">
         <div className="space-y-1">
           <h3 className="font-semibold text-sm lg:text-base">{assignment.tieu_de}</h3>
-          <p className="text-xs lg:text-sm text-muted-foreground line-clamp-1 text-wrap">
+          <p className="text-xs lg:text-sm text-muted-foreground line-clamp-2 text-wrap">
             {assignment.mo_ta}
           </p>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -66,6 +66,10 @@ const AssignmentRow = ({ assignment, onViewDetails }: AssignmentRowProps) => {
           <Calendar className="h-4 w-4" />
           {formatDate(assignment.ngay_het_han)}
         </div>
+      </TableCell>
+
+      <TableCell>
+
       </TableCell>
 
       <TableCell className="hidden sm:table-cell">

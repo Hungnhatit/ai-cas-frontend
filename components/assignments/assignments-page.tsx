@@ -23,7 +23,7 @@ import { Calendar, Clock, FileText, CheckCircle, AlertCircle, Upload, Eye, Downl
 
 import { useAuth } from "@/providers/auth-provider"
 import { assignmentService } from "@/services/assignmentService"
-import { Assignment } from "@/types/interfaces/assignment"
+import { Assignment } from "@/types/interfacess/assignment"
 import { useRouter } from "next/navigation"
 import { api } from "@/services/api"
 

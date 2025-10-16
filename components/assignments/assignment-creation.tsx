@@ -9,9 +9,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Calendar, CalendarDays, FileText, GraduationCap, User, Users, Upload, AlertCircle, Check, ChevronDown } from 'lucide-react'
-import { AssignmentFormData } from '@/types/interface/assignment';
+import { AssignmentFormData } from '@/types/interfaces/assignment';
 import { useAuth } from '@/providers/auth-provider'
-import { Student } from '@/types/interface/model';
+import { Student } from '@/types/interfaces/model';
 import { studentService } from '@/services/studentService'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { assignmentService } from '@/services/assignmentService'

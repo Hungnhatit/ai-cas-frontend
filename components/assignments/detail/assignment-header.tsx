@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { Assignment } from '@/types/interfaces/assignment'
+import { Assignment } from '@/types/interfacess/assignment'
 import { capitalizeFirstLetter } from '@/utils/string'
 import { Calendar, Clock, BookOpen, User } from 'lucide-react'
 
