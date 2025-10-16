@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
 import { ArrowLeft, Check, Plus, Save, Trash2 } from 'lucide-react';
-import { TestSetup } from '@/types/interfaces/quiz';
+import { TestSetup } from '@/types/interfacess/quiz';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { Course, Quiz, QuizQuestion } from '@/services/api';
@@ -19,8 +19,8 @@ import { quizService } from '@/services/quizService';
 import { studentService } from '@/services/studentService';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { testService } from '@/services/test/testService';
-import { Student } from '@/types/interface/model';
-import { Test, TestQuestion } from '@/types/interface/test';
+import { Student } from '@/types/interfaces/model';
+import { Test, TestQuestion } from '@/types/interfaces/test';
 
 interface TestEditProp {
   test_id: number,
@@ -249,6 +249,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
       </div>
     )
   }
+  
   const handleSetupChange = (setup: TestSetup) => {
     setTest(prev => ({ ...prev, setup }));
   };

@@ -29,8 +29,7 @@ export default function Layout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className=''>
+    <div className="">
         {/* <Sidebar
           currentPage={currentPage}
           isOpen={sidebarOpen}
@@ -41,7 +40,6 @@ export default function Layout({
         <main className="">
           {children}
         </main>
-      </div>
     </div>
   );
 }

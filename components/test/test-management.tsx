@@ -14,6 +14,7 @@ import { formatDate } from '@/utils/formatDate';
 import { Calendar, Slash } from 'lucide-react';
 import { getDifficultyLabel, getStatusLabel } from '@/utils/test';
 import TestDataTable from './table/test-data-table';
+import { Badge } from '../ui/badge';
 
 interface Question {
   id: string;
@@ -63,8 +64,6 @@ const TestManagement = () => {
 
     fetchTests()
   }, [user?.ma_nguoi_dung]);
-
-  console.log(tests)
 
   const handleCreatePage = () => {
     router.push('/tests/create');
@@ -214,7 +213,7 @@ const TestManagement = () => {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="all">
+      <Tabs defaultValue="all" className='gap-1'>
         <div className='flex items-center justify-between'>
           <TabsList>
             <TabsTrigger value="all" className='cursor-pointer'>All tests ({stats.total})</TabsTrigger>
@@ -327,7 +326,7 @@ const TestManagement = () => {
                     <tr key={test.ma_kiem_tra} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <div className="font-medium text-gray-900 mb-1">{test.tieu_de}</div>
-                        <div className="text-sm text-gray-500 flex items-center">
+                        <div className="text-sm text-gray-500 flex items-center mb-1">
                           <div>
                             <span>Mức độ: </span>
                             {getDifficultyLabel(test.do_kho)}
@@ -337,6 +336,13 @@ const TestManagement = () => {
                             <span>Số câu hỏi: </span>
                             {test?.cau_hoi_kiem_tra?.length}
                           </div>
+                        </div>
+                        <div className='flex flex-wrap gap-2'>
+                          {(JSON.parse(test?.danh_muc)).map((item: string, index: number) => (
+                            <span key={index} className='text-xs border border-blue-400 px-2 py-1 rounded-xs'>
+                              {item}
+                            </span>
+                          ))}
                         </div>
                       </td>
                       <td className="px-6 py-4">

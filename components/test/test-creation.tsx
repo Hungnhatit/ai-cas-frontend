@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Save } from 'lucide-react';
-import { Test } from '@/types/interfaces/test';
+import { Test } from '@/types/interfacess/test';
 import React, { useEffect } from 'react'
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
@@ -16,7 +16,7 @@ import { api, Course, Quiz, QuizQuestion } from '@/services/api'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/auth-provider'
 import toast from 'react-hot-toast';
-import { TestQuestion } from '@/types/interface/test';
+import { TestQuestion } from '@/types/interfaces/model';
 import { testService } from '@/services/test/testService';
 
 const CreateTestPage = () => {
@@ -91,13 +91,6 @@ const CreateTestPage = () => {
   const handleCreateTest = async () => {
     try {
       const total_points = questions.reduce((sum, q) => sum + (q.diem || 0), 0)
-      // const quizData = {
-      //   ...newQuiz,
-      //   ma_giang_vien: user?.ma_nguoi_dung,
-      //   tong_diem,
-      //   status: "draft" as const,
-      //   dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 7 days from now
-      // }
 
       const testData = {
         ...newTest,
@@ -267,7 +260,6 @@ const CreateTestPage = () => {
             </Card>
           </div>
         )
-
       }
 
       <div className="space-y-4 mb-4">

@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { testService } from '@/services/test/testService';
 import Layout from './layout/layout';
 import ProgressBar from '../ui/ProgressBar';
-import { TestSession, UserAnswer } from '@/types/interfaces/test';
+import { TestSession, UserAnswer } from '@/types/interfacess/test';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Clock, Send } from 'lucide-react';
@@ -14,8 +14,10 @@ import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import ConfirmModal from '../ui/ConfirmModal';
 import { useParams, useRouter } from 'next/navigation';
-import { Test } from '@/types/interface/test';
+import { Test } from '@/types/interfaces/model';
 import { testAttemptService } from '@/services/test/testAttemptService';
+import { useAuth } from '@/providers/auth-provider';
+import { TestAttempt } from '@/types/interfaces/test';
 
 interface TestPageProps {
   test_id: number,
@@ -25,35 +27,64 @@ interface TestPageProps {
 const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
   const [test, setTest] = useState<Test | null>(null);
   const [session, setSession] = useState<TestSession | null>(null);
-  const [answers, setAnswers] = useState<Record<string, string | number>>({})
+  const [answers, setAnswers] = useState<Record<string, string | number>>({});
+  const [attempt, setAttempt] = useState<TestAttempt | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const questionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { id } = useParams();
+  const { user } = useAuth();
   const router = useRouter();
 
+  /**
+   * Time effect
+   */
+  useEffect(() => {
+    if (timeRemaining > 0) {
+      const timer = setTimeout(() => {
+        setTimeRemaining((prev) => prev - 1)
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (timeRemaining === 0 && test && attempt) {
+      handleSubmitTest();
+    }
+  }, [timeRemaining, test, attempt]);
+
+  /**
+   * handle load test
+   */
   useEffect(() => {
     const loadTest = async () => {
       try {
-        // Get test ID from URL params
-        const urlParams = new URLSearchParams(window.location.search);
-        // const ma_kiem_tra = urlParams.get('id') || 'test-1';
-
         // Check for custom tests first
-        const customTests = JSON.parse(localStorage.getItem('customTests') || '[]');
-        let testData = customTests.find((t: Test) => t.m === id);
-
-        if (!testData) {
-          testData = await testService.getTestById(parseInt(id));
-        }
+        const testData = await testService.getTestById(test_id);
 
         if (!testData) {
           throw new Error('Test not found');
         }
 
         setTest(testData.data);
-        setTimeRemaining(testData.duration * 60);
+        // setTimeRemaining(testData.duration * 60);
+
+        if (attempt_id) {
+          const res = await testAttemptService.getTestAttempts(test_id, user?.ma_nguoi_dung);
+          const attempts = res.data;
+          const currentAttempt = attempts.find((attempt: any) => attempt.ma_lan_lam === Number(attempt_id));
+
+          console.log('currentAttempt: ', currentAttempt);
+
+          if (currentAttempt) {
+            setAttempt(currentAttempt);
+            setAnswers(currentAttempt.cau_tra_loi || {});
+
+            const startTime = new Date(currentAttempt.thoi_gian_bat_dau).getTime();
+            const now = new Date().getTime();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const remaining = Math.max(0, testData.data.thoi_luong * 60 - elapsed);
+            setTimeRemaining(remaining);
+          }
+        }
 
         const newSession: TestSession = {
           ma_kiem_tra: testData.id,
@@ -71,7 +102,7 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
     };
 
     loadTest();
-  }, []);
+  }, [test_id, attempt_id, router]);
 
   console.log(test?.cau_hoi[0].lua_chon);
 
@@ -91,7 +122,7 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
     return () => clearInterval(timer);
   }, [timeRemaining, session]);
 
-  const handleAnswerChange = async(question_id: number, answer: string | number) => {
+  const handleAnswerChange = async (question_id: number, answer: string | number) => {
     const newAnswers = { ...answers, [question_id]: answer } // object
     // setAnswers(prev => ({
     //   ...prev,
@@ -140,29 +171,29 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
 
   if (loading) {
     return (
-      <Layout currentPage="test" title="Loading Test...">
-        <div className="text-center py-12">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading test...</p>
-          </div>
+      <div className="text-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading test...</p>
         </div>
-      </Layout>
+      </div>
+      // <Layout currentPage="test" title="Loading Test...">
+      // </Layout>
     );
   }
 
   // if (!test || !session) {
   if (!test) {
     return (
-      <Layout currentPage="test" title="Test Not Found">
-        <div className="text-center py-12">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Test not found</h2>
-          <p className="text-gray-600 mb-4">The requested test could not be loaded.</p>
-          <Button asChild>
-            <a href="/">Back to Tests</a>
-          </Button>
-        </div>
-      </Layout>
+      <div className="text-center py-12">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Test not found</h2>
+        <p className="text-gray-600 mb-4">The requested test could not be loaded.</p>
+        <Button asChild>
+          <a href="/">Back to Tests</a>
+        </Button>
+      </div>
+      // <Layout currentPage="test" title="Test Not Found">
+      // </Layout>
     );
   }
 
