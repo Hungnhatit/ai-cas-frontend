@@ -54,8 +54,6 @@ export function QuizTakingPage({ quizId, attemptId }: QuizTakingPageProps) {
         }
 
         setQuiz(quizData);
-        // const res = quizService.getQuizAttempt(parseInt(quizId), user?.user_id)
-        // console.log(res);
 
         if (attemptId) {
           const attempts = await quizService.getQuizAttempt(quizId, user?.user_id)

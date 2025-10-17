@@ -21,7 +21,7 @@ import { useAuth } from "@/providers/auth-provider"
 import { courseService } from "@/services/courseService"
 import ConfirmModal from "../modals/confirm-modal";
 import { capitalizeFirstLetter } from "@/utils/string"
-import { BaiTracNghiem } from "@/types/interface/model"
+import { BaiTracNghiem } from "@/types/interfaces/model"
 
 export function QuizManagementPage() {
   const [quizzes, setQuizzes] = useState<BaiTracNghiem[]>([])
