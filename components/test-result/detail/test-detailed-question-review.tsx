@@ -44,8 +44,8 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
     if (userAnswer === undefined || userAnswer === '') {
       return <AlertCircle className="h-5 w-5 text-gray-500" />;
     }
-    return isCorrect ? 
-      <CheckCircle className="h-5 w-5 text-green-500" /> : 
+    return isCorrect ?
+      <CheckCircle className="h-5 w-5 text-green-500" /> :
       <XCircle className="h-5 w-5 text-red-500" />;
   };
 
@@ -109,9 +109,9 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
                 <ChevronDown className="h-4 w-4 ml-2 flex-shrink-0" />
               </Button>
             </CollapsibleTrigger>
-            
+
             <CollapsibleContent className="mt-2">
-              <div className="p-4 bg-gray-50 rounded-lg space-y-4">
+              <div className="p-4 bg-gray-50 border border-gray-400 rounded-lg space-y-4">
                 <div>
                   <h5 className="font-medium mb-2">Question:</h5>
                   <p className="text-sm break-words">{question.question}</p>
@@ -122,12 +122,19 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
                     <h5 className="font-medium mb-2">Options:</h5>
                     <div className="space-y-1">
                       {question.options.map((option, optionIndex) => (
-                        <div key={optionIndex} className={`text-sm p-2 rounded ${
-                          optionIndex === question.correctAnswer ? 'bg-green-100 text-green-800' :
+                        <div key={optionIndex} className={`flex items-center justify-between text-sm p-2 rounded border ${optionIndex === question.correctAnswer ? 'bg-green-100 text-green-800' :
                           optionIndex === question.userAnswer ? 'bg-red-100 text-red-800' :
-                          'bg-white'
-                        }`}>
-                          {String.fromCharCode(65 + optionIndex)}. {option}
+                            'bg-white'
+                          }`}>
+                          <span>
+                            {String.fromCharCode(65 + optionIndex)}. {option}
+                          </span>
+                          <span className='font-semibold'>
+                            {
+                              question.userAnswer === optionIndex.toString()
+                              && <span className='text-blue-600 '>Đúng</span>
+                            }
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -138,11 +145,11 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
                   <div>
                     <h5 className="font-medium mb-1">Your Answer:</h5>
                     <p className="text-sm">
-                      {question.userAnswer !== undefined && question.userAnswer !== '' ? 
-                        (question.options ? 
+                      {question.userAnswer !== undefined && question.userAnswer !== '' ?
+                        (question.options ?
                           `${String.fromCharCode(65 + Number(question.userAnswer))}. ${question.options[Number(question.userAnswer)]}` :
                           String(question.userAnswer)
-                        ) : 
+                        ) :
                         'Not answered'
                       }
                     </p>
@@ -150,7 +157,7 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
                   <div>
                     <h5 className="font-medium mb-1">Correct Answer:</h5>
                     <p className="text-sm text-green-700">
-                      {question.options ? 
+                      {question.options ?
                         `${String.fromCharCode(65 + Number(question.correctAnswer))}. ${question.options[Number(question.correctAnswer)]}` :
                         String(question.correctAnswer)
                       }

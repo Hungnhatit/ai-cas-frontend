@@ -15,7 +15,8 @@ import { attemptService } from "@/services/attemptService"
 import { useAuth } from "@/providers/auth-provider"
 import { testAttemptService } from "@/services/test/testAttemptService"
 import { testService } from "@/services/test/testService"
-import { Test, TestAttempt, TestQuestion } from "@/types/interface/test"
+import { Test, TestQuestion } from "@/types/interfaces/model"
+import { TestAttempt } from "@/types/interfaces/test"
 
 interface TestResultOverviewPageProps {
   test_id: number
@@ -44,8 +45,15 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
           return
         }
 
-        setTest(testsRes.data);
-        setAttempt(attemptListRes.data);
+        const testData = testsRes.data;
+        const attemptData = attemptListRes.data;
+
+        if (attemptData?.cau_tra_loi && typeof attemptData.cau_tra_loi === "string") {
+          attemptData.cau_tra_loi = JSON.parse(attemptData.cau_tra_loi);
+        }
+
+        setTest(testData);
+        setAttempt(attemptData);
 
         // console.log(attemptListRes)
 
@@ -128,7 +136,7 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
   // render detail question
   const renderQuestionResult = (question: TestQuestion, index: number) => {
     const userAnswer = attempt?.cau_tra_loi?.[question.ma_cau_hoi]
-    const isCorrect = userAnswer?.toString() === question.dap_an_dung
+    const isCorrect = userAnswer?.toString() === question.dap_an_dung.toString();
 
     return (
       <Card key={question.ma_cau_hoi} className={`border-l-4 ${isCorrect ? "border-l-sky-600" : "border-l-red-500"} gap-0.5 py-4`}>
@@ -260,7 +268,7 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
       <div className="text-center py-12">
         <h2 className="text-xl font-semibold mb-2">Test result not found</h2>
         <p className="text-muted-foreground mb-4">The test result you're looking for don't exist.</p>
-        <Button onClick={() => router.push("/tests")}>
+        <Button onClick={() => router.push("/tests-management")}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to tests
         </Button>
@@ -282,7 +290,7 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
       <div className="flex items-center justify-between">
         <Button variant="outline" onClick={() => router.push("/tests")}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to tests
+          Quay lại
         </Button>
         <div className="flex gap-2">
           <Button variant="outline" size="sm">

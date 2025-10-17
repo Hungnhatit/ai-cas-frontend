@@ -7,7 +7,7 @@ import { Clock, Edit, Eye, Notebook, Trash2, Trophy } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useParams, useRouter } from 'next/navigation';
 import { testService } from '@/services/test/testService';
-import { Test, TestAttempt } from '@/types/interface/test';
+import { Test, TestAttempt } from '@/types/interfaces/test';
 
 interface TestResultsProps {
   test_id: number
