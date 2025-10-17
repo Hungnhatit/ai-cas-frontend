@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2, Plus } from 'lucide-react';
-import { Question, QuestionType, AnswerOption } from '@/types/interfaces/quiz';
+import { Question, QuestionType, AnswerOption } from '@/types/interfacess/quiz';
 
 interface QuestionCardProps {
   question: Question;
