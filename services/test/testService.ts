@@ -31,6 +31,15 @@ export const testService = {
     }
   },
 
+  getAllTests: async () => {
+    try {
+      const res = await api.get('/test/all-tests');
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
   getTestResults: async (test_id: number, student_id: number) => {
     // router.get('/:test_id/student/:student_id/results', 
     try {
