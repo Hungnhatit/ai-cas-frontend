@@ -18,6 +18,15 @@ export const testAttemptService = {
       console.log(error)
     }
   },
+
+  getTestAttempts: async (test_id: number, student_id: number) => {
+    try {
+      const res = await api.get(`/test-attempt?test_id=${test_id}&student_id=${student_id}`);
+      return res.data;
+    } catch (error) {
+      console.log(error)
+    }
+  },
   
   submitTestAnswers: async (attempt_id: number, answers: Record<number, string | number>): Promise<boolean> => {
     try {
