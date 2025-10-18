@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Button } from '../ui/button';
@@ -11,10 +11,11 @@ import { testAttemptService } from '@/services/test/testAttemptService';
 import { useAuth } from '@/providers/auth-provider';
 import { testService } from '@/services/test/testService';
 import { formatDate } from '@/utils/formatDate';
-import { Calendar, Slash } from 'lucide-react';
+import { Award, Calendar, Clock, NotebookPen, Slash, Users } from 'lucide-react';
 import { getDifficultyLabel, getStatusLabel } from '@/utils/test';
 import TestDataTable from './table/test-data-table';
-import { Badge } from '../ui/badge';
+import { getVisibilityIcon } from '@/utils/tests';
+import { Input } from '../ui/input';
 
 interface Question {
   id: string;
@@ -44,6 +45,30 @@ const TestManagement = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
   const router = useRouter();
   const { user } = useAuth();
+
+  /**
+   * Search
+   */
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const filteredTests = useMemo(() => {
+    return tests
+      .filter(test => {
+        if (statusFilter === 'all') return true;
+        return test.status === statusFilter;
+      })
+      .filter(test =>
+        test.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+  }, [searchQuery, statusFilter]);
+
+  const status = {
+    total: tests.length,
+    active: tests.filter(t => t.trang_thai === 'active' || t.trang_thai === 'ready').length,
+    drafts: tests.filter(t => t.trang_thai === 'draft').length,
+    totalAttempts: tests.reduce((sum, t) => sum + t.attempts, 0),
+  };
 
   useEffect(() => {
     const fetchTests = async () => {
@@ -89,6 +114,10 @@ const TestManagement = () => {
   const handleViewResultDetail = async (test_id: number) => {
     // router.push(`/tests/${test_id}/result-detail?attempt=${attempt_id}`)
     router.push(`/tests/${test_id}/results`);
+  }
+
+  const handleDetailTest = async (test_id: number) => {
+
   }
 
   const handleEditingPage = async (test_id: number) => {
@@ -147,7 +176,6 @@ const TestManagement = () => {
   }
 
   const archivedTests = tests.filter((test) => test.trang_thai === 'luu_tru');
-  console.log(archivedTests)
 
   const stats = getQuizStats()
 
@@ -169,19 +197,25 @@ const TestManagement = () => {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className='gap-1'>
+          <Card className='gap-0'>
             <CardHeader>
-              <CardTitle>Total tests</CardTitle>
+              <CardTitle className='flex items-center justify-between'>
+                Số bài kiểm tra
+                <span><NotebookPen size={18} className='mr-2' /></span>
+              </CardTitle>
               <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="text-2xl font-bold text-blue-600">{tests.length}</div>
-              <div className="text-sm text-gray-600">Total tests</div>
+              <div className="text-sm text-gray-600">Tổng số bài test đã được tạo</div>
             </CardContent>
           </Card>
           <Card className='gap-1'>
             <CardHeader>
-              <CardTitle>Total tests</CardTitle>
+              <CardTitle className='flex items-center justify-between'>
+                Tổng số lượt nộp
+                <span><Users size={18} className='mr-2' /></span>
+              </CardTitle>
               <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
@@ -191,7 +225,10 @@ const TestManagement = () => {
           </Card>
           <Card className='gap-1'>
             <CardHeader>
-              <CardTitle>Total tests</CardTitle>
+              <CardTitle className='flex items-center justify-between'>
+                Đang chờ chấm điểm
+                <span><Clock size={18} className='mr-2' /></span>
+              </CardTitle>
               <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
@@ -201,7 +238,10 @@ const TestManagement = () => {
           </Card>
           <Card className='gap-1'>
             <CardHeader>
-              <CardTitle>Total tests</CardTitle>
+              <CardTitle className='flex items-center justify-between'>
+                Điểm trung bình
+                <span><Award size={18} className='mr-2' /></span>
+              </CardTitle>
               <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
@@ -226,157 +266,99 @@ const TestManagement = () => {
           </Button>
         </div>
 
-        <TabsContent value="all" className="mt-6">
-          {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {tests.map(test => (
-                <Card key={test.ma_kiem_tra} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between mb-2">
-                      <CardTitle className="text-lg">{test.tieu_de}</CardTitle>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${test.trang_thai === 'hoat_dong' ? 'bg-green-100 text-green-700' :
+        <div className="flex items-center bg-white">
+          <Input
+            placeholder="Tìm kiếm theo tên bài test..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="max-w-sm shadow-none border border-gray-300 rounded-xs"
+          />
+          <select
+            className="ml-4 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+          >
+            <option value="all">Tất cả trạng thái</option>
+            <option value="active">Hoạt động</option>
+            <option value="ready">Sẵn sàng</option>
+            <option value="draft">Bản nháp</option>
+            <option value="archived">Đã lưu trữ</option>
+          </select>
+        </div>
+
+        <TabsContent value="all" className="">
+          <div className="bg-white rounded-xs border overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Tên bài kiểm tra</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Trạng thái</th>
+                  {/* <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Số lượng câu hỏi</th> */}
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Số lần làm</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Điểm trung bình</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Tỉ lệ pass</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Chỉnh sửa lần cuối</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Hành động</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {tests.map(test => (
+                  <tr key={test.ma_kiem_tra} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center font-medium text-gray-900 mb-1">
+                        {test.tieu_de}
+                        {getVisibilityIcon(test?.pham_vi_hien_thi)}
+                      </div>
+                      <div className="text-sm text-gray-500 flex items-center mb-1">
+                        <div className=''>
+                          <span>Mức độ: </span>
+                          {getDifficultyLabel(test.do_kho)}
+                        </div>
+                        <span className='px-1'>|</span>
+                        <div>
+                          <span>Số câu hỏi: </span>
+                          {test?.cau_hoi_kiem_tra?.length}
+                        </div>
+                      </div>
+                      <div className='flex flex-wrap gap-2'>
+                        {(JSON.parse(test?.danh_muc)).map((item: string, index: number) => (
+                          <span key={index} className='text-xs border border-blue-400 px-2 py-1 rounded-xs'>
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-1 text-nowrap rounded-full text-xs font-medium ${test.trang_thai === 'hoat_dong' ? 'bg-green-100 text-green-700' :
                         test.trang_thai === 'ban_nhap' ? 'bg-yellow-100 text-yellow-700' :
                           'bg-gray-100 text-gray-700'
                         }`}>
-                        {test.trang_thai.charAt(0).toUpperCase() + test.trang_thai.slice(1)}
+                        {getStatusLabel(test.trang_thai)}
                       </span>
-                    </div>
-                    <CardDescription className="line-clamp-2">{test.mo_ta}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div>
-                          <div className="text-gray-600">Duration</div>
-                          <div className="font-medium">{test.thoi_luong / 60} min</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600">Questions</div>
-                          <div className="font-medium">{test?.cau_hoi?.length}</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600">Attempts</div>
-                          <div className="font-medium">{test.so_lan_lam_toi_da}</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600">Avg Score</div>
-                          <div className="font-medium">test.avgScore%</div>
-                        </div>
+                    </td>
+                    {/* <td className="px-6 py-4 text-sm">{test?.cau_hoi_kiem_tra?.length}</td> */}
+                    <td className="px-6 py-4 text-sm">{test.so_lan_lam_toi_da}</td>
+                    <td className="px-6 py-4 text-sm font-medium">{test.avgScore}%</td>
+                    <td className="px-6 py-4 text-sm">{test.passRate}%</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      <div className='flex items-center'>
+                        <Calendar size={16} className='mr-2' />
+                        {formatDate(test.ngay_cap_nhat)}
                       </div>
-                      <div className="pt-2 border-t">
-                        <div className="text-xs text-gray-500">
-                          Last modified: {test.ngay_cap_nhat}
-                        </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-1">
+                        <Button onClick={() => handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Edit</Button>
+                        <Button onClick={() => handleViewResultDetail(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Results</Button>
+                        <Button onClick={() => handleDetailTest(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Detail</Button>
+                        <Button onClick={() => handleDeleteTest(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer text-red-600'>Delete</Button>
                       </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex flex-col gap-2">
-                    <div className="flex gap-2 w-full">
-                      <Button variant="outline" size="sm" className="flex-1 cursor-pointer">
-                        Edit
-                      </Button>
-                      <Button onClick={() => handleStartTest(test.ma_kiem_tra, user?.ma_nguoi_dung)} variant="default" size="sm" className="flex-1 cursor-pointer">
-                        Start
-                      </Button>
-                    </div>
-                    <div className="flex gap-2 w-full">
-                      <Button variant="outline" size="sm" className="flex-1 cursor-pointer"
-                        onClick={() => {
-                          handleViewResultDetail(test.ma_kiem_tra)
-                        }}
-                      >
-                        Results
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1 cursor-pointer">
-                        Duplicate
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 hover:text-red-700 cursor-pointer"
-                        onClick={() => {
-                          setSelectedtest(test.ma_kiem_tra.toString());
-                          setShowDeleteDialog(true);
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white rounded-lg border overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Tên bài kiểm tra</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Trạng thái</th>
-                    {/* <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Số lượng câu hỏi</th> */}
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Số lần làm</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Điểm trung bình</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Tỉ lệ pass</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Chỉnh sửa lần cuối</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Hành động</th>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {tests.map(test => (
-                    <tr key={test.ma_kiem_tra} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900 mb-1">{test.tieu_de}</div>
-                        <div className="text-sm text-gray-500 flex items-center mb-1">
-                          <div>
-                            <span>Mức độ: </span>
-                            {getDifficultyLabel(test.do_kho)}
-                          </div>
-                          <span className='px-1'>|</span>
-                          <div>
-                            <span>Số câu hỏi: </span>
-                            {test?.cau_hoi_kiem_tra?.length}
-                          </div>
-                        </div>
-                        <div className='flex flex-wrap gap-2'>
-                          {(JSON.parse(test?.danh_muc)).map((item: string, index: number) => (
-                            <span key={index} className='text-xs border border-blue-400 px-2 py-1 rounded-xs'>
-                              {item}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${test.trang_thai === 'hoat_dong' ? 'bg-green-100 text-green-700' :
-                          test.trang_thai === 'ban_nhap' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-gray-100 text-gray-700'
-                          }`}>
-                          {/* {test.trang_thai.charAt(0).toUpperCase() + test.trang_thai.slice(1)} */}
-                          {getStatusLabel(test.trang_thai)}
-                        </span>
-                      </td>
-                      {/* <td className="px-6 py-4 text-sm">{test?.cau_hoi_kiem_tra?.length}</td> */}
-                      <td className="px-6 py-4 text-sm">{test.so_lan_lam_toi_da}</td>
-                      <td className="px-6 py-4 text-sm font-medium">{test.avgScore}%</td>
-                      <td className="px-6 py-4 text-sm">{test.passRate}%</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        <div className='flex items-center'>
-                          <Calendar size={16} className='mr-2' />
-                          {formatDate(test.ngay_cap_nhat)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-1">
-                          <Button onClick={() => handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Edit</Button>
-                          <Button onClick={() => handleViewResultDetail(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Results</Button>
-                          <Button onClick={() => handleDeleteTest(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer text-red-600'>Delete</Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                ))}
+              </tbody>
+            </table>
+          </div>
         </TabsContent>
 
         <TabsContent value="active" className="mt-6">
