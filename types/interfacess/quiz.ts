@@ -68,3 +68,10 @@ export interface BaiTracNghiem {
   cau_hoi_trac_nghiem?: CauHoiTracNghiem[]; // liên kết (1-n)
 }
 
+export interface TestSetup {
+  title: string;
+  course: string;
+  description: string;
+  duration: number; // in minutes
+  attemptsAllowed: number;
+}

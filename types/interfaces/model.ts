@@ -10,6 +10,7 @@ export interface Test {
   do_kho: "de" | "trung_binh" | "kho"; // difficulty ('easy' | 'medium' | 'hard')
   trang_thai: "hoat_dong" | "ban_nhap" | "luu_tru"; // status
   ngay_bat_dau: string;              // start_date
+  pham_vi_hien_thi: 'cong_khai' | 'rieng_tu' | 'lop_hoc'
   ngay_ket_thuc: string;             // end_date
   ngay_tao: string;                  // createdAt
   ngay_cap_nhat: string;             // updatedAt
