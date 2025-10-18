@@ -105,7 +105,7 @@ export function InstructorDashboard() {
       {/* quick access */}
       <div>
         <div>
-          <h1 className="text-2xl font-bold">Quiz access</h1>
+          <h1 className="text-2xl font-bold">Quick access</h1>
           <p className="text-muted-foreground">Manage your courses and students</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

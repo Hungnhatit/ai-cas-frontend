@@ -1,7 +1,7 @@
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import QuizEditor from '@/components/quizzes/quiz-editing-page';
-import { QuizSetup } from '@/types/quiz';
+import { QuizSetup } from '@/types/interfacess/quiz';
 import React from 'react';
 
 interface EditQuizPageProps {

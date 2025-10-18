@@ -1,6 +1,5 @@
 import { api } from '@/lib/axios';
 
-const token = localStorage.getItem("token");
 
 // Submit test answers and get results
 export const testService = {
@@ -51,6 +50,7 @@ export const testService = {
   },
 
   updateTest: async (test_id: number, data: any) => {
+    const token = localStorage.getItem("token");
     try {
       const res = await api.put(`/test/${test_id}/update`, data, {
         headers: {
@@ -64,6 +64,7 @@ export const testService = {
   },
 
   deleteTest: async (test_id: number, force = false) => {
+    const token = localStorage.getItem("token");
     try {
       const res = await api.delete(`/test/remove/${test_id}${force ? 'force=true' : ''}`, {
         headers: {
@@ -79,6 +80,7 @@ export const testService = {
   },
 
   restoreTest: async (test_id: number) => {
+    const token = localStorage.getItem("token");
     try {
       const res = await api.patch(`/test/${test_id}/restore`, {}, {
         headers: {

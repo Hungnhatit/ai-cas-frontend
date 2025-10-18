@@ -1,3 +1,5 @@
+import { Earth, Lock, GraduationCap } from "lucide-react";
+
 export const TEST_DIFFICULTY_LABEL: Record<string, string> = {
   de: 'Dễ',
   trung_binh: 'Trung bình',

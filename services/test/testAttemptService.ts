@@ -27,7 +27,7 @@ export const testAttemptService = {
       console.log(error)
     }
   },
-  
+
   submitTestAnswers: async (attempt_id: number, answers: Record<number, string | number>): Promise<boolean> => {
     try {
       const res = await api.post(`/test-attempt/${attempt_id}/submit-answers`, {

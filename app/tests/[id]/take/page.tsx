@@ -1,3 +1,4 @@
+'use client'
 import { AuthGuard } from '@/components/auth/auth-guard'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import TestPage from '@/components/test/test-page'

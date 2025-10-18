@@ -20,15 +20,15 @@ import { studentService } from '@/services/studentService';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { testService } from '@/services/test/testService';
 import { Student } from '@/types/interfaces/model';
-import { Test, TestQuestion } from '@/types/interfaces/test';
+import { Test, TestQuestion } from '@/types/interfaces/model';
 
 interface TestEditProp {
   test_id: number,
-  setup: TestSetup,
+  setup?: TestSetup,
 }
 
 const TestEditor = ({ test_id, setup }: TestEditProp) => {
-  const [test, setTest] = useState<Test[]>([])
+  const [test, setTest] = useState<Test | null>(null)
   const [search, setSearch] = useState("")
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true);
@@ -87,7 +87,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
       }
     }
     fetchData()
-  }, [id]);
+  }, [id, test_id]);
 
   const addQuestion = () => {
     setQuestions([
@@ -171,7 +171,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
       setNewTest({ tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 })
       setQuestions([]);
       toast.success('Test has been created successfully!');
-      router.push('/test');
+      router.push('/tests');
     } catch (error) {
       console.error("Failed to create test:", error)
     }
@@ -212,6 +212,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
     }
   }
 
+  // TODO: implement duplication API when backend ready
   const duplicateTest = async (quiz: Quiz) => {
     try {
       console.log("[v0] Duplicating quiz:", quiz.id)
@@ -224,8 +225,10 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
   const deleteTest = async (test_id: number) => {
     try {
       console.log("[v0] Deleting test:", test_id)
-      // In a real app, you would call api.deleteTest(test_id)
-      setTest(test?.filter((q) => q.ma_kiem_tra !== test_id))
+      await testService.deleteTest(test_id)
+      setTest(null);
+      toast.success("Test deleted successfully!");
+      router.push("/tests");
     } catch (error) {
       console.error("Failed to delete test:", error)
     }
@@ -249,17 +252,19 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
       </div>
     )
   }
-  
+
   const handleSetupChange = (setup: TestSetup) => {
-    setTest(prev => ({ ...prev, setup }));
+    if (!test) return;
+    setTest({ ...test, setup } as Test);
   };
 
   const handleQuestionsChange = (questions: TestQuestion[]) => {
-    setTest(prev => ({ ...prev, questions }));
+    if (!test) return;
+    setTest({ ...test, questions } as Test);
   };
 
   // const handleCancel = () => {
-  //   if (test.setup.title || test?.questions?.length > 0) {
+  //   if (test?.setup.title || test?.questions?.length > 0) {
   //     if (window.confirm('Are you sure you want to cancel? All changes will be lost.')) {
   //       setTest({
   //         setup: {
@@ -295,8 +300,8 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
               </Button>
               <div>
                 <div className='flex items-center'>
-                  <h1 className="text-xl font-semibold text-white mr-2">{test.tieu_de}</h1>
-                  {test.trang_thai === 'hoat_dong'
+                  <h1 className="text-xl font-semibold text-white mr-2">{test?.tieu_de}</h1>
+                  {test?.trang_thai === 'hoat_dong'
                     ? (
                       <Badge className={cn('bg-blue-500')}>
                         Active
@@ -322,7 +327,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                 Cancel
               </Button>
               <Button
-                onClick={test.trang_thai === 'hoat_dong' ? handleUpdateTest : handleCreateTest}
+                onClick={test?.trang_thai === 'hoat_dong' ? handleUpdateTest : handleCreateTest}
                 disabled={loading}
                 className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
               >
@@ -334,7 +339,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                 ) : (
                   <>
                     <Save className='h-4 w-4' />
-                    {test.trang_thai === 'hoat_dong' ? 'Save' : 'Publish'}
+                    {test?.trang_thai === 'hoat_dong' ? 'Save' : 'Publish'}
                   </>
                 )}
               </Button>
@@ -351,7 +356,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
               <Label htmlFor="test-title" className='mb-2'>Test title</Label>
               <Input
                 id="test-title"
-                value={newTest.tieu_de}
+                value={newTest?.tieu_de}
                 onChange={(e) => setNewTest({ ...newTest, tieu_de: e.target.value })}
                 placeholder="Enter test title"
                 className="rounded-sm h-12 text-base border-gray-400/70 shadow-none"
@@ -359,7 +364,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
             </div>
             {/* <div>
               <Label htmlFor="quiz-course" className='mb-2'>Course</Label>
-              <Select value={newTest.course} onValueChange={(value) => setNewTest({ ...newTest, course: value })}>
+              <Select value={newTest?.course} onValueChange={(value) => setNewTest({ ...newTest, course: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select course" />
                 </SelectTrigger>
@@ -378,7 +383,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
             <Label htmlFor="test-description" className='mb-2'>Description</Label>
             <Textarea
               id="test-description"
-              value={newTest.mo_ta}
+              value={newTest?.mo_ta}
               onChange={(e) => setNewTest({ ...newTest, mo_ta: e.target.value })}
               placeholder="Describe what this test covers"
               className="rounded-sm h-12 text-base border-gray-400/70 shadow-none"
@@ -391,7 +396,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
               <Input
                 id="test-duration"
                 type="number"
-                value={newTest.thoi_luong}
+                value={newTest?.thoi_luong}
                 onChange={(e) => setNewTest({ ...newTest, thoi_luong: Number.parseInt(e.target.value) })}
                 min="5"
                 max="180"
@@ -403,7 +408,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
               <Input
                 id="test-attempts"
                 type="number"
-                value={newTest.so_lan_lam_toi_da}
+                value={newTest?.so_lan_lam_toi_da}
                 onChange={(e) => setNewTest({ ...newTest, so_lan_lam_toi_da: Number(e.target.value) })}
                 min="1"
                 max="10"
@@ -505,7 +510,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                             lua_chon: value === "trac_nghiem" ? ["", "", "", ""] : undefined,
                           })
                         }
-                      >                      
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -616,14 +621,14 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
 
       </div>
 
-      {test.trang_thai === 'draft' && (
+      {test?.trang_thai === 'ban_nhap' && (
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className='cursor-pointer'>
             Cancel
           </Button>
           <Button
             onClick={handleCreateTest}
-            disabled={!newTest.tieu_de || questions.length === 0}
+            disabled={!newTest?.tieu_de || questions.length === 0}
             className='cursor-pointer'
           >
             Create test

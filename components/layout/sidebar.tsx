@@ -166,22 +166,23 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 href={item.href}
                 onClick={isMobile ? onClose : undefined}
                 className={cn(
-                  "group relative flex items-center gap-3 px-3 py-2 rounded-sm text-sm font-medium transition-colors text-nowrap",
+                  "group relative flex gap-3 px-3 py-2 rounded-sm text-sm font-medium transition-colors text-nowrap",
                   "hover:bg-[#374151] hover:text-white",
                   isActive
                     ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-blue-400"
                     : "text-white",
-                  collapsed && !isMobile && "justify-center"
+                  collapsed && !isMobile && "justify-center",
                 )}
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />
-                {(!collapsed || isMobile) && <span>{item.title}</span>}
+                {(!collapsed || isMobile) && <span className="overflow-hidden">{item.title}</span>}
 
+                {/* Tooltip khi collapse */}
                 {collapsed && !isMobile && (
                   <span
                     className={cn(
                       "absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 rounded text-xs text-white bg-gray-900",
-                      "opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-200 pointer-events-none z-50"
+                      "opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-200 z-50"
                     )}
                   >
                     {item.title}
@@ -194,6 +195,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       </ul>
     </nav>
   )
+
 
 
   if (isMobile) {

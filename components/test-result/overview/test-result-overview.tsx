@@ -136,7 +136,7 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
   // render detail question
   const renderQuestionResult = (question: TestQuestion, index: number) => {
     const userAnswer = attempt?.cau_tra_loi?.[question.ma_cau_hoi]
-    const isCorrect = userAnswer?.toString() === question.dap_an_dung.toString();
+    const isCorrect = userAnswer?.toString() === question?.dap_an_dung?.toString();
 
     return (
       <Card key={question.ma_cau_hoi} className={`border-l-4 ${isCorrect ? "border-l-sky-600" : "border-l-red-500"} gap-0.5 py-4`}>
