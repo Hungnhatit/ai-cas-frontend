@@ -6,7 +6,7 @@ import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
-import { Test } from '@/types/interfaces/test';
+import { Test } from '@/types/interfaces/model';
 import { testAttemptService } from '@/services/test/testAttemptService';
 import { useAuth } from '@/providers/auth-provider';
 import { testService } from '@/services/test/testService';
@@ -50,24 +50,27 @@ const TestManagement = () => {
    * Search
    */
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<"all" | "hoat_dong" | "ban_nhap" | "luu_tru">('all');
 
   const filteredTests = useMemo(() => {
     return tests
       .filter(test => {
         if (statusFilter === 'all') return true;
-        return test.status === statusFilter;
+        return test.trang_thai === statusFilter;
       })
       .filter(test =>
-        test.title.toLowerCase().includes(searchQuery.toLowerCase())
+        test.tieu_de.toLowerCase().includes(searchQuery.toLowerCase())
       );
-  }, [searchQuery, statusFilter]);
+  }, [tests, searchQuery, statusFilter]);
+
+  console.log(filteredTests);
+
 
   const status = {
     total: tests.length,
-    active: tests.filter(t => t.trang_thai === 'active' || t.trang_thai === 'ready').length,
-    drafts: tests.filter(t => t.trang_thai === 'draft').length,
-    totalAttempts: tests.reduce((sum, t) => sum + t.attempts, 0),
+    active: tests.filter(t => t.trang_thai === 'hoat_dong').length,
+    drafts: tests.filter(t => t.trang_thai === 'ban_nhap').length,
+    totalAttempts: tests.reduce((sum, t) => sum + t.so_lan_lam_toi_da, 0),
   };
 
   useEffect(() => {
@@ -87,7 +90,9 @@ const TestManagement = () => {
       }
     }
 
-    fetchTests()
+    if (user?.ma_nguoi_dung) {
+      fetchTests()
+    }
   }, [user?.ma_nguoi_dung]);
 
   const handleCreatePage = () => {
@@ -182,11 +187,11 @@ const TestManagement = () => {
   return (
     <div className="">
       {/* Header Section */}
-      <div className="mb-8">
+      <div className="mb-4">
         <div className="bg-[#232f3e] flex flex-col lg:flex-row p-5 lg:items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-3xl font-bold text-white">Tests Management</h2>
-            <p className="text-white mt-2">Create, edit, and monitor your assessments</p>
+            <p className="text-white mt-2">Tạo, chỉnh sửa và theo dõi bài thi của bạn của bạn</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={() => handleCreatePage()} className="bg-blue-600 hover:bg-blue-700 cursor-pointer">
@@ -220,7 +225,7 @@ const TestManagement = () => {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="text-2xl font-bold text-green-600">{stats.active}</div>
-              <div className="text-sm text-gray-600">Active</div>
+              <div className="text-sm text-gray-600">Trên tất cả các bài test</div>
             </CardContent>
           </Card>
           <Card className='gap-1'>
@@ -254,19 +259,7 @@ const TestManagement = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="all" className='gap-1'>
-        <div className='flex items-center justify-between'>
-          <TabsList>
-            <TabsTrigger value="all" className='cursor-pointer'>All tests ({stats.total})</TabsTrigger>
-            <TabsTrigger value="active" className='cursor-pointer'>Active ({stats.active})</TabsTrigger>
-            <TabsTrigger value="draft" className='cursor-pointer'>Drafts ({stats.draft})</TabsTrigger>
-            <TabsTrigger value="archived" className='cursor-pointer'>Archived ({stats.archived})</TabsTrigger>
-          </TabsList>
-          <Button variant="outline" className='cursor-pointer' onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}>
-            {viewMode === 'grid' ? 'Table View' : 'Grid View'}
-          </Button>
-        </div>
-
-        <div className="flex items-center bg-white">
+        <div className="flex items-center bg-white mb-2">
           <Input
             placeholder="Tìm kiếm theo tên bài test..."
             value={searchQuery}
@@ -274,15 +267,14 @@ const TestManagement = () => {
             className="max-w-sm shadow-none border border-gray-300 rounded-xs"
           />
           <select
-            className="ml-4 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="ml-4 h-9 rounded-xc border border-gray-300 bg-background px-3 py-2 text-sm"
             value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
+            onChange={e => setStatusFilter(e.target.value as "all" | "hoat_dong" | "ban_nhap" | "luu_tru")}
           >
             <option value="all">Tất cả trạng thái</option>
-            <option value="active">Hoạt động</option>
-            <option value="ready">Sẵn sàng</option>
-            <option value="draft">Bản nháp</option>
-            <option value="archived">Đã lưu trữ</option>
+            <option value="hoat_dong">Hoạt động</option>
+            <option value="ban_nhap">Bản nháp</option>
+            <option value="luu_tru">Đã lưu trữ</option>
           </select>
         </div>
 
@@ -302,7 +294,7 @@ const TestManagement = () => {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {tests.map(test => (
+                {filteredTests.map(test => (
                   <tr key={test.ma_kiem_tra} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center font-medium text-gray-900 mb-1">
@@ -357,7 +349,14 @@ const TestManagement = () => {
                   </tr>
                 ))}
               </tbody>
+
             </table>
+
+            {filteredTests.length === 0 && (
+              <div className='w-full text-center py-4 italic text-gray-500'>
+                Không tìm thấy bài test nào!
+              </div>
+            )}
           </div>
         </TabsContent>
 
