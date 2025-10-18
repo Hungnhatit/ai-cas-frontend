@@ -191,7 +191,7 @@ const TestManagement = () => {
         <div className="bg-[#232f3e] flex flex-col lg:flex-row p-5 lg:items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-3xl font-bold text-white">Tests Management</h2>
-            <p className="text-white mt-2">Tạo, chỉnh sửa và theo dõi bài thi của bạn của bạn</p>
+            <p className="text-white mt-2">Tạo, chỉnh sửa và theo dõi bài thi của bạn</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={() => handleCreatePage()} className="bg-blue-600 hover:bg-blue-700 cursor-pointer">
