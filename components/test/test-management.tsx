@@ -297,7 +297,7 @@ const TestManagement = () => {
                 {filteredTests.map(test => (
                   <tr key={test.ma_kiem_tra} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
-                      <div className="flex items-center font-medium text-gray-900 mb-1">
+                      <div className="flex items-center font-medium text-gray-900 hover:underline mb-1 cursor-pointer transition-all">
                         {test.tieu_de}
                         {getVisibilityIcon(test?.pham_vi_hien_thi)}
                       </div>
@@ -349,7 +349,6 @@ const TestManagement = () => {
                   </tr>
                 ))}
               </tbody>
-
             </table>
 
             {filteredTests.length === 0 && (

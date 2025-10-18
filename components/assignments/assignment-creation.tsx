@@ -104,7 +104,6 @@ const AssignmentForm = () => {
         const [getStudents] = await Promise.all([
           studentService.getStudentByInstructorId(user?.ma_nguoi_dung)
         ]);
-        console.log(getStudents);
         setStudents(getStudents.data.instructor.hoc_vien);
       } catch (error) {
         console.log(error);
@@ -113,8 +112,6 @@ const AssignmentForm = () => {
     fetchStudent();
 
   }, [user?.user_id]);
-
-  console.log(students);
 
   useEffect(() => {
     handleInputChange('danh_sach_ma_hoc_vien', selectedStudents);
@@ -176,7 +173,6 @@ const AssignmentForm = () => {
           attachments.map(async (file) => {
             try {
               const res = await fileService.fileUploadService(file);
-              console.log(res.data)
               return {
                 url: res.data.url,
                 name: res.data.name || file.name

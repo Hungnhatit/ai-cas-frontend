@@ -6,26 +6,14 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  BookOpen,
-  Calendar,
-  ChevronLeft,
-  GraduationCap,
-  Home,
-  MessageSquare,
-  Settings,
-  Users,
-  BarChart3,
-  FileText,
-  Award,
-  Video,
-  HelpCircle,
-  BookType,
+  BookOpen, Calendar, ChevronLeft, GraduationCap, Home, MessageSquare, Settings, Users, BarChart3, FileText, Award, Video, HelpCircle, BookType,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { useAuth } from "@/providers/auth-provider"
 import { useIsMobile } from "@/components/ui/use-mobile"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip"
 
 interface NavItem {
   title: string
@@ -162,33 +150,29 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           const isActive = pathname === item.href
           return (
             <li key={item.href}>
-              <Link
-                href={item.href}
-                onClick={isMobile ? onClose : undefined}
-                className={cn(
-                  "group relative flex gap-3 px-3 py-2 rounded-sm text-sm font-medium transition-colors text-nowrap",
-                  "hover:bg-[#374151] hover:text-white",
-                  isActive
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-blue-400"
-                    : "text-white",
-                  collapsed && !isMobile && "justify-center",
-                )}
-              >
-                <item.icon className="h-5 w-5 flex-shrink-0" />
-                {(!collapsed || isMobile) && <span className="overflow-hidden">{item.title}</span>}
-
-                {/* Tooltip khi collapse */}
-                {collapsed && !isMobile && (
-                  <span
-                    className={cn(
-                      "absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 rounded text-xs text-white bg-gray-900",
-                      "opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-200 z-50"
-                    )}
-                  >
-                    {item.title}
-                  </span>
-                )}
-              </Link>
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Link
+                      href={item.href}
+                      onClick={isMobile ? onClose : undefined}
+                      className={cn(
+                        "group relative flex gap-3 px-3 py-2 rounded-sm text-sm font-medium transition-colors text-nowrap",
+                        "hover:bg-[#374151] hover:text-white",
+                        isActive
+                          ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-blue-400"
+                          : "text-white",
+                        collapsed && !isMobile && "justify-center",
+                      )}
+                    >
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      {(!collapsed || isMobile) && <span className="overflow-hidden">{item.title}</span>}
+                    </Link>
+                    <TooltipContent side="right" className="ml-4 bg-[#374151] text-sm 
+                     text-white px-2 py-1 rounded-[4px] z-50">{item.title}</TooltipContent>
+                  </TooltipTrigger>
+                </Tooltip>
+              </TooltipProvider>
             </li>
           )
         })}
@@ -222,7 +206,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
     <div
       className={cn(
         "relative flex flex-col h-full bg-[#1F2937] border-r border-sidebar-border transition-all duration-300",
-        collapsed ? "w-16" : "w-64",
+        collapsed ? "w-16" : "w-56",
       )}
     >
       <div className="flex items-center justify-between p-4">

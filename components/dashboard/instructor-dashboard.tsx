@@ -46,8 +46,8 @@ export function InstructorDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Instructor Dashboard</h1>
-          <p className="text-muted-foreground">Manage your courses and students</p>
+          <h1 className="text-3xl font-bold">Trang quản trị dành cho giảng viên</h1>
+          <p className="text-muted-foreground">Quản lý bài thi, học viên của bạn</p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
