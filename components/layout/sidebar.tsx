@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -75,8 +75,8 @@ const navItems: NavItem[] = [
     roles: ['instructor']
   },
   {
-    title: 'Tests',
-    href: '/tests',
+    title: 'Your tests',
+    href: '/student/tests-management',
     icon: BookType,
     roles: ['student']
   },
@@ -133,12 +133,27 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open, onClose }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false)
+  // initialize state directly from localStorage (lazy initializer)
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("sidebar-collapsed");
+      return saved === "true";
+    }
+    return false;
+  });
   const pathname = usePathname()
   const { user } = useAuth()
   const isMobile = useIsMobile()
 
-  const filteredNavItems = navItems.filter((item) => !item.roles || item.roles.includes(user?.vai_tro || "student"))
+  const filteredNavItems = navItems.filter((item) => !item.roles || item.roles.includes(user?.vai_tro || "student"));
+
+  useEffect(() => {
+    localStorage.setItem("sidebar-collapsed", String(collapsed))
+  }, [collapsed])
+
+  const toggleSidebar = () => {
+    setCollapsed((prev) => !prev);
+  }
 
   const NavigationContent = () => (
     <nav className="flex-1 px-2 py-4">
@@ -151,14 +166,27 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 href={item.href}
                 onClick={isMobile ? onClose : undefined}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground",
-                  collapsed && !isMobile && "justify-center",
+                  "group relative flex items-center gap-3 px-3 py-2 rounded-sm text-sm font-medium transition-colors text-nowrap",
+                  "hover:bg-[#374151] hover:text-white",
+                  isActive
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-blue-400"
+                    : "text-white",
+                  collapsed && !isMobile && "justify-center"
                 )}
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />
                 {(!collapsed || isMobile) && <span>{item.title}</span>}
+
+                {collapsed && !isMobile && (
+                  <span
+                    className={cn(
+                      "absolute left-full top-1/2 -translate-y-1/2 ml-4 px-2 py-1 rounded text-xs text-white bg-gray-900",
+                      "opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-200 pointer-events-none z-50"
+                    )}
+                  >
+                    {item.title}
+                  </span>
+                )}
               </Link>
             </li>
           )
@@ -166,6 +194,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       </ul>
     </nav>
   )
+
 
   if (isMobile) {
     return (
@@ -177,7 +206,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
                   <span className="text-sidebar-primary-foreground font-bold text-sm">E</span>
                 </div>
-                <SheetTitle className="font-bold text-lg text-sidebar-foreground">AI-CAS</SheetTitle>
+                <SheetTitle className="font-bold text-lg text-sidebar-foreground text-nowrap">AI-CAS</SheetTitle>
               </div>
             </div>
           </SheetHeader>
@@ -190,7 +219,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   return (
     <div
       className={cn(
-        "relative flex flex-col h-full bg-sidebar border-r border-sidebar-border transition-all duration-300",
+        "relative flex flex-col h-full bg-[#1F2937] border-r border-sidebar-border transition-all duration-300",
         collapsed ? "w-16" : "w-64",
       )}
     >
@@ -200,14 +229,15 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
               <span className="text-sidebar-primary-foreground font-bold text-sm">E</span>
             </div>
-            <span className="font-bold text-lg text-sidebar-foreground">AI-CAS</span>
+            <span className="font-bold text-lg text-white text-nowrap">AI-CAS</span>
           </div>
+
         )}
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setCollapsed(!collapsed)}
-          className="h-8 w-8 text-sidebar-foreground hover:bg-sidebar-accent cursor-pointer"
+          onClick={toggleSidebar}
+          className="h-8 w-8 text-white hover:bg-sidebar-accent cursor-pointer"
         >
           <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />
         </Button>
