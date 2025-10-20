@@ -102,8 +102,6 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
     ])
   }
 
-  console.log(questions);
-
   const updateQuestion = (index: number, updates: Partial<QuizQuestion>) => {
     setQuestions(questions.map((q, i) => (
       i === index
@@ -125,8 +123,6 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
       })
     }
   }
-
-  console.log(selectedStudents)
 
   const toggleStudent = (id: string) => {
     setSelectedStudents((prev) =>

@@ -61,7 +61,6 @@ const CreateQuizzes = () => {
     ])
   }
 
-  console.log(user)
   const updateQuestion = (index: number, updates: Partial<QuizQuestion>) => {
     setQuestions(questions.map((q, i) => (
       i === index
@@ -100,8 +99,6 @@ const CreateQuizzes = () => {
       console.error("Failed to create quiz:", error)
     }
   }
-
-  console.log('New quiz: ', newQuiz)
 
   const duplicateQuiz = async (quiz: Quiz) => {
     try {

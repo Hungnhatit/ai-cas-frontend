@@ -30,7 +30,7 @@ export function QuizManagementPage() {
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const { user } = useAuth();
-  console.log(user);
+
   const [newQuiz, setNewQuiz] = useState({
     title: "",
     course: "",
@@ -46,11 +46,8 @@ export function QuizManagementPage() {
       try {
         // const [quizzesData, coursesData] = await Promise.all([api.getQuizzes(), api.getCourses()]);
         const [quizzesData, ] = await Promise.all([
-          quizService.getQuizByInstructorId(user?.ma_nguoi_dung),
-          
+          quizService.getQuizByInstructorId(user?.ma_nguoi_dung),        
         ]);
-        console.log('hello')
-        console.log('quizzesData: ', quizzesData)
         setQuizzes(quizzesData)
       } catch (error) {
         console.error("Failed to fetch data:", error)
@@ -116,7 +113,6 @@ export function QuizManagementPage() {
         const attempt_id = data.attempt.quizAttempt_id
         router.push(`/quizzes/${ma_bai_trac_nghiem}/take?attempt=${attempt_id}`)
       }
-      console.log(ma_bai_trac_nghiem, student_id);
     } catch (error) {
       console.error("Failed to start quiz:", error)
     }

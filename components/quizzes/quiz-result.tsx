@@ -45,8 +45,6 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
         setQuiz(quizzes);
         setAttempt(attemptList.attempt);
 
-        console.log(attemptList)
-
         // if (quizAttempt_id) {
         //   const currentAttempt = attemptList.find((a: any) => a.quizAttempt_id === quizAttempt_id)
         //   if (currentAttempt) {
@@ -112,7 +110,6 @@ export function QuizResultPage({ quiz_id, quizAttempt_id }: QuizResultPageProps)
     let correct = 0
     quiz.quiz_questions.forEach((question) => {
       const userAnswer = JSON.parse(attempt?.answers)[question.quizQuestion_id];
-      console.log(userAnswer)
       if (userAnswer.toString() === question.correctAnswer) {
         correct++
       }

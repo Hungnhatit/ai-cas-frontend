@@ -59,8 +59,6 @@ export function QuizTakingPage({ quizId, attemptId }: QuizTakingPageProps) {
           const attempts = await quizService.getQuizAttempt(quizId, user?.user_id)
           const currentAttempt = attempts.find((a: any) => a.quizAttempt_id === Number(attemptId))
 
-          console.log('Current attempt: ', currentAttempt);
-
           if (currentAttempt) {
             setAttempt(currentAttempt)
             setAnswers(currentAttempt.answers || {})
@@ -107,7 +105,6 @@ export function QuizTakingPage({ quizId, attemptId }: QuizTakingPageProps) {
       if (result) {
         router.push(`/quizzes/${quizId}/result?attempt=${attemptId}`)
       }
-      console.log(result)
     } catch (error) {
       console.error("Failed to submit quiz:", error)
     } finally {

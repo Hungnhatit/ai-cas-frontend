@@ -46,8 +46,6 @@ const QuizResultsPage = ({ quiz_id }: QuizResultsPageProps) => {
     router.push(`/quizzes/${quiz_id}/result-detail?attempt=${quizAttempt_id}`);
   }
 
-  console.log(id);
-
   return (
     <div className='space-y-6'>
       <div>

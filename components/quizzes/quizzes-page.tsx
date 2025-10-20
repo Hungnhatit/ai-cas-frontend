@@ -71,7 +71,6 @@ export function QuizzesPage() {
         const attempt_id = data.attempt.quizAttempt_id
         router.push(`/quizzes/${quiz_id}/take?attempt=${attempt_id}`)
       }
-      console.log(quiz_id, student_id);
     } catch (error) {
       console.error("Failed to start quiz:", error)
     }
@@ -80,8 +79,6 @@ export function QuizzesPage() {
   const handleViewResult = async (quiz_id: number) => {
     router.push(`/quizzes/${quiz_id}/results`)
   }
-
-  console.log('attempts: ', attempts);
 
   const getQuizStats = () => {
     const total = quizzes.length;
