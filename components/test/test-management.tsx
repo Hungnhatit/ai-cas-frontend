@@ -63,9 +63,6 @@ const TestManagement = () => {
       );
   }, [tests, searchQuery, statusFilter]);
 
-  console.log(filteredTests);
-
-
   const status = {
     total: tests.length,
     active: tests.filter(t => t.trang_thai === 'hoat_dong').length,
@@ -110,7 +107,6 @@ const TestManagement = () => {
         const attempt_id = data.data.ma_lan_lam;
         router.push(`/tests/${test_id}/take?attempt=${attempt_id}`);
       }
-      console.log(data.data.ma_lan_lam);
     } catch (error) {
       toast.error(`Failed when starting test: ${error}`)
     }

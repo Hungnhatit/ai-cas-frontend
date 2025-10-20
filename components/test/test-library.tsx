@@ -191,8 +191,6 @@ const TestLibrary = () => {
     fetchData();
   }, []);
 
-  console.log(tests);
-
   const filteredAndSortedTests = useMemo(() => {
     let filtered = tests.filter(test => {
       const matchesSearch = test.tieu_de.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -242,8 +240,6 @@ const TestLibrary = () => {
       default: return difficulty;
     }
   };
-
-  console.log(filteredAndSortedTests);
 
   if (loading) {
     return (

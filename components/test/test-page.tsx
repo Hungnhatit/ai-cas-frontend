@@ -72,8 +72,6 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
           const attempts = res.data;
           const currentAttempt = attempts.find((attempt: any) => attempt.ma_lan_lam === Number(attempt_id));
 
-          console.log('currentAttempt: ', currentAttempt);
-
           if (currentAttempt) {
             setAttempt(currentAttempt);
             setAnswers(currentAttempt.cau_tra_loi || {});
@@ -103,8 +101,6 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
 
     loadTest();
   }, [test_id, attempt_id, router]);
-
-  console.log(test?.cau_hoi[0].lua_chon);
 
   useEffect(() => {
     if (timeRemaining <= 0 || !session || session.isCompleted) return;

@@ -100,11 +100,9 @@ const CreateTestPage = () => {
         trang_thai: 'ban_nhap' as const,
         ngay_ket_thuc: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')
       }
-
-      // console.log("[v0] Creating quiz:", quizData)
+      
       console.log("[v0] Creating test:", testData)
       const res = await testService.createTest(testData);
-      console.log(res);
 
       if (res.status) {
         setIsCreateDialogOpen(false)
@@ -117,8 +115,6 @@ const CreateTestPage = () => {
       console.error("Failed to create quiz:", error)
     }
   }
-
-  console.log('New quiz: ', newQuiz)
 
   const duplicateQuiz = async (quiz: Quiz) => {
     try {

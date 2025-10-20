@@ -190,8 +190,6 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
           .toISOString().split('T')[0]
       }
 
-      console.log(updatedData);
-
       console.log("[v0] Updating test:", updatedData);
 
       const res = await testService.updateTest(test_id, updatedData);
