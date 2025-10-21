@@ -70,9 +70,6 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
     loadQuizResult();
   }, []);
 
-  console.log('test: ', test);
-  console.log('attempt: ', attempt)
-
   if (loading) {
     return (
       <div className="min-h-screen">
