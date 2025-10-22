@@ -34,25 +34,25 @@ export default function QuestionBreakdown({
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-          <div className="text-center p-3 bg-blue-50 rounded-lg">
+          <div className="text-center p-3 bg-blue-50 rounded-xs">
             <div className="text-2xl font-bold text-blue-600">{totalQuestions}</div>
             <div className="text-sm text-muted-foreground">Total Questions</div>
           </div>
-          <div className="text-center p-3 bg-green-50 rounded-lg">
+          <div className="text-center p-3 bg-green-50 rounded-xs">
             <div className="flex items-center justify-center gap-1 mb-1">
               <CheckCircle className="h-4 w-4 text-green-500" />
               <span className="text-2xl font-bold text-green-600">{correctAnswers}</span>
             </div>
             <div className="text-sm text-muted-foreground">Correct</div>
           </div>
-          <div className="text-center p-3 bg-red-50 rounded-lg">
+          <div className="text-center p-3 bg-red-50 rounded-xs">
             <div className="flex items-center justify-center gap-1 mb-1">
               <XCircle className="h-4 w-4 text-red-500" />
               <span className="text-2xl font-bold text-red-600">{incorrectAnswers}</span>
             </div>
             <div className="text-sm text-muted-foreground">Incorrect</div>
           </div>
-          <div className="text-center p-3 bg-gray-50 rounded-lg">
+          <div className="text-center p-3 bg-gray-50 rounded-xs">
             <div className="flex items-center justify-center gap-1 mb-1">
               <HelpCircle className="h-4 w-4 text-gray-500" />
               <span className="text-2xl font-bold text-gray-600">{skippedQuestions}</span>

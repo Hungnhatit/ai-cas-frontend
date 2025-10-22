@@ -55,8 +55,6 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
         setTest(testData);
         setAttempt(attemptData);
 
-        // console.log(attemptListRes)
-
         // if (testAttempt_id) {
         //   const currentAttempt = attemptList.find((a: any) => a.testAttempt_id === testAttempt_id)
         //   if (currentAttempt) {
@@ -84,10 +82,6 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
 
     fetchData()
   }, [test_id, testAttempt_id, router]);
-
-  test && console.log('test: ', test);
-  attempt && console.log('attempt: ', attempt);
-
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
@@ -125,7 +119,6 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
     let correct = 0
     test.cau_hoi.forEach((question) => {
       const userAnswer = attempt?.cau_tra_loi?.[question.ma_cau_hoi];
-      console.log(userAnswer);
       if (userAnswer?.toString() === question.dap_an_dung) {
         correct++
       }

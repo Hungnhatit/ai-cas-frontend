@@ -43,15 +43,10 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
     fetchTestResults();
   }, []);
 
-  console.log('test: ', test)
-  console.log('results: ', results);
-
   const handleResultPage = async (test_id: number, attempt_id: number) => {
     // router.push(`/quizzes/${test_id}/result?attempt=${attempt_id}`);
     router.push(`/tests/${test_id}/result-detail?attempt=${attempt_id}`);
   }
-
-  console.log(id);
 
   return (
     <div className='space-y-6'>
