@@ -15,7 +15,6 @@ export default function AssignmentTable({ assignments }: AssignmentTableProps) {
     router.push(`/assignments/${assignment_id}/detail`);
   }
 
-  console.log(assignments)
   return (
     <Card className="w-full gap-1">
       <CardHeader className='px-4 py-0'>

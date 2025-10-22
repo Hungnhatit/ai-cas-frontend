@@ -49,9 +49,7 @@ export function AssignmentsPage() {
     }
 
     fetchAssignments()
-  }, []);
-
-  console.log(assignments);
+  }, []);  
 
   const pendingAssignments = assignments?.filter((a) => a.status === "pending")
   const submittedAssignments = assignments?.filter((a) => a.status === "submitted")

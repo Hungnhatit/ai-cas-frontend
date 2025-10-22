@@ -91,7 +91,6 @@ const AssignmentManagement = () => {
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const { user } = useAuth();
-  console.log(user)
 
   useEffect(() => {
     const fetchAssignment = async () => {
@@ -110,8 +109,6 @@ const AssignmentManagement = () => {
 
     fetchAssignment();
   }, []);
-
-  console.log(assignments);
 
   // sort assignments by creation date
   const sortedAssignments = useMemo(() => {
