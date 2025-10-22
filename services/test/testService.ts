@@ -1,6 +1,5 @@
 import { api } from '@/lib/axios';
 
-
 // Submit test answers and get results
 export const testService = {
   createTest: async (data: any) => {
@@ -49,6 +48,16 @@ export const testService = {
     }
   },
 
+  assignTestToStudent: async (test_id: number, data: any) => {
+    try {
+      const res = await api.post(`/test/${test_id}/assign`, data);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+
   updateTest: async (test_id: number, data: any) => {
     const token = localStorage.getItem("token");
     try {
@@ -66,7 +75,7 @@ export const testService = {
   deleteTest: async (test_id: number, force = false) => {
     const token = localStorage.getItem("token");
     try {
-      const res = await api.delete(`/test/remove/${test_id}${force ? 'force=true' : ''}`, {
+      const res = await api.delete(`/test/remove/${test_id}?${force ? 'force=true' : ''}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
