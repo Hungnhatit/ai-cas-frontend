@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
-import { ArrowLeft, Check, Plus, Save, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowLeft, Check, ChevronDown, Plus, Save, Trash2 } from 'lucide-react';
 import { TestSetup } from '@/types/interfacess/quiz';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
@@ -33,7 +33,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<Student[]>([]);
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
   const [testStatus, setTestStatus] = useState('');
   const [selectedTest, setSelectedTest] = useState<Test | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -115,8 +115,8 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
   }
 
   // handle select student
-  const handleSelectStudent = (student_id: string) => {
-    const student = students.find((s) => s.ma_hoc_vien.toString() === student_id)
+  const handleSelectStudent = (student_id: number) => {
+    const student = students.find((s) => s.ma_hoc_vien === student_id)
     if (student) {
       setNewStudent({
         ma_hoc_vien: student.ma_hoc_vien.toString(),
@@ -125,7 +125,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
     }
   }
 
-  const toggleStudent = (id: string) => {
+  const toggleStudent = (id: number) => {
     setSelectedStudents((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
     )
@@ -135,7 +135,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
     if (selectedStudents.length === students.length) {
       setSelectedStudents([]) // clear
     } else {
-      setSelectedStudents(students.map((s) => s.ma_hoc_vien.toString())) // select all
+      setSelectedStudents(students.map((s) => s.ma_hoc_vien)) // select all
     }
   }
 
@@ -145,7 +145,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
 
   const placeholder =
     selectedStudents.length === 0
-      ? "Select students..."
+      ? "Chọn học viên..."
       : selectedStudents.length === students.length
         ? "All students selected"
         : `${selectedStudents.length} students selected`
@@ -162,16 +162,17 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
         trang_thai: "draft" as const,
         ngay_ket_thuc: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 7 days from now
       }
+      console.log(testData);
 
-      console.log("[v0] Creating test:", testData)
-      const res = await testService.createTest(testData);
-      // In a real app, you would call api.createQuiz(quizData)
+      // console.log("[v0] Creating test:", testData)
+      // const res = await testService.createTest(testData);
+      // // In a real app, you would call api.createQuiz(quizData)
 
-      setIsCreateDialogOpen(false)
-      setNewTest({ tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 })
-      setQuestions([]);
-      toast.success('Test has been created successfully!');
-      router.push('/tests');
+      // setIsCreateDialogOpen(false)
+      // setNewTest({ tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 })
+      // setQuestions([]);
+      // toast.success('Test has been created successfully!');
+      // router.push('/tests');
     } catch (error) {
       console.error("Failed to create test:", error)
     }
@@ -190,11 +191,18 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
           .toISOString().split('T')[0]
       }
 
+      const assignData = {
+        // test_id: test_id,
+        instructor_id: user?.ma_nguoi_dung,
+        student_ids: selectedStudents,
+        // han_nop: 
+      }
+
       console.log("[v0] Updating test:", updatedData);
 
       const res = await testService.updateTest(test_id, updatedData);
+      await testService.assignTestToStudent(test_id, assignData);
 
-      // await quizService.assignQuiz(test_id, selectedStudents);
       setIsCreateDialogOpen(false)
       setNewTest({
         tieu_de: "",
@@ -209,6 +217,9 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
       console.log(error)
     }
   }
+
+  console.log(selectedStudents);
+
 
   // TODO: implement duplication API when backend ready
   const duplicateTest = async (quiz: Quiz) => {
@@ -261,24 +272,24 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
     setTest({ ...test, questions } as Test);
   };
 
-  // const handleCancel = () => {
-  //   if (test?.setup.title || test?.questions?.length > 0) {
-  //     if (window.confirm('Are you sure you want to cancel? All changes will be lost.')) {
-  //       setTest({
-  //         setup: {
-  //           title: '',
-  //           course: '',
-  //           description: '',
-  //           duration: 60,
-  //           attemptsAllowed: 3
-  //         },
-  //         questions: [],
-  //         quiz: []
-  //       });
-  //       toast.info('Quiz creation cancelled');
-  //     }
-  //   }
-  // };
+  const handleCancel = () => {
+    if (test?.cau_hoi_kiem_tra?.length > 0) {
+      if (window.confirm('Are you sure you want to cancel? All changes will be lost.')) {
+        setTest({
+          setup: {
+            title: '',
+            course: '',
+            description: '',
+            duration: 60,
+            attemptsAllowed: 3
+          },
+          questions: [],
+          quiz: []
+        });
+        toast.success('Quiz creation cancelled');
+      }
+    }
+  };
 
   const total_points = test?.cau_hoi?.reduce((sum, q) => sum + (q.diem || 0), 0) ?? 0;
 
@@ -313,14 +324,16 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
 
                 </div>
                 <p className="text-sm text-white">
-                  {test?.cau_hoi?.length} question{test?.cau_hoi?.length !== 1 ? 's' : ''} • {total_points} points total
+                  {test?.cau_hoi?.length} question{test?.cau_hoi?.length !== 1 ? 's' : ''} • {total_points} điểm
                 </p>
               </div>
             </div>
 
             <div className="flex items-center space-x-3">
-              <Button variant="outline"
-              // onClick={handleCancel}
+              <Button
+                variant="outline"
+                className='cursor-pointer'
+                onClick={handleCancel}
               >
                 Cancel
               </Button>
@@ -357,7 +370,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                 value={newTest?.tieu_de}
                 onChange={(e) => setNewTest({ ...newTest, tieu_de: e.target.value })}
                 placeholder="Enter test title"
-                className="rounded-sm h-12 text-base border-gray-400/70 shadow-none"
+                className="rounded-xs h-10 text-base border-gray-400/70 shadow-none"
               />
             </div>
             {/* <div>
@@ -384,7 +397,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
               value={newTest?.mo_ta}
               onChange={(e) => setNewTest({ ...newTest, mo_ta: e.target.value })}
               placeholder="Describe what this test covers"
-              className="rounded-sm h-12 text-base border-gray-400/70 shadow-none"
+              className="rounded-xs h-12 text-base border-gray-400/70 shadow-none"
             />
           </div>
 
@@ -398,7 +411,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                 onChange={(e) => setNewTest({ ...newTest, thoi_luong: Number.parseInt(e.target.value) })}
                 min="5"
                 max="180"
-                className="rounded-sm h-12 text-base border-gray-400/80 shadow-none"
+                className="rounded-xs h-12 text-base border-gray-400/80 shadow-none"
               />
             </div>
             <div>
@@ -410,30 +423,34 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                 onChange={(e) => setNewTest({ ...newTest, so_lan_lam_toi_da: Number(e.target.value) })}
                 min="1"
                 max="10"
-                className="rounded-sm h-12 text-base border-gray-400/80 shadow-none"
+                className="rounded-xs h-12 text-base border-gray-400/80 shadow-none"
               />
             </div>
           </div>
+
+
         </div>
       </div>
 
-      {/* assign test section */}
+      {/* Assign test section */}
       <div className='bg-card p-4 rounded-xs shadow-sm mb-4 border border-gray-300'>
         <div className="flex items-center justify-between mb-3">
-          <Label className='text-xl font-bold'>Assign to</Label>
+          <Label className='text-xl font-bold'>Giao cho</Label>
         </div>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="w-3xs justify-between cursor-pointer">
+            <Button variant="outline" className="w-3xs justify-between cursor-pointer rounded-xs border-gray-300">
               {placeholder}
+              <ChevronDown />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-3xs p-2 space-y-2">
+          <PopoverContent className="w-3xs p-2 space-y-2 rounded-xs border-gray-300">
             {/* Search box */}
             <Input
               placeholder="Type a name"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              className='rounded-xs border-gray-300'
             />
 
             {/* Select All */}
@@ -441,7 +458,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
               className="cursor-pointer flex items-center justify-between px-2 hover:bg-gray-100 rounded"
               onClick={selectAll}
             >
-              <span className="font-medium">Select All</span>
+              <span className="font-medium">Chọn tất cả</span>
               {selectedStudents.length === students.length && <Check size={16} />}
             </div>
 
@@ -452,12 +469,12 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                   key={student.ma_hoc_vien}
                   className={cn(
                     "cursor-pointer flex items-center justify-between p-2 hover:bg-gray-100 rounded transition",
-                    selectedStudents.includes(student.ma_hoc_vien.toString()) && 'bg-gray-200'
+                    selectedStudents.includes(student.ma_hoc_vien) && 'bg-gray-200'
                   )}
-                  onClick={() => toggleStudent(student.ma_hoc_vien.toString())}
+                  onClick={() => toggleStudent(student.ma_hoc_vien)}
                 >
                   <span>{student.ten} ({student.email})</span>
-                  {selectedStudents.includes(student.ma_hoc_vien.toString()) && <Check size={16} className='ml-2' />}
+                  {selectedStudents.includes(student.ma_hoc_vien) && <Check size={16} className='ml-2' />}
                 </div>
               ))}
             </div>
@@ -478,7 +495,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
         <div className="space-y-4 mt-3">
           <div className='grid lg:grid-cols-2 gap-4'>
             {questions.map((question, index) => (
-              <Card key={question.ma_cau_hoi} className='gap-4 shadow-none border-gray-300'>
+              <Card key={question.ma_cau_hoi} className='gap-3 py-3 shadow-none border-gray-300'>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">Question {index + 1}</CardTitle>
@@ -494,6 +511,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                       value={question.cau_hoi}
                       onChange={(e) => updateQuestion(index, { cau_hoi: e.target.value })}
                       placeholder="Enter your question"
+                      className='rounded-xs shadow-none border-gray-300'
                     />
                   </div>
 
@@ -509,7 +527,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                           })
                         }
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className='rounded-xs border-gray-300'>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -527,14 +545,14 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                         onChange={(e) => updateQuestion(index, { diem: Number.parseInt(e.target.value) })}
                         min="1"
                         max="50"
-
+                        className='rounded-xs border-gray-300'
                       />
                     </div>
                   </div>
 
                   {question.loai === "trac_nghiem" && (
                     <div>
-                      <Label className="mb-3">Answer Options</Label>
+                      <Label className="mb-3">Tuỳ chọn trả lời (click vào để chỉnh sửa)</Label>
                       <div className="space-y-2">
                         <RadioGroup
                           value={question.dap_an_dung?.toString()}
@@ -549,7 +567,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                             return (
                               <div
                                 key={optionIndex}
-                                className={`flex items-center space-x-2 p-2 rounded-md border transition-colors ${isCorrect ? "border-sky-400 bg-sky-50" : "border-gray-200"}`}
+                                className={`flex items-center space-x-2 p-2 rounded-xs border transition-colors ${isCorrect ? "border-sky-400 bg-sky-50" : "border-gray-300"}`}
                               >
                                 <RadioGroupItem
                                   value={optionIndex.toString()}
@@ -564,11 +582,11 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                                     updateQuestion(index, { lua_chon: newOptions });
                                   }}
                                   placeholder={`Option ${optionLabel}`}
-                                  className="flex-1 border border-gray-200"
+                                  className="flex-1 rounded-xs border-none shadow-none"
                                 />
                                 {isCorrect && (
                                   <span className="ml-2 text-sm font-semibold text-sky-600">
-                                    ✓ Correct answer will be this one
+                                    ✓ Đáp án đúng
                                   </span>
                                 )}
                               </div>

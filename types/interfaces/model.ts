@@ -8,9 +8,9 @@ export interface Test {
   tong_diem: number;                 // total_points
   so_lan_lam_toi_da: number;         // max_attempts
   do_kho: "de" | "trung_binh" | "kho"; // difficulty ('easy' | 'medium' | 'hard')
-  trang_thai: "hoat_dong" | "ban_nhap" | "luu_tru"; // status
-  ngay_bat_dau: string;              // start_date
+  trang_thai: "hoat_dong" | "ban_nhap" | "luu_tru"; // status  
   pham_vi_hien_thi: 'cong_khai' | 'rieng_tu' | 'lop_hoc'
+  ngay_bat_dau: string;              // start_date
   ngay_ket_thuc: string;             // end_date
   ngay_tao: string;                  // createdAt
   ngay_cap_nhat: string;             // updatedAt
@@ -18,6 +18,23 @@ export interface Test {
   cau_hoi_kiem_tra: TestQuestion[];
   giang_vien: Instructor | null
   danh_muc: string
+}
+
+export type TestAttemptStatus = "in-progress" | "submitted" | "graded";
+export interface TestAttempt {
+  ma_lan_lam: number;       // testAttempt_id
+  ma_kiem_tra: number;           // test_id
+  ma_hoc_vien: number;               // student_id
+  cau_tra_loi: Record<string, any> | null; // answers
+  diem: number;                      // score
+  thoi_gian_bat_dau: string;         // start_time
+  thoi_gian_ket_thuc: string; // end_time
+  trang_thai: TestAttemptStatus;     // status
+  ngay_tao: string;                  // createdAt
+  ngay_cap_nhat: string;             // updatedAt
+
+  bai_kiem_tra?: Test;               // test
+  hoc_vien?: any;                    // student
 }
 
 export interface TestSetup {

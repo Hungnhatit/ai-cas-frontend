@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Test } from '@/types/interfaces/test';
+import { Test } from '@/types/interfaces/model';
 import { Button } from '@/components/ui/button';
 import { getStatusLabel } from '@/utils/test';
 import { formatDate } from '@/utils/formatDate';

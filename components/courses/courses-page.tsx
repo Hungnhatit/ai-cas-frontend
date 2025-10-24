@@ -43,14 +43,12 @@ export function CoursesPage() {
 
   const [getCourses, setGetCourses] = useState<Course[]>([]);
   const userId = user?.user_id ?? null;
-  console.log(user?.user_id)
 
   useEffect(() => {
     try {
       if (!user?.user_id) return;
       const fetchCourses = async () => {
         const res = await courseService.getCourseByUser(userId);
-        console.log(res)
         setGetCourses(res.data);
       }
       fetchCourses();
@@ -58,8 +56,6 @@ export function CoursesPage() {
       console.log(error)
     }
   }, []);
-
-  console.log('Get courses: ', getCourses);
 
   const enrolledCourses = courses.filter((course) => course.progress !== undefined)
   const availableCourses = courses.filter((course) => course.progress === undefined)

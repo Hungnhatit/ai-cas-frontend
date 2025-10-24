@@ -5,13 +5,11 @@ const token = localStorage.getItem("token");
 
 export const quizService = {
   createQuiz: async (quizData: any) => {
-    console.log(token)
     const res = await api.post(`/quizzes/create`, quizData, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
-    console.log('res: ', res);
     return res.data;
   },
 
@@ -48,7 +46,6 @@ export const quizService = {
 
   getQuizAttempt: async (quiz_id: number, student_id: number) => {
     const res = await api.get(`/attempt?quiz_id=${quiz_id}&student_id=${student_id}`)
-    // console.log(res.data);
     return res.data
   },
 

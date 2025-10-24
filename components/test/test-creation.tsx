@@ -7,8 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Save } from 'lucide-react';
-import { Test } from '@/types/interfacess/test';
+import { Calendar, CalendarDays, Save } from 'lucide-react';
 import React, { useEffect } from 'react'
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
@@ -18,21 +17,15 @@ import { useAuth } from '@/providers/auth-provider'
 import toast from 'react-hot-toast';
 import { TestQuestion } from '@/types/interfaces/model';
 import { testService } from '@/services/test/testService';
+import FormField from '../assignments/assignment-form-field';
 
 const CreateTestPage = () => {
-  const [quizzes, setQuizzes] = useState<Quiz[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([])
   const { user } = useAuth();
-  const [newQuiz, setNewQuiz] = useState({
-    title: "",
-    course: "",
-    description: "",
-    duration: 30,
-    attempts: 3,
-  });
+  const router = useRouter();
 
   const [newTest, setNewTest] = useState({
     tieu_de: '',
@@ -40,17 +33,16 @@ const CreateTestPage = () => {
     thoi_luong: 30,
     tong_diem: 0,
     so_lan_lam_toi_da: 1,
+    ngay_bat_dau: '',
+    ngay_ket_thuc: '',
     do_kho: '',
     trang_thai: '',
   })
-  const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([])
-  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [quizzesData, coursesData] = await Promise.all([api.getQuizzes(), api.getCourses()])
-        setQuizzes(quizzesData)
+        const [coursesData] = await Promise.all([api.getCourses()])
         setCourses(coursesData)
       } catch (error) {
         console.error("Failed to fetch data:", error)
@@ -98,9 +90,11 @@ const CreateTestPage = () => {
         cau_hoi: questions as TestQuestion[],
         tong_diem: total_points,
         trang_thai: 'ban_nhap' as const,
-        ngay_ket_thuc: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')
+        ngay_bat_dau: new Date(newTest.ngay_bat_dau).toISOString(),
+        ngay_ket_thuc: new Date(newTest.ngay_ket_thuc).toISOString(),
       }
-      
+      console.log(testData);
+
       console.log("[v0] Creating test:", testData)
       const res = await testService.createTest(testData);
 
@@ -125,26 +119,26 @@ const CreateTestPage = () => {
     }
   }
 
-  const deleteQuiz = async (quizId: string) => {
-    try {
-      console.log("[v0] Deleting quiz:", quizId)
-      // In a real app, you would call api.deleteQuiz(quizId)
-      setQuizzes(quizzes.filter((q) => q.id !== quizId))
-    } catch (error) {
-      console.error("Failed to delete quiz:", error)
-    }
-  }
+  // const deleteQuiz = async (quizId: string) => {
+  //   try {
+  //     console.log("[v0] Deleting quiz:", quizId)
+  //     // In a real app, you would call api.deleteQuiz(quizId)
+  //     setQuizzes(quizzes.filter((q) => q.id !== quizId))
+  //   } catch (error) {
+  //     console.error("Failed to delete quiz:", error)
+  //   }
+  // }
 
-  const getQuizStats = () => {
-    const total = quizzes.length
-    const active = quizzes.filter((q) => q.status === "active").length
-    const draft = quizzes.filter((q) => q.status === "draft").length
-    const archived = quizzes.filter((q) => q.status === "archived").length
+  // const getQuizStats = () => {
+  //   const total = quizzes.length
+  //   const active = quizzes.filter((q) => q.status === "active").length
+  //   const draft = quizzes.filter((q) => q.status === "draft").length
+  //   const archived = quizzes.filter((q) => q.status === "archived").length
 
-    return { total, active, draft, archived }
-  }
+  //   return { total, active, draft, archived }
+  // }
 
-  const stats = getQuizStats()
+  // const stats = getQuizStats()
 
   if (loading) {
     return (
@@ -155,9 +149,8 @@ const CreateTestPage = () => {
   }
 
   return (
-
     <div className=" overflow-y-auto mb-4">
-      {/* new quizz section */}
+      {/* new test section */}
       <Button onClick={() => window.history.back()} className='mb-4 cursor-pointer'>
         <ArrowLeft />
         Back
@@ -166,7 +159,7 @@ const CreateTestPage = () => {
         <h1 className='text-2xl font-bold mb-2 text-white'>Create New Test</h1>
         <div className='text-white'>Set up a new test for your students</div>
       </header>
-      <div className='bg-card p-4 rounded-sm mb-4 border border-gray-300'>
+      <div className='bg-card p-4 rounded-xs mb-4 border border-gray-300'>
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -176,7 +169,7 @@ const CreateTestPage = () => {
                 value={newTest.tieu_de}
                 onChange={(e) => setNewTest({ ...newTest, tieu_de: e.target.value })}
                 placeholder="Enter test title"
-                className="rounded-sm h-12 text-base border-gray-300 shadow-none"
+                className="rounded-xs h-12 text-base border-gray-300 shadow-none"
               />
             </div>
             {/* <div>
@@ -203,7 +196,7 @@ const CreateTestPage = () => {
               value={newTest.mo_ta}
               onChange={(e) => setNewTest({ ...newTest, mo_ta: e.target.value })}
               placeholder="Describe what this quiz covers"
-              className="rounded-sm text-base border-gray-300 shadow-none"
+              className="rounded-xs text-base border-gray-300 shadow-none"
             />
           </div>
 
@@ -217,7 +210,7 @@ const CreateTestPage = () => {
                 onChange={(e) => setNewTest({ ...newTest, thoi_luong: Number.parseInt(e.target.value) })}
                 min="5"
                 max="180"
-                className="rounded-sm h-12 text-base border-gray-300 shadow-none"
+                className="rounded-xs h-12 text-base border-gray-300 shadow-none"
               />
             </div>
             <div>
@@ -229,10 +222,60 @@ const CreateTestPage = () => {
                 onChange={(e) => setNewTest({ ...newTest, so_lan_lam_toi_da: Number.parseInt(e.target.value) })}
                 min="1"
                 max="10"
-                className="rounded-sm h-12 text-base border-gray-300 shadow-none"
+                className="rounded-xs h-12 text-base border-gray-300 shadow-none"
               />
             </div>
           </div>
+
+          {/* Dates Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="text-blue-600" size={20} />
+              <h3 className="text-md font-semibold text-gray-900">Hạn nộp</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField label="Ngày bắt đầu" required>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
+                  <Input
+                    type="datetime-local"
+                    value={newTest.ngay_bat_dau}
+                    onChange={(e) => setNewTest({ ...newTest, ngay_bat_dau: e.target.value })}
+                    className="rounded-xs pl-10 h-12 border-gray-300 shadow-none"
+                  />
+                </div>
+              </FormField>
+
+              <FormField label="Ngày kết thúc" required>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
+                  <Input
+                    type="datetime-local"
+                    value={newTest.ngay_ket_thuc}
+                    onChange={(e) => setNewTest({ ...newTest, ngay_ket_thuc: e.target.value })}
+                    className="rounded-xs pl-10 h-12 border-gray-300 shadow-none"
+                  />
+                </div>
+              </FormField>
+
+              {/* {formData.trang_thai === 'submitted' && (
+                <FormField label="Submission Date & Time">
+                  <div className="relative">
+                    <CalendarDays className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="datetime-local"
+                      value={formData.ngay_nop || ''}
+                      onChange={(e) => setNewTest({ ...newTest, han_nop: e.target.value })}
+                      className="rounded-xs pl-10 h-12 border-gray-400 shadow-none"
+                    />
+                  </div>
+                </FormField>
+              )} */}
+            </div>
+          </div>
+
+
         </div>
       </div>
 
@@ -276,7 +319,7 @@ const CreateTestPage = () => {
                   value={question.cau_hoi}
                   onChange={(e) => updateQuestion(index, { cau_hoi: e.target.value })}
                   placeholder="Enter your question"
-                  className="rounded-sm text-base border-gray-300 shadow-none"
+                  className="rounded-xs text-base border-gray-300 shadow-none"
                 />
               </div>
 
@@ -310,7 +353,7 @@ const CreateTestPage = () => {
                     onChange={(e) => updateQuestion(index, { diem: Number.parseInt(e.target.value) })}
                     min="1"
                     max="50"
-                    className="rounded-sm h-12 text-base border-gray-300 shadow-none"
+                    className="rounded-xs h-12 text-base border-gray-300 shadow-none"
                   />
                 </div>
               </div>
@@ -342,7 +385,7 @@ const CreateTestPage = () => {
                                 updateQuestion(index, { lua_chon: newOptions })
                               }}
                               placeholder={`Option ${optionIndex + 1}`}
-                              className={`flex-1 rounded-sm h-12 text-black border-gray-300 shadow-none cursor-pointer ${isSelected ? "bg-blue-50 border border-blue-500" : "border border-gray-300"}`}
+                              className={`flex-1 rounded-xs h-12 text-black border-gray-300 shadow-none cursor-pointer ${isSelected ? "bg-blue-50 border border-blue-500" : "border border-gray-300"}`}
                             />
                             {isSelected && (
                               <span className="ml-2 text-sm font-semibold text-sky-600">

@@ -7,7 +7,6 @@ export const attemptService = {
   getAttemptById: async (attempt_id: number) => {
     try {
       const res = await api.get(`/attempt/${attempt_id}`);
-      console.log(res)
       return res.data.attempt;
     } catch (error) {
       console.log(error);

@@ -36,8 +36,6 @@ export function StudentsManagement() {
     fetchStudents()
   }, []);
 
-  console.log(students)
-
   const filteredStudents = students
     .filter(
       (student) =>

@@ -15,7 +15,7 @@ import AICareerPathway from './test-ai-career-pathway';
 import { quizService } from '@/services/quizService';
 import { useAuth } from '@/providers/auth-provider';
 import { attemptService } from '@/services/attemptService';
-import { Test } from '@/types/interfaces/test';
+import { Test } from '@/types/interfaces/model';
 import { TestAttempt } from '@/types/interfaces/test';
 import { testService } from '@/services/test/testService';
 import { testAttemptService } from '@/services/test/testAttemptService';

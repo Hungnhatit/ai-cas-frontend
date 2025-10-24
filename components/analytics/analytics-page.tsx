@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -8,22 +8,14 @@ import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell,
 } from "recharts"
 import { TrendingUp, Users, BookOpen, Award, Download } from "lucide-react"
 import { useCourses } from "@/hooks/use-courses"
 import { useAuth } from "@/providers/auth-provider"
+import { studentService } from "@/services/studentService"
+import { Instructor, Student } from "@/types/interfaces/model"
+import { testService } from "@/services/test/testService"
 
 const engagementData = [
   { name: "Week 1", students: 45, completion: 85 },
@@ -50,12 +42,30 @@ const courseCompletionData = [
 
 export function AnalyticsPage() {
   const { courses } = useCourses()
-  const { user } = useAuth()
+  const { user } = useAuth();
+  const [students, setStudents] = useState<Student[]>([]);
+  const [tests, setTests] = useState<Instructor[]>([]);
   const [selectedCourse, setSelectedCourse] = useState("all")
-  const [timeRange, setTimeRange] = useState("30d")
+  const [timeRange, setTimeRange] = useState("30d");
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      const [resTests, resStudent] = await Promise.all([
+        testService.getTestsByInstructorId(user?.ma_nguoi_dung),
+        studentService.getStudentByInstructorId(user?.ma_nguoi_dung)
+      ])
+
+      setTests(resTests.data);
+      setStudents(resStudent.data.hoc_vien);
+    }
+    fetchStudents();
+  }, []);
+
+  console.log(tests);
 
   const myCourses = courses.filter((course) => course.instructor === user?.name)
-  const totalStudents = myCourses.reduce((sum, course) => sum + course.students, 0)
+  const totalStudents = students.length;
+  const totalTests = tests.length;
   const avgRating =
     myCourses.length > 0 ? myCourses.reduce((sum, course) => sum + course.rating, 0) / myCourses.length : 0
 
@@ -64,7 +74,7 @@ export function AnalyticsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Analytics</h1>
-          <p className="text-muted-foreground">Track student performance and course engagement</p>
+          <p className="text-muted-foreground">Theo dõi hiệu suất làm bài kiểm tra và sự tham gia của học sinh.</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={timeRange} onValueChange={setTimeRange}>
@@ -85,7 +95,7 @@ export function AnalyticsPage() {
       </div>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Students</CardTitle>
@@ -93,6 +103,20 @@ export function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalStudents}</div>
+            <p className="text-xs text-muted-foreground">
+              <span className="text-green-600">+12%</span> from last month
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Total test */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total tests</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalTests}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600">+12%</span> from last month
             </p>

@@ -37,19 +37,19 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
   const { user } = useAuth();
   const router = useRouter();
 
-  /**
-   * Time effect
-   */
-  useEffect(() => {
-    if (timeRemaining > 0) {
-      const timer = setTimeout(() => {
-        setTimeRemaining((prev) => prev - 1)
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (timeRemaining === 0 && test && attempt) {
-      handleSubmitTest();
-    }
-  }, [timeRemaining, test, attempt]);
+  // /**
+  //  * Time effect
+  //  */
+  // useEffect(() => {
+  //   if (timeRemaining > 0) {
+  //     const timer = setTimeout(() => {
+  //       setTimeRemaining((prev) => prev - 1)
+  //     }, 1000);
+  //     return () => clearTimeout(timer);
+  //   } else if (timeRemaining === 0 && test && attempt) {
+  //     handleSubmitTest();
+  //   }
+  // }, [timeRemaining, test, attempt]);
 
   /**
    * handle load test

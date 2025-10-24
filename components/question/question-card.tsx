@@ -68,7 +68,6 @@ export default function QuestionCard({
     handleQuestionChange('type', type);
     handleQuestionChange('options', options);
   };
-  console.log(JSON.parse(question.options));
 
   return (
     <Card className="w-full">

@@ -16,6 +16,8 @@ import { getDifficultyLabel, getStatusLabel } from '@/utils/test';
 import TestDataTable from './table/test-data-table';
 import { getVisibilityIcon } from '@/utils/tests';
 import { Input } from '../ui/input';
+import Link from 'next/link';
+import ConfirmModal from '../modals/confirm-modal';
 
 interface Question {
   id: string;
@@ -178,7 +180,7 @@ const TestManagement = () => {
 
   const archivedTests = tests.filter((test) => test.trang_thai === 'luu_tru');
 
-  const stats = getQuizStats()
+  const stats = getQuizStats();
 
   return (
     <div className="">
@@ -202,7 +204,7 @@ const TestManagement = () => {
             <CardHeader>
               <CardTitle className='flex items-center justify-between'>
                 Số bài kiểm tra
-                <span><NotebookPen size={18} className='mr-2' /></span>
+                <span><NotebookPen size={18} className='mr-2' color='blue' /></span>
               </CardTitle>
               <CardDescription></CardDescription>
             </CardHeader>
@@ -215,7 +217,7 @@ const TestManagement = () => {
             <CardHeader>
               <CardTitle className='flex items-center justify-between'>
                 Tổng số lượt nộp
-                <span><Users size={18} className='mr-2' /></span>
+                <span><Users size={18} className='mr-2' color='green' /></span>
               </CardTitle>
               <CardDescription></CardDescription>
             </CardHeader>
@@ -228,7 +230,7 @@ const TestManagement = () => {
             <CardHeader>
               <CardTitle className='flex items-center justify-between'>
                 Đang chờ chấm điểm
-                <span><Clock size={18} className='mr-2' /></span>
+                <span><Clock size={18} className='mr-2' color='red' /></span>
               </CardTitle>
               <CardDescription></CardDescription>
             </CardHeader>
@@ -241,7 +243,7 @@ const TestManagement = () => {
             <CardHeader>
               <CardTitle className='flex items-center justify-between'>
                 Điểm trung bình
-                <span><Award size={18} className='mr-2' /></span>
+                <span><Award size={18} className='mr-2' color='orange' /></span>
               </CardTitle>
               <CardDescription></CardDescription>
             </CardHeader>
@@ -263,7 +265,7 @@ const TestManagement = () => {
             className="max-w-sm shadow-none border border-gray-300 rounded-xs"
           />
           <select
-            className="ml-4 h-9 rounded-xc border border-gray-300 bg-background px-3 py-2 text-sm"
+            className="ml-4 h-9 rounded-xc border border-gray-300 bg-background px-3 py-2 text-sm cursor-pointer"
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value as "all" | "hoat_dong" | "ban_nhap" | "luu_tru")}
           >
@@ -279,22 +281,22 @@ const TestManagement = () => {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Tên bài kiểm tra</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Trạng thái</th>
-                  {/* <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Số lượng câu hỏi</th> */}
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Số lần làm</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Điểm trung bình</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Tỉ lệ pass</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Chỉnh sửa lần cuối</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Hành động</th>
+                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Tên bài kiểm tra</th>
+                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Trạng thái</th>
+                  {/* <th className="p-3 text-left text-sm font-medium text-gray-600">Số lượng câu hỏi</th> */}
+                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Số lần làm</th>
+                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Điểm trung bình</th>
+                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Tỉ lệ pass</th>
+                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Chỉnh sửa lần cuối</th>
+                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Hành động</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {filteredTests.map(test => (
                   <tr key={test.ma_kiem_tra} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
+                    <td className="border-r border-gray-200 w-96 p-3">
                       <div className="flex items-center font-medium text-gray-900 hover:underline mb-1 cursor-pointer transition-all">
-                        {test.tieu_de}
+                        <Link href={`/tests/${test.ma_kiem_tra}/detail`}>{test.tieu_de}</Link>
                         {getVisibilityIcon(test?.pham_vi_hien_thi)}
                       </div>
                       <div className="text-sm text-gray-500 flex items-center mb-1">
@@ -309,14 +311,14 @@ const TestManagement = () => {
                         </div>
                       </div>
                       <div className='flex flex-wrap gap-2'>
-                        {(JSON.parse(test?.danh_muc)).map((item: string, index: number) => (
+                        {(JSON.parse(test?.danh_muc))?.map((item: string, index: number) => (
                           <span key={index} className='text-xs border border-blue-400 px-2 py-1 rounded-xs'>
                             {item}
                           </span>
                         ))}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="border-r border-gray-200 p-3 ">
                       <span className={`px-2 py-1 text-nowrap rounded-full text-xs font-medium ${test.trang_thai === 'hoat_dong' ? 'bg-green-100 text-green-700' :
                         test.trang_thai === 'ban_nhap' ? 'bg-yellow-100 text-yellow-700' :
                           'bg-gray-100 text-gray-700'
@@ -324,22 +326,40 @@ const TestManagement = () => {
                         {getStatusLabel(test.trang_thai)}
                       </span>
                     </td>
-                    {/* <td className="px-6 py-4 text-sm">{test?.cau_hoi_kiem_tra?.length}</td> */}
-                    <td className="px-6 py-4 text-sm">{test.so_lan_lam_toi_da}</td>
-                    <td className="px-6 py-4 text-sm font-medium">{test.avgScore}%</td>
-                    <td className="px-6 py-4 text-sm">{test.passRate}%</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    {/* <td className="border-r border-gray-200 p-3 text-sm">{test?.cau_hoi_kiem_tra?.length}</td > */}
+                    <td className="border-r border-gray-200 p-3 text-sm">{test.so_lan_lam_toi_da}</td>
+                    <td className="border-r border-gray-200 p-3 text-sm font-medium">{test.avgScore}%</td>
+                    <td className="border-r border-gray-200 p-3 text-sm">{test.passRate}%</td>
+                    <td className="border-r border-gray-200 p-3 text-sm text-gray-500 ">
                       <div className='flex items-center'>
                         <Calendar size={16} className='mr-2' />
                         {formatDate(test.ngay_cap_nhat)}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="border-r border-gray-200 p-3 ">
                       <div className="flex gap-1">
-                        <Button onClick={() => handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Edit</Button>
-                        <Button onClick={() => handleViewResultDetail(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Results</Button>
-                        <Button onClick={() => handleDetailTest(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Detail</Button>
-                        <Button onClick={() => handleDeleteTest(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer text-red-600'>Delete</Button>
+                        {/* <Button onClick={() => handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Edit</Button> */}
+                        {/* <Button onClick={() => handleViewResultDetail(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Results</Button> */}
+                        {/* <Button onClick={() => handleDetailTest(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Detail</Button> */}
+                        {test.trang_thai !== 'luu_tru' &&
+                          <Button
+                            onClick={() => handleDeleteTest(test.ma_kiem_tra)}
+                            variant="ghost"
+                            size="sm"
+                            className='cursor-pointer text-red-600'>
+                            Xoá
+                          </Button>
+                        }
+
+                        {test.trang_thai === 'luu_tru' &&
+                          <ConfirmModal
+                            onConfirm={() => handleForceDelete(test.ma_kiem_tra)}
+                            title="Are you sure to delete this test permantly? This action can't be undone!"
+                            description='Delete permantly test'
+                          >
+                            <Button variant="ghost" size="sm" className='cursor-pointer text-red-600'>Xoá vĩnh viễn</Button>
+                          </ConfirmModal>
+                        }
                       </div>
                     </td>
                   </tr>
@@ -394,7 +414,7 @@ const TestManagement = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="archived" className="mt-6">
+        <TabsContent value="archived" className="mt-6">          
           {/* <p className="text-gray-600 text-center py-8">No archived tests</p> */}
           <TestDataTable
             tests={archivedTests}

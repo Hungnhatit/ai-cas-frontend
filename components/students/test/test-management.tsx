@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Plus, Edit, Trash2, Eye, Users, Clock, Trophy, Copy, Earth, Lock, NotebookPen, Play } from "lucide-react"
+import { Plus, Edit, Trash2, Eye, Users, Clock, Trophy, Copy, Earth, Lock, NotebookPen, Play, FileWarning } from "lucide-react"
 import { type Quiz, type QuizQuestion, type Course } from "@/services/api"
 import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
@@ -23,6 +23,7 @@ import { capitalizeFirstLetter } from "@/utils/string"
 import { testService } from "@/services/test/testService"
 import { Test } from "@/types/interfaces/model"
 import { testAttemptService } from "@/services/test/testAttemptService"
+import { getStatusLabel } from "@/utils/test"
 
 const TestManagementPage = () => {
   const [tests, setTests] = useState<Test[]>([])
@@ -45,8 +46,7 @@ const TestManagementPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const [testData, coursesData] = await Promise.all([api.getQuizzes(), api.getCourses()]);
-        const [testData,] = await Promise.all([
+        const [testData] = await Promise.all([
           testService.getAllTests()
         ]);
         setTests(testData.data);
@@ -73,6 +73,8 @@ const TestManagementPage = () => {
       },
     ])
   }
+
+  console.log(tests);
 
   const updateQuestion = (index: number, updates: Partial<QuizQuestion>) => {
     setQuestions(questions.map((q, i) => (i === index ? { ...q, ...updates } : q)))
@@ -109,7 +111,6 @@ const TestManagementPage = () => {
   const handleStartTest = async (test_id: number, student_id: number) => {
     try {
       const res = await testAttemptService.startTestAttempt(test_id, student_id);
-      console.log(res);
       if (res.success) {
         const attempt_id = res.data.ma_lan_lam
         router.push(`/tests/${test_id}/take?attempt=${attempt_id}`)
@@ -197,8 +198,8 @@ const TestManagementPage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between bg-[#232f3e] shadow-lg p-5">
         <div>
-          <h1 className="text-3xl mb-2 font-bold text-white">Test Management</h1>
-          <p className="text-white">View all your test assigned by your instructor</p>
+          <h1 className="text-3xl mb-2 font-bold text-white">Bài thi</h1>
+          <p className="text-white">Xem tất cả các bài kiểm tra đã tham gia hoặc được giao bởi giảng viên của bạn</p>
         </div>
         {/* <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}> */}
       </div>
@@ -208,38 +209,42 @@ const TestManagementPage = () => {
         {/* -------------------------------Quiz trang_thai--------------------------------- */}
         <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-md font-medium">Total Quizzes</CardTitle>
+            <CardTitle className="text-md font-medium">Tổng số bài thi</CardTitle>
             <Trophy className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-2xl font-bold mb-2">{stats.total}</div>
+            <p className="text-[15px] text-base">Hiển thị tổng số bài thi mà bạn đang có trong hệ thống</p>
           </CardContent>
         </Card>
         <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-md font-medium">Active</CardTitle>
+            <CardTitle className="text-md font-medium">Đã tham gia</CardTitle>
             <Eye className="h-5 w-5 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.active}</div>
+            <div className="text-2xl font-bold mb-2">{stats.active}</div>
+            <p className="text-[15px] text-base">Số bài thi bạn đã thực hiện ít nhất một lần</p>
           </CardContent>
         </Card>
         <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-md font-medium">Draft</CardTitle>
+            <CardTitle className="text-md font-medium">Bài thi được giao</CardTitle>
             <Edit className="h-5 w-5 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.draft}</div>
+            <div className="text-2xl font-bold mb-2">{stats.draft}</div>
+            <p className="text-[15px] text-base">Số bài thi mà giảng viên hoặc hệ thống đã giao cho bạn</p>
           </CardContent>
         </Card>
         <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-md font-medium">Archived</CardTitle>
-            <Trash2 className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-md font-medium">Chưa hoàn thành</CardTitle>
+            <FileWarning className="h-5 w-5 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.archived}</div>
+            <div className="text-2xl font-bold mb-2">{stats.draft}</div>
+            <p className="text-[15px] text-base">Số bài thi được giao bạn đã bắt đầu nhưng chưa hoàn tất hoặc chưa làm</p>
           </CardContent>
         </Card>
         {/* ---------------------------------------------------------------- */}
@@ -248,9 +253,9 @@ const TestManagementPage = () => {
 
       <Tabs defaultValue="active" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="active" className="cursor-pointer">Active ({stats.active})</TabsTrigger>
-          <TabsTrigger value="draft" className="cursor-pointer">Draft ({stats.draft})</TabsTrigger>
-          <TabsTrigger value="archived" className="cursor-pointer">Archived ({stats.archived})</TabsTrigger>
+          <TabsTrigger value="active" className="cursor-pointer">Tất cả bài thi ({stats.active})</TabsTrigger>
+          <TabsTrigger value="draft" className="cursor-pointer">Đã tham gia ({stats.draft})</TabsTrigger>
+          <TabsTrigger value="archived" className="cursor-pointer">Được giao ({stats.archived})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="active" className="space-y-4">
@@ -259,14 +264,18 @@ const TestManagementPage = () => {
               .filter((test) => test.trang_thai === "hoat_dong")
               .map((test) => (
                 <Card key={test.ma_kiem_tra} className="hover:shadow-md transition-shadow gap-2 py-4">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
+                  <CardHeader className="flex items-center justify-between">
+                    <div className="flex items-center justify-start gap-2">
                       <div className="space-y-1">
-                        <CardTitle className="text-lg">{test.tieu_de}</CardTitle>
+                        <CardTitle className="text-lg mb-0">{test.tieu_de}</CardTitle>
                         <CardDescription>{test.ma_khoa_hoc}</CardDescription>
                       </div>
-                      <Badge variant="default">{capitalizeFirstLetter(test.trang_thai)}</Badge>
+                      <Badge variant="default">{getStatusLabel(test.trang_thai)}</Badge>
                     </div>
+                    <Button className="cursor-pointer bg-blue-600 text-white" variant="outline" size="sm" onClick={() => handleStartTest(test.ma_kiem_tra, user?.ma_nguoi_dung)}>
+                      <Play />
+                      Vào thi
+                    </Button>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="text-sm text-muted-foreground line-clamp-2">{test.mo_ta}</p>
@@ -282,13 +291,13 @@ const TestManagementPage = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        {test?.cau_hoi?.length} questions
+                        {test?.cau_hoi_kiem_tra?.length} câu hỏi
                       </div>
                       <div className="flex items-center gap-1">
-                        {test.che_do_hien_thi === 'public' && <Earth className="h-4 w-4" />}
-                        {test.che_do_hien_thi === 'private' && <Lock className="h-4 w-4" />}
-                        {test.che_do_hien_thi === 'assigned' && <NotebookPen className="h-4 w-4" />}
-                        {capitalizeFirstLetter(test.che_do_hien_thi)}
+                        {test.pham_vi_hien_thi === 'cong_khai' && <Earth className="h-4 w-4" />}
+                        {test.pham_vi_hien_thi === 'rieng_tu' && <Lock className="h-4 w-4" />}
+                        {test.pham_vi_hien_thi === 'lop_hoc' && <NotebookPen className="h-4 w-4" />}
+                        {capitalizeFirstLetter(test.pham_vi_hien_thi)}
                       </div>
                     </div>
 
@@ -297,18 +306,18 @@ const TestManagementPage = () => {
                         <Eye className="h-4 w-4 mr-1" />
                         Xem trước
                       </Button>
-                      {/* <Button className="cursor-pointer" variant="outline" size="sm" onClick={() => { }}>
+                      <Button className="cursor-pointer" variant="outline" size="sm" onClick={() => { router.push(`/tests/${test.ma_kiem_tra}/results`) }}>
                         <Copy className="h-4 w-4 mr-1" />
-                        Tạo bản sao
-                      </Button> */}
+                        Xem kết quả
+                      </Button>
                       {/* <Button onClick={() => handleEditQuiz(test.ma_kiem_tra)} className="cursor-pointer" variant="outline" size="sm">
                         <Edit className="h-4 w-4 mr-1" />
                         Edit
                       </Button> */}
-                      <Button className="cursor-pointer" variant="outline" size="sm" onClick={() => handleStartTest(test.ma_kiem_tra, user?.ma_nguoi_dung)}>
+                      {/* <Button className="cursor-pointer" variant="outline" size="sm" onClick={() => handleStartTest(test.ma_kiem_tra, user?.ma_nguoi_dung)}>
                         <Play />
                         Vào thi
-                      </Button>
+                      </Button> */}
                     </div>
                   </CardContent>
                 </Card>
@@ -346,7 +355,7 @@ const TestManagementPage = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        {test?.cau_hoi?.length} questions
+                        {test?.cau_hoi_kiem_tra?.length} câu hỏi
                       </div>
                     </div>
 
@@ -395,7 +404,7 @@ const TestManagementPage = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        {test?.cau_hoi?.length} questions
+                        {test?.cau_hoi_kiem_tra?.length} câu hỏi
                       </div>
                     </div>
 

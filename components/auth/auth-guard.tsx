@@ -15,7 +15,6 @@ interface AuthGuardProps {
 export function AuthGuard({ children, requiredRole, redirectTo = "/auth/login" }: AuthGuardProps) {
   const { user, loading } = useAuth()
   const router = useRouter();
-  // console.log('Get user: ', user);
 
   useEffect(() => {
     if (!loading) {

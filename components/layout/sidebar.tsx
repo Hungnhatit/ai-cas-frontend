@@ -7,6 +7,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   BookOpen, Calendar, ChevronLeft, GraduationCap, Home, MessageSquare, Settings, Users, BarChart3, FileText, Award, Video, HelpCircle, BookType,
+  ChartNoAxesCombined,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -19,7 +20,8 @@ interface NavItem {
   title: string
   href: string
   icon: React.ComponentType<{ className?: string }>
-  roles?: ("student" | "instructor" | "admin")[]
+  roles?: ("student" | "instructor" | "admin")[],
+  children?: NavItem[]
 }
 
 const navItems: NavItem[] = [
@@ -27,6 +29,15 @@ const navItems: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: Home,
+    children: [
+      { title: 'Analytics', href: '/analytics', icon: ChartNoAxesCombined },
+    ],
+  },
+  {
+    title: "Analytics",
+    href: "/analytics",
+    icon: BarChart3,
+    roles: ["instructor", "admin"],
   },
   {
     title: "My Courses",
@@ -102,12 +113,7 @@ const navItems: NavItem[] = [
     icon: Video,
     roles: ["instructor", "admin"],
   },
-  {
-    title: "Analytics",
-    href: "/analytics",
-    icon: BarChart3,
-    roles: ["instructor", "admin"],
-  },
+
   {
     title: "Settings",
     href: "/settings",
@@ -143,42 +149,47 @@ export function Sidebar({ open, onClose }: SidebarProps) {
     setCollapsed((prev) => !prev);
   }
 
-  const NavigationContent = () => (
-    <nav className="flex-1 px-2 py-4">
-      <ul className="space-y-2">
-        {filteredNavItems.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <li key={item.href}>
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Link
-                      href={item.href}
-                      onClick={isMobile ? onClose : undefined}
-                      className={cn(
-                        "group relative flex gap-3 px-3 py-2 rounded-sm text-sm font-medium transition-colors text-nowrap",
-                        "hover:bg-[#374151] hover:text-white",
-                        isActive
-                          ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-blue-400"
-                          : "text-white",
-                        collapsed && !isMobile && "justify-center",
+  const NavigationContent = () => {
+    const [openMenu, setOpenMenu] = useState<string[]>([]);
+    return (
+      <nav className="flex-1 px-2 py-4">
+        <ul className="space-y-2">
+          {filteredNavItems.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <li key={item.href} className="w-full">
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger className="w-full">
+                      <Link
+                        href={item.href}
+                        onClick={isMobile ? onClose : undefined}
+                        className={cn(
+                          "group relative flex gap-3 px-3 py-2 rounded-sm text-sm font-medium transition-colors text-nowrap",
+                          "hover:bg-[#374151] hover:text-white",
+                          isActive
+                            ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-blue-400"
+                            : "text-white",
+                          collapsed && !isMobile && "justify-center",
+                        )}
+                      >
+                        <item.icon className="h-5 w-5 flex-shrink-0" />
+                        {(!collapsed || isMobile) && <span className="overflow-hidden">{item.title}</span>}
+                      </Link>
+                      {collapsed && !isMobile && (
+                        <TooltipContent side="right" className="ml-4 bg-[#374151] text-sm 
+                      text-white px-2 py-1 rounded-[4px] z-50">{item.title}</TooltipContent>
                       )}
-                    >
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
-                      {(!collapsed || isMobile) && <span className="overflow-hidden">{item.title}</span>}
-                    </Link>
-                    <TooltipContent side="right" className="ml-4 bg-[#374151] text-sm 
-                     text-white px-2 py-1 rounded-[4px] z-50">{item.title}</TooltipContent>
-                  </TooltipTrigger>
-                </Tooltip>
-              </TooltipProvider>
-            </li>
-          )
-        })}
-      </ul>
-    </nav>
-  )
+                    </TooltipTrigger>
+                  </Tooltip>
+                </TooltipProvider>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+    )
+  }
 
 
 
