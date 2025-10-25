@@ -15,7 +15,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/auth-provider'
-import { quizService } from '@/services/quizService';
 import { studentService } from '@/services/studentService';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { testService } from '@/services/test/testService';
@@ -37,6 +36,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
   const [testStatus, setTestStatus] = useState('');
   const [selectedTest, setSelectedTest] = useState<Test | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([])
   const { user } = useAuth();
   const { id } = useParams();
   const isEditMode = Boolean(id);
@@ -45,6 +45,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
   const [newTest, setNewTest] = useState({
     tieu_de: "",
     mo_ta: "",
+    giai_thich: "",
     thoi_luong: 30,
     so_lan_lam_toi_da: 3,
   });
@@ -53,8 +54,6 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
     ma_hoc_vien: '',
     ten: ''
   })
-
-  const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([])
 
   // fetch data
   useEffect(() => {
@@ -75,6 +74,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
         setNewTest({
           tieu_de: data.data.tieu_de || "",
           // course: data.data.course || "",
+          giai_thich: "",
           mo_ta: data.data.mo_ta || "",
           thoi_luong: data.data.thoi_luong || 30,
           so_lan_lam_toi_da: data.data.so_lan_lam_toi_da || 3,
@@ -207,6 +207,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
       setNewTest({
         tieu_de: "",
         mo_ta: "",
+        giai_thich: "",
         thoi_luong: 30,
         so_lan_lam_toi_da: 3,
       });
@@ -296,10 +297,10 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-[#232f3e] border py-2 border-gray-300 sticky top-0 z-10 mb-4">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8  py-2">
+      <div className="bg-[#232f3e] sticky top-0 z-10 mb-4 -mx-4 -mt-4">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8  py-4">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 ">
               <Button variant="ghost" size="sm" className='cursor-pointer flex items-center justify-center hover:bg-gray-600'
                 // handle cancel
                 onClick={() => router.push('/tests')}
@@ -359,17 +360,17 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
         </div>
       </div>
 
-      {/* quiz info */}
-      <div className='bg-card p-4 rounded-xs shadow-sm mb-4 border border-gray-300'>
-        <div className="space-y-6">
+      {/* test info */}
+      <div className='bg-card p-4 rounded-xs shadow-xs mb-4 border border-gray-300'>
+        <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="test-title" className='mb-2'>Test title</Label>
+              <Label htmlFor="test-title" className='mb-2'>Tên bài thi</Label>
               <Input
                 id="test-title"
                 value={newTest?.tieu_de}
                 onChange={(e) => setNewTest({ ...newTest, tieu_de: e.target.value })}
-                placeholder="Enter test title"
+                placeholder="Nhập tên bài thi"
                 className="rounded-xs h-10 text-base border-gray-400/70 shadow-none"
               />
             </div>
@@ -391,7 +392,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
           </div>
 
           <div>
-            <Label htmlFor="test-description" className='mb-2'>Description</Label>
+            <Label htmlFor="test-description" className='mb-2'>Mô tả</Label>
             <Textarea
               id="test-description"
               value={newTest?.mo_ta}
@@ -403,7 +404,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="test-duration" className='mb-2'>Duration (minutes)</Label>
+              <Label htmlFor="test-duration" className='mb-2'>Thời gian làm bài</Label>
               <Input
                 id="test-duration"
                 type="number"
@@ -415,7 +416,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
               />
             </div>
             <div>
-              <Label htmlFor="test-attempts" className='mb-2'>Attempts Allowed</Label>
+              <Label htmlFor="test-attempts" className='mb-2'>Số lần làm tối đa</Label>
               <Input
                 id="test-attempts"
                 type="number"
@@ -433,9 +434,9 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
       </div>
 
       {/* Assign test section */}
-      <div className='bg-card p-4 rounded-xs shadow-sm mb-4 border border-gray-300'>
-        <div className="flex items-center justify-between mb-3">
-          <Label className='text-xl font-bold'>Giao cho</Label>
+      <div className='bg-card p-4 rounded-xs shadow-xs mb-4 border border-gray-300'>
+        <div className="flex items-center justify-between mb-2">
+          <Label className='text-lg font-bold'>Giao cho</Label>
         </div>
         <Popover>
           <PopoverTrigger asChild>
@@ -483,158 +484,170 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
       </div>
 
       {/* question section */}
-      <div className='bg-card p-4 rounded-xs shadow-sm mb-4 border border-gray-300'>
+      <div className='space-y-4 bg-card p-4 rounded-xs shadow-xs mb-4 border border-gray-300'>
         <div className="flex items-center justify-between">
-          <Label className='text-xl font-bold'>Questions</Label>
-          <Button type="button" variant="outline" onClick={addQuestion} className='cursor-pointer'>
+          <Label className='text-xl font-bold'>Danh sách câu hỏi</Label>
+          <Button type="button" variant="outline" onClick={addQuestion} className='cursor-pointer rounded-xs'>
             <Plus className="h-4 w-4 mr-2" />
-            Add question
+            Thêm câu hỏi
           </Button>
         </div>
 
-        <div className="space-y-4 mt-3">
-          <div className='grid lg:grid-cols-2 gap-4'>
-            {questions.map((question, index) => (
-              <Card key={question.ma_cau_hoi} className='gap-3 py-3 shadow-none border-gray-300'>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Question {index + 1}</CardTitle>
-                    <Button variant="ghost" size="sm" onClick={() => removeQuestion(index)} className='cursor-pointer'>
-                      <Trash2 className="h-10 w-10" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
+        {/* <div className="space-y-4 mt-3"> */}
+        <div className='grid lg:grid-cols-2 gap-4'>
+          {questions.map((question, index) => (
+            <Card key={question.ma_cau_hoi} className='gap-2 py-3 shadow-none border-gray-300'>
+              <CardHeader className='gap-0'>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Câu hỏi {index + 1}</CardTitle>
+                  <Button variant="ghost" size="sm" onClick={() => removeQuestion(index)} className='cursor-pointer'>
+                    <Trash2 className="h-10 w-10" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className='mb-3'>Nội dung câu hỏi</Label>
+                  <Textarea
+                    value={question.cau_hoi}
+                    onChange={(e) => updateQuestion(index, { cau_hoi: e.target.value })}
+                    placeholder="Enter your question"
+                    className='rounded-xs shadow-none border-gray-300'
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className='mb-3'>Question Text</Label>
-                    <Textarea
-                      value={question.cau_hoi}
-                      onChange={(e) => updateQuestion(index, { cau_hoi: e.target.value })}
-                      placeholder="Enter your question"
-                      className='rounded-xs shadow-none border-gray-300'
+                    <Label className='mb-3'>Question Type</Label>
+                    <Select
+                      value={question.loai}
+                      onValueChange={(value) =>
+                        updateQuestion(index, {
+                          loai: value as TestQuestion["loai"],
+                          lua_chon: value === "trac_nghiem" ? ["", "", "", ""] : undefined,
+                        })
+                      }
+                    >
+                      <SelectTrigger className='rounded-xs border-gray-300'>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="trac_nghiem">Trắc nghiệm</SelectItem>
+                        <SelectItem value="dung_sai">Đúng/Sai</SelectItem>
+                        <SelectItem value="tra_loi_ngan">Trả lời ngắn</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className='mb-3'>Points</Label>
+                    <Input
+                      type="number"
+                      value={question.diem}
+                      onChange={(e) => updateQuestion(index, { diem: Number.parseInt(e.target.value) })}
+                      min="1"
+                      max="50"
+                      className='rounded-xs border-gray-300'
                     />
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className='mb-3'>Question Type</Label>
-                      <Select
-                        value={question.loai}
-                        onValueChange={(value) =>
-                          updateQuestion(index, {
-                            loai: value as TestQuestion["loai"],
-                            lua_chon: value === "trac_nghiem" ? ["", "", "", ""] : undefined,
-                          })
-                        }
-                      >
-                        <SelectTrigger className='rounded-xs border-gray-300'>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="trac_nghiem">Trắc nghiệm</SelectItem>
-                          <SelectItem value="dung_sai">Đúng/Sai</SelectItem>
-                          <SelectItem value="tra_loi_ngan">Trả lời ngắn</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className='mb-3'>Points</Label>
-                      <Input
-                        type="number"
-                        value={question.diem}
-                        onChange={(e) => updateQuestion(index, { diem: Number.parseInt(e.target.value) })}
-                        min="1"
-                        max="50"
-                        className='rounded-xs border-gray-300'
-                      />
-                    </div>
-                  </div>
-
-                  {question.loai === "trac_nghiem" && (
-                    <div>
-                      <Label className="mb-3">Tuỳ chọn trả lời (click vào để chỉnh sửa)</Label>
-                      <div className="space-y-2">
-                        <RadioGroup
-                          value={question.dap_an_dung?.toString()}
-                          onValueChange={(value) =>
-                            updateQuestion(index, { dap_an_dung: Number.parseInt(value) })
-                          }
-                        >
-                          {question?.lua_chon?.map((option, optionIndex) => {
-                            const optionLabel = String.fromCharCode(65 + optionIndex); // A, B, C, D
-                            const isCorrect = question.dap_an_dung === optionIndex;
-
-                            return (
-                              <div
-                                key={optionIndex}
-                                className={`flex items-center space-x-2 p-2 rounded-xs border transition-colors ${isCorrect ? "border-sky-400 bg-sky-50" : "border-gray-300"}`}
-                              >
-                                <RadioGroupItem
-                                  value={optionIndex.toString()}
-                                  className="cursor-pointer"
-                                />
-                                <span className="font-medium w-6">{optionLabel}.</span>
-                                <Input
-                                  value={option}
-                                  onChange={(e) => {
-                                    const newOptions = [...(question.lua_chon || [])];
-                                    newOptions[optionIndex] = e.target.value;
-                                    updateQuestion(index, { lua_chon: newOptions });
-                                  }}
-                                  placeholder={`Option ${optionLabel}`}
-                                  className="flex-1 rounded-xs border-none shadow-none"
-                                />
-                                {isCorrect && (
-                                  <span className="ml-2 text-sm font-semibold text-sky-600">
-                                    ✓ Đáp án đúng
-                                  </span>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </RadioGroup>
-                      </div>
-                    </div>
-
-                  )}
-
-                  {question.loai === "dung_sai" && (
-                    <div>
-                      <Label>Correct Answer</Label>
+                {question.loai === "trac_nghiem" && (
+                  <div>
+                    <Label className="mb-3">
+                      Tuỳ chọn trả lời (click vào để chỉnh sửa)
+                    </Label>
+                    <div className="space-y-2">
                       <RadioGroup
                         value={question.dap_an_dung?.toString()}
                         onValueChange={(value) =>
                           updateQuestion(index, { dap_an_dung: Number.parseInt(value) })
                         }
                       >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="1" />
-                          <Label>True</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="0" />
-                          <Label>False</Label>
-                        </div>
+                        {question?.lua_chon?.map((option, optionIndex) => {
+                          const optionLabel = String.fromCharCode(65 + optionIndex); // A, B, C, D
+                          const isCorrect = question.dap_an_dung === optionIndex;
+
+                          return (
+                            <div
+                              key={optionIndex}
+                              className={`flex items-center space-x-2 py-1 px-2 rounded-xs border transition-colors ${isCorrect ? "border-sky-400 bg-sky-50" : "border-gray-300"}`}
+                            >
+                              <RadioGroupItem
+                                value={optionIndex.toString()}
+                                className="cursor-pointer"
+                              />
+                              <span className="font-medium w-6">{optionLabel}.</span>
+                              <Input
+                                value={option}
+                                onChange={(e) => {
+                                  const newOptions = [...(question.lua_chon || [])];
+                                  newOptions[optionIndex] = e.target.value;
+                                  updateQuestion(index, { lua_chon: newOptions });
+                                }}
+                                placeholder={`Option ${optionLabel}`}
+                                className="flex-1 rounded-xs border-none shadow-none"
+                              />
+                              {isCorrect && (
+                                <span className="ml-2 text-sm font-semibold text-sky-600">
+                                  ✓ Đáp án đúng
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
                       </RadioGroup>
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  {question.loai === "tra_loi_ngan" && (
-                    <div>
-                      <Label>Correct Answer</Label>
-                      <Input
-                        value={question.dap_an_dung?.toString()}
-                        onChange={(e) => updateQuestion(index, { dap_an_dung: e.target.value })}
-                        placeholder="Enter the correct answer"
-                      />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                {question.loai === "dung_sai" && (
+                  <div>
+                    <Label>Correct Answer</Label>
+                    <RadioGroup
+                      value={question.dap_an_dung?.toString()}
+                      onValueChange={(value) =>
+                        updateQuestion(index, { dap_an_dung: Number.parseInt(value) })
+                      }
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="1" />
+                        <Label>True</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="0" />
+                        <Label>False</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                )}
+
+                {question.loai === "tra_loi_ngan" && (
+                  <div>
+                    <Label>Correct Answer</Label>
+                    <Input
+                      value={question.dap_an_dung?.toString()}
+                      onChange={(e) => updateQuestion(index, { dap_an_dung: e.target.value })}
+                      placeholder="Enter the correct answer"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <Label className="mb-3">
+                    Giải thích (tuỳ chọn)
+                  </Label>
+                  <Textarea
+                    id="question-description"
+                    value={question.giai_thich}
+                    onChange={(e) => updateQuestion(index, { giai_thich: e.target.value })}
+                    placeholder="Describe what this test covers"
+                    className="rounded-xs h-12 text-base border-gray-400/70 shadow-none"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-
       </div>
 
       {test?.trang_thai === 'ban_nhap' && (
