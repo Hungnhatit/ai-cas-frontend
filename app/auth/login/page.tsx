@@ -59,7 +59,7 @@ export default function LoginPage() {
             <span className="font-bold text-2xl">AI-CAS</span>
           </div>
           <h1 className="text-2xl font-bold">Welcome back</h1>
-          <p className="text-muted-foreground">Sign in to your account to continue</p>
+          <p className="text-white">Sign in to your account to continue</p>
         </div>
 
         <Card className="border-border">

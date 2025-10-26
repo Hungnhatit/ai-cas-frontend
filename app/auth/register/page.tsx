@@ -76,7 +76,7 @@ export default function RegisterPage() {
             <span className="font-bold text-2xl">AI-CAS</span>
           </div>
           <h1 className="text-2xl font-bold">Create your account</h1>
-          <p className="text-muted-foreground">Join thousands of learners and educators</p>
+          <p className="text-white">Join thousands of learners and educators</p>
         </div>
 
         <Card className="border-border">

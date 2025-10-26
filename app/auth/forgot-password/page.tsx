@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
             <span className="font-bold text-2xl">AI-CAS</span>
           </div>
           <h1 className="text-2xl font-bold">Forgot your password?</h1>
-          <p className="text-muted-foreground">No worries, we'll send you reset instructions</p>
+          <p className="text-white">No worries, we'll send you reset instructions</p>
         </div>
 
         <Card className="border-border">
