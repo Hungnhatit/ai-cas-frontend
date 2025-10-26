@@ -1,4 +1,5 @@
 import { api } from "@/lib/axios"
+import { headers } from "next/headers";
 
 export const testAttemptService = {
   startTestAttempt: async (test_id: number, student_id: number) => {
@@ -48,5 +49,16 @@ export const testAttemptService = {
       console.log('Failed to submit test attempt: ', error);
       return null
     }
+  },
+
+  abortAttempt: async (attempt_id: number) => {
+    const token = localStorage.getItem("token");
+    const res = await api.post(`/test-attempt/${attempt_id}/abort`, {}, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return res.data;
   },
 }
