@@ -5,7 +5,7 @@ import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 
 interface User {
-  user_id: number
+  ma_nguoi_dung: number
   email: string
   name: string
   vai_tro: "student" | "instructor" | "admin"
