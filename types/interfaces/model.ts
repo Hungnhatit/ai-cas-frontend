@@ -1,3 +1,17 @@
+export interface User {
+  ma_nguoi_dung: number
+  ten: string
+  email: string
+  mat_khau: string
+  so_dien_thoai: string
+  anh_dai_dien: string
+  vai_tro: "student" | 'instructor' | 'admin'
+  trang_thai: 'dang_hoat_dong' | 'ngung_hoat_dong'
+  ngay_tao: string
+  ngay_cap_nhat: string
+}
+
+
 export interface Test {
   ma_kiem_tra: number;           // test_id
   ma_giang_vien: number;             // instructor_id
@@ -7,7 +21,7 @@ export interface Test {
   thoi_luong: number;                // duration (minutes)
   tong_diem: number;                 // total_points
   so_lan_lam_toi_da: number;         // max_attempts
-  do_kho: "de" | "trung_binh" | "kho"; // difficulty ('easy' | 'medium' | 'hard')
+  do_kho: "de" | "trung_binh" | "kho";
   trang_thai: "hoat_dong" | "ban_nhap" | "luu_tru"; // status  
   pham_vi_hien_thi: 'cong_khai' | 'rieng_tu' | 'lop_hoc'
   ngay_bat_dau: string;              // start_date
@@ -48,13 +62,13 @@ export interface TestSetup {
 export interface TestQuestion {
   ma_cau_hoi: number;             // question_id
   ma_kiem_tra: number;           // test_id
-  // ma_phan_kiem_tra: number;          // section_id
+  ma_phan: number;          // section_id
   loai: "trac_nghiem" | "tu_luan" | "dung_sai" | "tra_loi_ngan";
   cau_hoi: string;                   // question
   lua_chon: string[];               // options
   dap_an_dung?: string | number;     // correctAnswer
   diem: number;                      // points
-  giai_thich?: string;               // explanation
+  giai_thich: string;               // explanation
   ngay_tao: string;                  // createdAt
   ngay_cap_nhat: string;             // updatedAt
 }
@@ -69,8 +83,6 @@ export interface Instructor {
   ngay_tao: string;          // createdAt
   ngay_cap_nhat: string;     // updatedAt
 }
-
-
 
 export interface Course {
   ma_khoa_hoc: number;            // id: string
