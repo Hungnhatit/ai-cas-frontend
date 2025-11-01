@@ -12,7 +12,7 @@ export const userService = {
   },
 
   updateUser: async (user_id: number, data: any) => {
-    const res = await api.put(`/user/${user_id}`, data)
+    const res = await api.patch(`/user/${user_id}`, data)
     return res.data
   },
 
