@@ -13,16 +13,16 @@ export function Footer() {
 
           <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm text-muted-foreground">
             <a href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
-              Privacy Policy
+              Chính sách bảo mật
             </a>
             <a href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
-              Terms of Service
+              Điều khoản dịch vụ
             </a>
             <a href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
-              Support
+              Hỗ trợ
             </a>
             <a href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
-              Documentation
+              Tài liệu
             </a>
           </div>
         </div>
