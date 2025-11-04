@@ -32,7 +32,24 @@ export interface Test {
   cau_hoi_kiem_tra: TestQuestion[];
   giang_vien: Instructor | null
   danh_muc: string
+  so_phan: number
 }
+
+export interface TestSection {
+  ma_phan: number;
+  ma_kiem_tra: number;
+  ten_phan: string;
+  mo_ta: string
+  loai_phan: 'trac_nghiem' | 'tu_luan' | 'viet_prompt' | 'xu_ly_tinh_huong' | 'dung_sai' | 'khac';
+  diem: number
+  thu_tu: number;
+  diem_toi_da: number;
+  thoi_gian_gioi_han?: number | null;
+  tieu_chi_danh_gia?: string | null;
+  ngay_tao: string;
+  ngay_cap_nhat: string;
+}
+
 
 export type TestAttemptStatus = "in-progress" | "submitted" | "graded";
 export interface TestAttempt {
