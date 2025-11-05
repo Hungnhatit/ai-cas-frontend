@@ -59,14 +59,14 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg gap-3">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           <Eye className="h-5 w-5 text-indigo-500 flex-shrink-0" />
-          Detailed Question Review
+          Đánh giá chi tiết câu hỏi
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Review each question with detailed explanations and AI concept mapping
+          Xem lại từng câu hỏi với lời giải thích chi tiết
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -75,14 +75,14 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
             <CollapsibleTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full p-4 h-auto justify-between text-left"
+                className="w-full p-4 h-auto justify-between text-left rounded-[3px] cursor-pointer"
                 onClick={() => toggleQuestion(question.id)}
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {getStatusIcon(question.isCorrect, question.userAnswer)}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium">Question {index + 1}</span>
+                  <div className="flex-1 min-w-0 ">
+                    <div className="flex items-center gap-2 mb-[6px]">
+                      <span className="font-medium">Câu hỏi {index + 1}</span>
                       <Badge variant="outline" className={getDifficultyColor(question.difficulty)}>
                         {question.difficulty}
                       </Badge>
@@ -95,9 +95,9 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <div className="text-right">
+                    <div className="text-right space-y-[6px]">
                       <div className="text-sm font-medium">
-                        {question.points}/{question.maxPoints} pts
+                        {question.points}/{question.maxPoints} điểm
                       </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
@@ -111,15 +111,15 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
             </CollapsibleTrigger>
 
             <CollapsibleContent className="mt-2">
-              <div className="p-4 bg-gray-50 border border-gray-400 rounded-lg space-y-4">
+              <div className="p-4 bg-gray-50 border border-gray-300 rounded-[3px] space-y-4">
                 <div>
-                  <h5 className="font-medium mb-2">Question:</h5>
+                  <h5 className="font-medium mb-2">Câu hỏi:</h5>
                   <p className="text-sm break-words">{question.question}</p>
                 </div>
 
                 {question.options && (
                   <div>
-                    <h5 className="font-medium mb-2">Options:</h5>
+                    <h5 className="font-medium mb-2">Lựa chọn:</h5>
                     <div className="space-y-1">
                       {question.options.map((option, optionIndex) => (
                         <div key={optionIndex} className={`flex items-center justify-between text-sm p-2 rounded border ${optionIndex === question.correctAnswer ? 'bg-green-100 text-green-800' :
@@ -143,7 +143,7 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <h5 className="font-medium mb-1">Your Answer:</h5>
+                    <h5 className="font-medium mb-1">Câu trả lời của bạn:</h5>
                     <p className="text-sm">
                       {question.userAnswer !== undefined && question.userAnswer !== '' ?
                         (question.options ?
@@ -155,7 +155,7 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
                     </p>
                   </div>
                   <div>
-                    <h5 className="font-medium mb-1">Correct Answer:</h5>
+                    <h5 className="font-medium mb-1">Đáp án đúng:</h5>
                     <p className="text-sm text-green-700">
                       {question.options ?
                         `${String.fromCharCode(65 + Number(question.correctAnswer))}. ${question.options[Number(question.correctAnswer)]}` :
@@ -174,7 +174,7 @@ export default function DetailedQuestionReview({ questions, showExplanations }: 
 
                 {showExplanations && (
                   <div>
-                    <h5 className="font-medium mb-2">Explanation:</h5>
+                    <h5 className="font-medium mb-2">Giải thích:</h5>
                     <p className="text-sm text-muted-foreground break-words">{question.explanation}</p>
                   </div>
                 )}

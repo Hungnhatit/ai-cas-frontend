@@ -209,7 +209,7 @@ export function QuizTakingPage({ quizId, attemptId }: QuizTakingPageProps) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">{quiz.title}</h1>
-          <p className="text-muted-foreground">{quiz.course}</p>
+          <p className="text-white">{quiz.course}</p>
         </div>
         <div className="flex items-center gap-4">
           <Badge variant={timeRemaining > 180 ? "default" : "destructive"} className="text-lg px-3 py-1">

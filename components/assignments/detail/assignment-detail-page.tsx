@@ -121,7 +121,7 @@ const AssignmentDetailPage = ({ assignment_id }: AssignmentDetailProps) => {
         </div>
 
         <div className='mb-3'>
-          <Alert variant="destructive" className='rounded-xs'>
+          <Alert variant="destructive" className='rounded-[3px]'>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription className='text-[15px] font-semibold'>
               This assignment is overdue. Late submissions may receive reduced points.

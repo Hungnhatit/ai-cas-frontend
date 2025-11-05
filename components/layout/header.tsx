@@ -20,6 +20,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { LanguageToggle } from "@/components/ui/language-toggle"
 import { useI18n } from "@/providers/i18n-provider"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 interface HeaderProps {
   onMobileMenuToggle?: () => void
@@ -64,7 +65,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">E</span>
             </div>
-            <span className="font-bold text-lg md:text-xl">AI-CAS</span>
+            <Link href='/dashboard' className="font-bold text-lg md:text-xl">AI-CAS</Link>
           </div>
         </div>
 
@@ -72,7 +73,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
           {!isMobile && (
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input placeholder={t.search} className="pl-10 bg-muted/50" />
+              <Input placeholder={t.search} className="pl-10 bg-muted/50 rounded-[3px] border-gray-400/80 shadow-none" />
             </div>
           )}
           {isMobile && !showSearch && (

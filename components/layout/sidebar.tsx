@@ -8,6 +8,8 @@ import { usePathname } from "next/navigation"
 import {
   BookOpen, Calendar, ChevronLeft, GraduationCap, Home, MessageSquare, Settings, Users, BarChart3, FileText, Award, Video, HelpCircle, BookType,
   ChartNoAxesCombined,
+  Library,
+  UsersRound,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -68,6 +70,12 @@ const navItems: NavItem[] = [
     icon: MessageSquare,
   },
   {
+    title: "Manage users",
+    href: "/admin/users",
+    icon: UsersRound,
+    roles: ['admin']
+  },
+  {
     title: 'Manage tests',
     href: '/tests',
     icon: BookType,
@@ -80,28 +88,33 @@ const navItems: NavItem[] = [
     roles: ['student']
   },
   {
-    title: "Assignments",
-    href: "/assignments",
-    icon: FileText,
+    title: "Manage library",
+    href: "/library",
+    icon: Library,
   },
+  // {
+  //   title: "Assignments",
+  //   href: "/assignments",
+  //   icon: FileText,
+  // },
   {
-    title: "Manage Assignments",
+    title: "Manage assignments",
     href: "/manage-assignments",
     icon: FileText,
     roles: ["instructor", "admin"],
   },
-  {
-    title: "Quizzes",
-    href: "/quizzes",
-    icon: HelpCircle,
-    roles: ['student', 'admin'] //temporary hide quizzes for instructor
-  },
-  {
-    title: "Manage Quizzes",
-    href: "/manage-quizzes",
-    icon: HelpCircle,
-    roles: ["instructor", "admin"],
-  },
+  // {
+  //   title: "Quizzes",
+  //   href: "/quizzes",
+  //   icon: HelpCircle,
+  //   roles: ['student', 'admin'] //temporary hide quizzes for instructor
+  // },
+  // {
+  //   title: "Manage Quizzes",
+  //   href: "/manage-quizzes",
+  //   icon: HelpCircle,
+  //   roles: ["instructor", "admin"],
+  // },
   {
     title: "Grades",
     href: "/grades",
@@ -216,7 +229,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   return (
     <div
       className={cn(
-        "relative flex flex-col h-full bg-[#1F2937] border-r border-sidebar-border transition-all duration-300",
+        "relative flex flex-col h-full bg-[#1F2937] transition-all duration-300",
         collapsed ? "w-16" : "w-56",
       )}
     >

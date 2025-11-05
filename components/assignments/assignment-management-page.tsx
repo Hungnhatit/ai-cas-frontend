@@ -45,6 +45,7 @@ export function AssignmentManagementPage() {
 
   // fetch assignment
   useEffect(() => {
+    if (!user) return;
     const fetchAssignment = async () => {
       setLoading(true);
       try {

@@ -45,8 +45,8 @@ export function AdminDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">System overview and management</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
+          <p className="text-white">System overview and management</p>
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="outline">

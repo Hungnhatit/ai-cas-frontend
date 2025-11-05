@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Target, Lightbulb } from 'lucide-react';
 
@@ -18,17 +18,20 @@ export default function PerformanceInsights({ insights, strengths, improvements 
   return (
     <Card className="shadow-lg">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg">
           <Lightbulb className="h-5 w-5 text-yellow-500" />
-          Performance Insights
+          Phân tích hiệu suất
         </CardTitle>
+        <CardDescription>
+          Phân tích chi tiết năng lực của bạn dựa trên kết quả bài thi, xác định các điểm mạnh nổi bật và kỹ năng cần phát triển thêm để nâng cao hiệu suất học tập.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="h-4 w-4 text-green-500" />
-              <h4 className="font-semibold text-green-700">Strengths</h4>
+              <p className="font-bold text-green-700 text-lg">Điểm mạnh</p>
             </div>
             <div className="space-y-2">
               {strengths.map((strength, index) => (
@@ -42,7 +45,7 @@ export default function PerformanceInsights({ insights, strengths, improvements 
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Target className="h-4 w-4 text-orange-500" />
-              <h4 className="font-semibold text-orange-700">Areas for Improvement</h4>
+              <h4 className="font-semibold text-orange-700">Các lĩnh vực cần cải thiện</h4>
             </div>
             <div className="space-y-2">
               {improvements.map((improvement, index) => (
@@ -55,12 +58,14 @@ export default function PerformanceInsights({ insights, strengths, improvements 
         </div>
 
         <div className="space-y-4 pt-4 border-t">
-          <h4 className="font-semibold text-gray-900">Detailed Analysis</h4>
+          <h4 className="font-semibold text-gray-900">
+            Phân tích chi tiết
+          </h4>
           {insights.map((insight, index) => (
-            <div key={index} className="p-4 rounded-lg bg-gray-50 border-l-4 border border-blue-400  ">
+            <div key={index} className="p-4 rounded-[3px] bg-gray-50 border-l-4 border border-blue-400  ">
               <div className="flex items-start gap-3">
                 <div className={`p-1 rounded-full ${insight.type === 'strength' ? 'bg-green-100' :
-                    insight.type === 'improvement' ? 'bg-orange-100' : 'bg-blue-100'
+                  insight.type === 'improvement' ? 'bg-orange-100' : 'bg-blue-100'
                   }`}>
                   {insight.type === 'strength' ? (
                     <TrendingUp className="h-4 w-4 text-green-600" />

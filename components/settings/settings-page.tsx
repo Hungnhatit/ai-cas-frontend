@@ -59,8 +59,8 @@ export function SettingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground">Manage your account preferences and settings</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
+          <p className="text-white">Manage your account preferences and settings</p>
         </div>
       </div>
 

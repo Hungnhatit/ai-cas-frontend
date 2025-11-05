@@ -25,34 +25,34 @@ export default function QuestionBreakdown({
   categoryPerformance
 }: QuestionBreakdownProps) {
   return (
-    <Card className="shadow-lg gap-1">
+    <Card className="shadow-lg gap-1">      
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg">
           <BarChart3 className="h-5 w-5 text-green-500" />
-          Question Analysis
+          Phân tích câu hỏi
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-          <div className="text-center p-3 bg-blue-50 rounded-xs">
+          <div className="text-center p-3 bg-blue-50 rounded-[3px]">
             <div className="text-2xl font-bold text-blue-600">{totalQuestions}</div>
-            <div className="text-sm text-muted-foreground">Total Questions</div>
+            <div className="text-sm text-muted-foreground">Tổng số câu hỏi</div>
           </div>
-          <div className="text-center p-3 bg-green-50 rounded-xs">
+          <div className="text-center p-3 bg-green-50 rounded-[3px]">
             <div className="flex items-center justify-center gap-1 mb-1">
               <CheckCircle className="h-4 w-4 text-green-500" />
               <span className="text-2xl font-bold text-green-600">{correctAnswers}</span>
             </div>
-            <div className="text-sm text-muted-foreground">Correct</div>
+            <div className="text-sm text-muted-foreground">Trả lời đúng</div>
           </div>
-          <div className="text-center p-3 bg-red-50 rounded-xs">
+          <div className="text-center p-3 bg-red-50 rounded-[3px]">
             <div className="flex items-center justify-center gap-1 mb-1">
               <XCircle className="h-4 w-4 text-red-500" />
               <span className="text-2xl font-bold text-red-600">{incorrectAnswers}</span>
             </div>
             <div className="text-sm text-muted-foreground">Incorrect</div>
           </div>
-          <div className="text-center p-3 bg-gray-50 rounded-xs">
+          <div className="text-center p-3 bg-gray-50 rounded-[3px]">
             <div className="flex items-center justify-center gap-1 mb-1">
               <HelpCircle className="h-4 w-4 text-gray-500" />
               <span className="text-2xl font-bold text-gray-600">{skippedQuestions}</span>
@@ -62,7 +62,7 @@ export default function QuestionBreakdown({
         </div>
 
         <div className="space-y-4">
-          <h4 className="font-semibold text-gray-900">Performance by Category</h4>
+          <h4 className="font-semibold text-gray-900">Đánh giá dựa theo danh mục</h4>
           {categoryPerformance.map((category, index) => (
             <div key={index} className="space-y-2">
               <div className="flex justify-between text-sm">

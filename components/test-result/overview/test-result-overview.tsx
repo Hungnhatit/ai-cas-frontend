@@ -8,10 +8,7 @@ import { Separator } from "@/components/ui/separator"
 import {
   CheckCircle, XCircle, Clock, Trophy, Target, BookOpen, ArrowLeft, Download, Share2, RotateCcw,
 } from "lucide-react"
-import { api, type Quiz, type QuizAttempt, type QuizQuestion } from "@/services/api"
-import { useParams, useRouter } from "next/navigation"
-import { quizService } from "@/services/quizService"
-import { attemptService } from "@/services/attemptService"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 import { testAttemptService } from "@/services/test/testAttemptService"
 import { testService } from "@/services/test/testService"
@@ -34,7 +31,6 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const [testData, attempts] = await Promise.all([api.getQuiz(test_id), api.getQuizAttempts(test_id)]);
         const [testsRes, attemptListRes] = await Promise.all([
           testService.getTestById(test_id),
           testAttemptService.getTestAttemptById(Number(testAttempt_id))
@@ -54,24 +50,6 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
 
         setTest(testData);
         setAttempt(attemptData);
-
-        // if (testAttempt_id) {
-        //   const currentAttempt = attemptList.find((a: any) => a.testAttempt_id === testAttempt_id)
-        //   if (currentAttempt) {
-        //     setAttempt(currentAttempt)
-        //   }
-        // } else {
-        //   // Get the latest attempt
-        //   const latestAttempt = attemptList
-        //     .filter((a) => a.status === "submitted")
-        //     .sort((a, b) => new Date(b.endTime || "").getTime() - new Date(a.endTime || "").getTime())[0]
-        //   setAttempt(latestAttempt)
-        // }
-
-        // if (testAttempt_id) {
-        //   setAttempt(attemptList)
-        // }
-
       } catch (error) {
         console.error("Failed to fetch quiz results:", error)
         // router.push("/tests")

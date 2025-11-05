@@ -24,12 +24,13 @@ const CreateTestPage = () => {
   const [loading, setLoading] = useState(true)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([])
-  const [section, setSection] = useState<Partial<TestSection>[]>([]);
+  const [sections, setSections] = useState<Partial<TestSection>[]>([])
+
   const [newSection, setNewSection] = useState<Partial<TestSection>>({
     ten_phan: '',
     loai_phan: 'trac_nghiem',
     mo_ta: '',
-    diem: '',
+    diem: 0,
   });
   const { user } = useAuth();
   const router = useRouter();
@@ -60,42 +61,64 @@ const CreateTestPage = () => {
     fetchData()
   }, [])
 
-  const addQuestion = () => {
-    setQuestions([
-      ...questions,
-      {
-        ma_cau_hoi: questions.length + 1,
-        cau_hoi: "",
-        loai: "trac_nghiem",
-        lua_chon: ["", "", "", ""],
-        dap_an_dung: 0,
-        diem: 10,
-      },
-    ])
-  }
+  // const addQuestion = () => {
+  //   setQuestions([
+  //     ...questions,
+  //     {
+  //       ma_cau_hoi: questions.length + 1,
+  //       cau_hoi: "",
+  //       loai: "trac_nghiem",
+  //       lua_chon: ["", "", "", ""],
+  //       dap_an_dung: 0,
+  //       diem: 10,
+  //     },
+  //   ])
+  // }
 
   const addSection = () => {
-    setSection([
-      ...section,
+    setSections([
+      ...sections,
       {
-        ma_phan: section.length + 1,
+        ma_phan: sections.length + 1,
         ten_phan: newSection.ten_phan,
         loai_phan: newSection.loai_phan,
-        mo_ta: newSection.mo_ta
+        mo_ta: newSection.mo_ta,
+        diem: 0,
+        cau_hoi: []
       }
     ]);
     setNewSection({ ten_phan: '', loai_phan: 'trac_nghiem', mo_ta: '' });
     toast.success('Đã thêm phần mới');
   }
 
-  console.log(section)
+  const addQuestion = (sectionIndex: number) => {
+    const updatedSections = [...sections];
+    if (!updatedSections[sectionIndex].cau_hoi) {
+      updatedSections[sectionIndex].cau_hoi = [];
+    }
+    updatedSections[sectionIndex].cau_hoi!.push({
+      ma_cau_hoi: (updatedSections[sectionIndex].cau_hoi!.length || 0) + 1,
+      cau_hoi: "",
+      loai: updatedSections[sectionIndex].loai_phan || "trac_nghiem",
+      lua_chon: ["", "", "", ""],
+      dap_an_dung: 0,
+      diem: 10,
+    });
+    setSections(updatedSections);
+  };
 
-  const updateQuestion = (index: number, updates: Partial<TestQuestion>) => {
-    setQuestions(questions.map((q, i) => (
-      i === index
-        ? { ...q, ...updates }
-        : q)))
-  }
+
+  console.log(sections)
+
+  const updateQuestion = (sectionIndex: number, questionIndex: number, updates: Partial<TestQuestion>) => {
+    const updatedSections = [...sections];
+    const section = updatedSections[sectionIndex];
+    if (section.cau_hoi && section.cau_hoi[questionIndex]) {
+      section.cau_hoi[questionIndex] = { ...section.cau_hoi[questionIndex], ...updates };
+    }
+    setSections(updatedSections);
+  };
+
 
   const removeQuestion = (index: number) => {
     setQuestions(questions.filter((_, i) => i !== index))
@@ -104,13 +127,16 @@ const CreateTestPage = () => {
   // handle create quiz when submit
   const handleCreateTest = async () => {
     try {
+      const allQuestions = sections.flatMap((s) => s.cau_hoi || []);
       const total_points = questions.reduce((sum, q) => sum + (q.diem || 0), 0)
 
       const testData = {
         ...newTest,
         ma_giang_vien: user?.ma_nguoi_dung,
-        cau_hoi: questions as TestQuestion[],
+        cau_hoi: allQuestions,
         tong_diem: total_points,
+        so_phan: sections.length,
+        sections: sections as TestSection[],
         trang_thai: 'ban_nhap' as const,
         ngay_bat_dau: new Date(newTest.ngay_bat_dau).toISOString(),
         ngay_ket_thuc: new Date(newTest.ngay_ket_thuc).toISOString(),
@@ -127,7 +153,7 @@ const CreateTestPage = () => {
         window.history.back();
       }
     } catch (error) {
-      console.error("Failed to create quiz:", error)
+      console.error("Failed to create test:", error)
     }
   }
   const duplicateQuiz = async (test: Test) => {
@@ -185,9 +211,10 @@ const CreateTestPage = () => {
 
       <div className='bg-card p-4 rounded-[3px] mb-4 border border-gray-300'>
         <div className="space-y-6">
+          <h3 className='text-black font-bold text-lg'>Thông tin chung của bài thi</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className='mb-2' htmlFor="test-title">Tên bài thi</Label>
+              <Label className='mb-2 text-black' htmlFor="test-title">Tên bài thi</Label>
               <Input
                 id="test-title"
                 value={newTest.tieu_de}
@@ -197,7 +224,7 @@ const CreateTestPage = () => {
               />
             </div>
             {/* <div>
-              <Label className='mb-2' htmlFor="test-course">Course</Label>
+              <Label className='mb-2 text-black' htmlFor="test-course">Course</Label>
               <Select value={newTest.course} onValueChange={(value) => setNewTest({ ...newTest, course: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select course" />
@@ -214,7 +241,7 @@ const CreateTestPage = () => {
           </div>
 
           <div>
-            <Label className='mb-2' htmlFor="test-description">Mô tả</Label>
+            <Label className='mb-2 text-black' htmlFor="test-description">Mô tả</Label>
             <Textarea
               id="test-description"
               value={newTest.mo_ta}
@@ -226,7 +253,7 @@ const CreateTestPage = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className='mb-2' htmlFor="test-duration">Thời lượng</Label>
+              <Label className='mb-2 text-black' htmlFor="test-duration">Thời lượng</Label>
               <Input
                 id="test-duration"
                 type="number"
@@ -238,7 +265,7 @@ const CreateTestPage = () => {
               />
             </div>
             <div>
-              <Label className='mb-2' htmlFor="test-attempts">Số lần làm tối đa</Label>
+              <Label className='mb-2 text-black' htmlFor="test-attempts">Số lần làm tối đa</Label>
               <Input
                 id="test-attempts"
                 type="number"
@@ -255,11 +282,11 @@ const CreateTestPage = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2">
               <Calendar className="text-blue-600" size={20} />
-              <h3 className="text-md font-semibold text-gray-900">Hạn nộp</h3>
+              <h3 className="text-md font-semibold">Hạn nộp</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Ngày bắt đầu" required>
+              <FormField label="Ngày bắt đầu" required className='!text-black'>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
                   <Input
@@ -271,7 +298,7 @@ const CreateTestPage = () => {
                 </div>
               </FormField>
 
-              <FormField label="Ngày kết thúc" required>
+              <FormField label="Ngày kết thúc" required className='text-black'>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
                   <Input
@@ -284,7 +311,7 @@ const CreateTestPage = () => {
               </FormField>
 
               {/* {formData.trang_thai === 'submitted' && (
-                <FormField label="Submission Date & Time">
+                <FormField label="Submission Date & Time" className='text-black'>
                   <div className="relative">
                     <CalendarDays className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
                     <Input
@@ -303,9 +330,9 @@ const CreateTestPage = () => {
         </div>
       </div>
 
-      {/* question section */}
+      {/* question sections */}
       <div className="flex items-center justify-between mb-4">
-        <Label className='text-2xl font-bold'>Câu hỏi</Label>
+        <Label className='text-2xl font-bold'>Nội dung bài thi</Label>
         {/* <Button type="button" variant="outline" onClick={addQuestion} className='cursor-pointer rounded-[3px]'>
           <Plus className="h-4 w-4 mr-2" />
           Thêm câu hỏi
@@ -317,7 +344,7 @@ const CreateTestPage = () => {
         </Button>
       </div>
 
-      {
+      {/* {
         questions.length === 0 && (
           <div>
             <Card className='shadow-none'>
@@ -328,248 +355,233 @@ const CreateTestPage = () => {
             </Card>
           </div>
         )
+      } */}
+
+      {
+        sections.length === 0 && (
+          <div className='mb-4'>
+            <Card className='shadow-none'>
+              <CardHeader className='justify-centerF'>
+                <CardTitle className='text-center text-xl font-bold'>Chưa có phần nào được thêm vào</CardTitle>
+                <CardDescription className='text-center text-md'>Click 'Thêm phần' để tạo phần bài thi của bạn</CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        )
       }
 
-      <div className="border p-4 rounded-[3px] mb-4">
-        <h3 className="font-semibold mb-2">Thêm phần bài thi</h3>
+      {/* add new section */}
+      {sections.map((section, sectionIndex) => (
+        <div key={sectionIndex} className="bg-card border p-4 rounded-[3px] mb-4 border-gray-400">
+          <h3 className="font-semibold text-lg mb-3 pb-3 border-b border-gray-300">Phần {sectionIndex + 1}</h3>
 
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <FormField label="Tên phần">
-            <Input
-              value={newSection.ten_phan}
-              onChange={(e) => setNewSection({ ...newSection, ten_phan: e.target.value })}
-              placeholder="Ví dụ: Phần 1 - Trắc nghiệm"
-              className='rounded-[3px] shadow-none border-gray-300'
-            />
-          </FormField>
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <FormField label="Tên phần">
+              <Input
+                value={section.ten_phan || ''}
+                onChange={(e) => {
+                  const updated = [...sections]
+                  updated[sectionIndex] = { ...updated[sectionIndex], ten_phan: e.target.value };
+                  setSections(updated);
+                }}
+                placeholder="Ví dụ: Phần 1 - Trắc nghiệm"
+                className='h-10 rounded-[3px] text-black shadow-none border-gray-300'
+              />
+            </FormField>
 
-          <FormField label="Loại phần">
-            <Select
-              value={newSection.loai_phan}
-              onValueChange={(val) => setNewSection({ ...newSection, loai_phan: val as any })}
-            >
-              <SelectTrigger className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>
-                <SelectValue placeholder="Chọn loại phần" />
-              </SelectTrigger>
-              <SelectContent className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>
-                <SelectItem value="trac_nghiem" className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>Trắc nghiệm</SelectItem>
-                <SelectItem value="tu_luan" className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>Tự luận</SelectItem>
-                <SelectItem value="viet_prompt" className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>Viết prompt</SelectItem>
-                <SelectItem value="xu_ly_tinh_huong" className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>Xử lý tình huống</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormField>
+            <FormField label="Loại phần" className='text-black'>
+              <Select
+                value={section.loai_phan}
+                onValueChange={(val) => {
+                  const updated = [...sections];
+                  updated[sectionIndex] = { ...updated[sectionIndex], loai_phan: val as any };
+                  setSections(updated);
+                }}
+              >
+                <SelectTrigger className='w-full rounded-[3px] shadow-none cursor-pointer border-gray-300'>
+                  <SelectValue placeholder="Chọn loại phần" />
+                </SelectTrigger>
+                <SelectContent className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>
+                  <SelectItem value="trac_nghiem" className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>Trắc nghiệm</SelectItem>
+                  <SelectItem value="tu_luan" className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>Tự luận</SelectItem>
+                  <SelectItem value="viet_prompt" className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>Viết prompt</SelectItem>
+                  <SelectItem value="xu_ly_tinh_huong" className='rounded-[3px] shadow-none cursor-pointer border-gray-300'>Xử lý tình huống</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormField>
 
-          <FormField label="Điểm">
-            <Input
-              value={newSection.ten_phan}
-              onChange={(e) => setNewSection({ ...newSection, ten_phan: e.target.value })}
-              placeholder="Nhập số điểm cho phần này"
-              className='rounded-[3px] shadow-none border-gray-300'
-            />
-          </FormField>
+            <FormField label="Điểm" className='text-black'>
+              <Input
+                value={section.diem || 0}
+                onChange={(e) => {
+                  const updated = [...sections];
+                  updated[sectionIndex] = { ...updated[sectionIndex], diem: Number(e.target.value) };
+                  setSections(updated);
+                }}
+                placeholder="Nhập số điểm cho phần này"
+                className='h-10 rounded-[3px] shadow-none border-gray-300'
+              />
+            </FormField>
 
-          <FormField label="Mô tả phần">
-            <Textarea
-              value={newSection.mo_ta}
-              onChange={(e) => setNewSection({ ...newSection, mo_ta: e.target.value })}
-              placeholder="Mô tả chi tiết nội dung cho phần này..."
-              className='rounded-[3px] shadow-none border-gray-300'
-            />
-          </FormField>
-        </div>
+            <FormField label="Mô tả phần" className='text-black'>
+              <Textarea
+                value={section.mo_ta}
+                onChange={(e) => {
+                  const updated = [...sections];
+                  updated[sectionIndex] = { ...updated[sectionIndex], mo_ta: e.target.value };
+                  setSections(updated);
+                }}
+                placeholder="Mô tả chi tiết nội dung cho phần này..."
+                className='rounded-[3px] shadow-none border-gray-300'
+              />
+            </FormField>
+          </div>
 
-        <Button type="button" variant="outline" onClick={addQuestion} className='cursor-pointer rounded-[3px] mb-4'>
-          <Plus className="h-4 w-4 mr-2" />
-          Thêm câu hỏi
-        </Button>
+          <Button type="button" variant="outline" onClick={() => addQuestion(sectionIndex)} className='cursor-pointer rounded-[3px] mb-4'>
+            <Plus className="h-4 w-4 mr-2" />
+            Thêm câu hỏi
+          </Button>
 
-        <Separator />
+          {/* <Separator /> */}
 
-        <div className="grid grid-cols-2 gap-3 space-y-4 mt-4 items-center">
-          {questions.map((question, index) => (
-            <Card key={index} className='shadow-none border-gray-300 my-0 gap-3'>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-bold">Câu hỏi {index + 1}</CardTitle>
-                  <Button variant="ghost" size="sm" onClick={() => removeQuestion(index)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label className="mb-3">Nội dung câu hỏi</Label>
-                  <Textarea
-                    value={question.cau_hoi}
-                    onChange={(e) => updateQuestion(index, { cau_hoi: e.target.value })}
-                    placeholder="Nhập vào nội dung câu hỏi"
-                    className="rounded-[3px] text-base border-gray-300 shadow-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 space-y-4 mt-4 items-center">
+            {section.cau_hoi?.map((question, index) => (
+              <Card key={index} className='shadow-none border-gray-300 my-0 gap-3'>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-bold">Câu hỏi {index + 1}</CardTitle>
+                    <Button variant="ghost" size="sm" onClick={() => removeQuestion(index)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div>
-                    <Label className='mb-3'>Mô tả</Label>
-                    <Input
-                      type="text"
-                      value={question.diem}
-                      onChange={(e) => updateQuestion(index, { diem: Number.parseInt(e.target.value) })}
-                      min="1"
-                      max="50"
-                      className="rounded-[3px] h-12 text-base border-gray-300 shadow-none"
+                    <Label className="mb-3">Nội dung câu hỏi</Label>
+                    <Textarea
+                      value={question.cau_hoi}
+                      onChange={(e) => updateQuestion(sectionIndex, index, { cau_hoi: e.target.value })}
+                      placeholder="Nhập vào nội dung câu hỏi"
+                      className="rounded-[3px] text-base border-gray-300 shadow-none"
                     />
                   </div>
-                  <div>
-                    <Label className='mb-3'>Điểm</Label>
-                    <Input
-                      type="number"
-                      value={question.diem}
-                      onChange={(e) => updateQuestion(index, { diem: Number.parseInt(e.target.value) })}
-                      min="1"
-                      max="50"
-                      className="rounded-[3px] h-12 text-base border-gray-300 shadow-none"
-                    />
-                  </div>
-                </div>
 
-                {newSection.loai_phan === 'trac_nghiem' && (
-                  <div>
-                    <Label className='mb-3'>Answer Options</Label>
-                    <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className='mb-3'>Mô tả</Label>
+                      <Input
+                        type="text"
+                        value={question.mo_ta}
+                        onChange={(e) => updateQuestion(sectionIndex, index, { mo_ta: e.target.value })}
+                        className="rounded-[3px] h-12 text-base border-gray-300 shadow-none"
+                      />
+                    </div>
+                    <div>
+                      <Label className='mb-3'>Điểm</Label>
+                      <Input
+                        type="number"
+                        value={question.diem}
+                        onChange={(e) => updateQuestion(sectionIndex, index, { diem: Number.parseInt(e.target.value) })}
+                        className="rounded-[3px] h-12 text-base border-gray-300 shadow-none"
+                      />
+                    </div>
+                  </div>
+
+                  {section.loai_phan === 'trac_nghiem' && (
+                    <div>
+                      <Label className='mb-3'>Answer Options</Label>
+                      <div className="space-y-2">
+                        <RadioGroup
+                          value={question.dap_an_dung?.toString()}
+                          onValueChange={(value) =>
+                            updateQuestion(sectionIndex, index, { dap_an_dung: Number.parseInt(value) })
+                          }
+                        >
+                          {question.lua_chon?.map((option, optionIndex) => {
+                            const isSelected = question.dap_an_dung === optionIndex;
+                            return (
+                              <div key={optionIndex} className={`flex items-center space-x-2 rounded-md cursor-pointer`}
+                                onClick={() => updateQuestion(sectionIndex, index, { dap_an_dung: optionIndex })}
+                              >
+                                <RadioGroupItem
+                                  value={optionIndex.toString()}
+                                  className='border-gray-300' />
+                                <Input
+                                  value={option}
+                                  onChange={(e) => {
+                                    const newOptions = [...(question.lua_chon || [])]
+                                    newOptions[optionIndex] = e.target.value
+                                    updateQuestion(sectionIndex, index, { lua_chon: newOptions })
+                                  }}
+                                  placeholder={`Lựa chọn ${optionIndex + 1}`}
+                                  className={`flex-1 rounded-[3px] h-12 text-black border-gray-300 shadow-none cursor-pointer ${isSelected ? "bg-blue-50 border border-blue-500" : "border border-gray-300"}`}
+                                />
+                                {isSelected && (
+                                  <span className="ml-2 text-sm font-semibold text-sky-600">
+                                    ✓ Câu trả lời đúng sẽ là câu này
+                                  </span>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </RadioGroup>
+                      </div>
+                    </div>
+                  )}
+
+
+                  {section.loai_phan === "dung_sai" && (
+                    <div>
+                      <Label className='mb-3'>Correct Answer</Label>
                       <RadioGroup
                         value={question.dap_an_dung?.toString()}
                         onValueChange={(value) =>
-                          updateQuestion(index, { dap_an_dung: Number.parseInt(value) })
+                          updateQuestion(sectionIndex, index, { dap_an_dung: Number.parseInt(value) })
                         }
                       >
-                        {question.lua_chon?.map((option, optionIndex) => {
-                          const isSelected = question.dap_an_dung === optionIndex;
-                          return (
-                            <div key={optionIndex} className={`flex items-center space-x-2 rounded-md cursor-pointer`}
-                              onClick={() => updateQuestion(index, { dap_an_dung: optionIndex })}
-                            >
-                              <RadioGroupItem
-                                value={optionIndex.toString()}
-                                className='border-gray-300' />
-                              <Input
-                                value={option}
-                                onChange={(e) => {
-                                  const newOptions = [...(question.lua_chon || [])]
-                                  newOptions[optionIndex] = e.target.value
-                                  updateQuestion(index, { lua_chon: newOptions })
-                                }}
-                                placeholder={`Lựa chọn ${optionIndex + 1}`}
-                                className={`flex-1 rounded-[3px] h-12 text-black border-gray-300 shadow-none cursor-pointer ${isSelected ? "bg-blue-50 border border-blue-500" : "border border-gray-300"}`}
-                              />
-                              {isSelected && (
-                                <span className="ml-2 text-sm font-semibold text-sky-600">
-                                  ✓ Câu trả lời đúng sẽ là câu này
-                                </span>
-                              )}
-                            </div>
-                          )
-                        })}
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="1" />
+                          <Label className='mb-3'>True</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="0" />
+                          <Label className='mb-3'>False</Label>
+                        </div>
                       </RadioGroup>
                     </div>
-                  </div>
-                )}
+                  )}
 
+                  {section.loai_phan === "viet_prompt" && (
+                    <div>
+                      <Label className='mb-3'>Đáp án đúng</Label>
+                      <Textarea
+                        value={question.dap_an_dung?.toString()}
+                        onChange={(e) => updateQuestion(sectionIndex, index, { dap_an_dung: e.target.value })}
+                        placeholder="Nhập đáp án đúng"
+                        className='shadow-none rounded-[3px] border-gray-300'
+                      />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
 
-                {newSection.loai_phan === "dung_sai" && (
-                  <div>
-                    <Label className='mb-3'>Correct Answer</Label>
-                    <RadioGroup
-                      value={question.dap_an_dung?.toString()}
-                      onValueChange={(value) =>
-                        updateQuestion(index, { dap_an_dung: Number.parseInt(value) })
-                      }
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="1" />
-                        <Label className='mb-3'>True</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="0" />
-                        <Label className='mb-3'>False</Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                )}
-
-                {newSection.loai_phan === "viet_prompt" && (
-                  <div>
-                    <Label className='mb-3'>Đáp án đúng</Label>
-                    <Textarea
-                      value={question.dap_an_dung?.toString()}
-                      onChange={(e) => updateQuestion(index, { dap_an_dung: e.target.value })}
-                      placeholder="Nhập đáp án đúng"
-                      className='shadow-none rounded-[3px] border-gray-300'
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-
-
-          {questions.length > 0 && (
-            <Button type="button" variant="outline" onClick={addQuestion} className='cursor-pointer rounded-[3px] place-self-center'>
-              <Plus className="h-4 w-4 mr-2" />
-              Thêm câu hỏi
-            </Button>)
-          }
-
+            {section.cau_hoi && section?.cau_hoi.length > 0 && (
+              <Button type="button" variant="outline" onClick={() => addQuestion(sectionIndex)} className='cursor-pointer rounded-[3px] place-self-center'>
+                <Plus className="h-4 w-4 mr-2" />
+                Thêm câu hỏi
+              </Button>)
+            }
+          </div>
         </div>
-      </div>
+      ))}
 
       <div className='flex items-center justify-center'>
-
-        <Button className='cursor-pointer rounded-full bg-sky-300 hover:bg-sky-200' onClick={addSection} >
-          <Plus size={40} className=" text-blue-700 " />
-          <span className='font-bold text-black'>Thêm phần</span>
+        <Button className='cursor-pointer rounded-[3px]' onClick={addSection} >
+          <Plus size={40} className="" />
+          <span className=''>Thêm phần</span>
         </Button>
       </div>
-
-      {newSection.length > 0 && (
-        <div className="space-y-3 mt-4">
-          <h4 className="font-semibold">Danh sách các phần:</h4>
-          {section.map((s, idx) => (
-            <Card key={idx} className="p-3 border-gray-300">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="font-semibold">{s.ten_phan}</div>
-                  <div className="text-sm text-gray-600">
-                    Loại: {s.loai_phan === 'trac_nghiem' ? 'Trắc nghiệm' :
-                      s.loai_phan === 'tu_luan' ? 'Tự luận' :
-                        s.loai_phan === 'viet_prompt' ? 'Viết Prompt' :
-                          'Xử lý tình huống'}
-                  </div>
-                </div>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => setSection(section.filter((_, i) => i !== idx))}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -589,7 +601,7 @@ const CreateTestPage = () => {
                 <Label className="mb-3">Nội dung câu hỏi</Label>
                 <Textarea
                   value={question.cau_hoi}
-                  onChange={(e) => updateQuestion(index, { cau_hoi: e.target.value })}
+                  onChange={(e) => updateQuestion(sectionIndex,index, { cau_hoi: e.target.value })}
                   placeholder="Nhập vào nội dung câu hỏi"
                   className="rounded-[3px] text-base border-gray-300 shadow-none"
                 />
@@ -601,7 +613,7 @@ const CreateTestPage = () => {
                   <Select
                     value={question.loai}
                     onValueChange={(value) =>
-                      updateQuestion(index, {
+                      updateQuestion(sectionIndex,index, {
                         loai: value as TestQuestion["loai"],
                         lua_chon: value === "trac_nghiem" ? ["", "", "", ""] : undefined,
                       })
@@ -622,7 +634,7 @@ const CreateTestPage = () => {
                   <Input
                     type="number"
                     value={question.diem}
-                    onChange={(e) => updateQuestion(index, { diem: Number.parseInt(e.target.value) })}
+                    onChange={(e) => updateQuestion(sectionIndex,index, { diem: Number.parseInt(e.target.value) })}
                     min="1"
                     max="50"
                     className="rounded-[3px] h-12 text-base border-gray-300 shadow-none"
@@ -637,14 +649,14 @@ const CreateTestPage = () => {
                     <RadioGroup
                       value={question.dap_an_dung?.toString()}
                       onValueChange={(value) =>
-                        updateQuestion(index, { dap_an_dung: Number.parseInt(value) })
+                        updateQuestion(sectionIndex,index, { dap_an_dung: Number.parseInt(value) })
                       }
                     >
                       {question.lua_chon?.map((option, optionIndex) => {
                         const isSelected = question.dap_an_dung === optionIndex;
                         return (
                           <div key={optionIndex} className={`flex items-center space-x-2 rounded-md cursor-pointer`}
-                            onClick={() => updateQuestion(index, { dap_an_dung: optionIndex })}
+                            onClick={() => updateQuestion(sectionIndex,index, { dap_an_dung: optionIndex })}
                           >
                             <RadioGroupItem
                               value={optionIndex.toString()}
@@ -654,7 +666,7 @@ const CreateTestPage = () => {
                               onChange={(e) => {
                                 const newOptions = [...(question.lua_chon || [])]
                                 newOptions[optionIndex] = e.target.value
-                                updateQuestion(index, { lua_chon: newOptions })
+                                updateQuestion(sectionIndex,index, { lua_chon: newOptions })
                               }}
                               placeholder={`Option ${optionIndex + 1}`}
                               className={`flex-1 rounded-[3px] h-12 text-black border-gray-300 shadow-none cursor-pointer ${isSelected ? "bg-blue-50 border border-blue-500" : "border border-gray-300"}`}
@@ -678,7 +690,7 @@ const CreateTestPage = () => {
                   <RadioGroup
                     value={question.dap_an_dung?.toString()}
                     onValueChange={(value) =>
-                      updateQuestion(index, { dap_an_dung: Number.parseInt(value) })
+                      updateQuestion(sectionIndex,index, { dap_an_dung: Number.parseInt(value) })
                     }
                   >
                     <div className="flex items-center space-x-2">
@@ -698,7 +710,7 @@ const CreateTestPage = () => {
                   <Label className='mb-3'>Correct Answer</Label>
                   <Input
                     value={question.dap_an_dung?.toString()}
-                    onChange={(e) => updateQuestion(index, { dap_an_dung: e.target.value })}
+                    onChange={(e) => updateQuestion(sectionIndex,index, { dap_an_dung: e.target.value })}
                     placeholder="Enter the correct answer"
                   />
                 </div>
@@ -714,7 +726,7 @@ const CreateTestPage = () => {
         </Button>
         <Button
           onClick={handleCreateTest}
-          disabled={!newTest.tieu_de || questions.length === 0}
+          disabled={!newTest.tieu_de}
           className='cursor-pointer rounded-[3px]'
         >
           Tạo bài thi

@@ -23,7 +23,7 @@ export function AuthGuard({ children, requiredRole, redirectTo = "/auth/login" }
         return
       }
 
-      if (requiredRole && user.role !== requiredRole) {
+      if (requiredRole && user.vai_tro !== requiredRole) {
         // Redirect based on user role
         switch (user.vai_tro) {
           case "admin":
@@ -55,7 +55,7 @@ export function AuthGuard({ children, requiredRole, redirectTo = "/auth/login" }
     return null
   }
 
-  if (requiredRole && user.role !== requiredRole) {
+  if (requiredRole && user.vai_tro !== requiredRole) {
     return null
   }
 

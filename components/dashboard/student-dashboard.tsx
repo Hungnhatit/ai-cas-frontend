@@ -40,8 +40,8 @@ export function StudentDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Welcome back, {user?.name}!</h1>
-          <p className="text-muted-foreground">Continue your learning journey</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Welcome back, {user?.name}!</h1>
+          <p className="text-white">Continue your learning journey</p>
         </div>
         <Button>
           <BookOpen className="mr-2 h-4 w-4" />

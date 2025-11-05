@@ -2,7 +2,7 @@
 import { api, Course, Quiz, QuizAttempt } from '@/services/api';
 import React, { useEffect, useState } from 'react';
 import { Skeleton } from '../../ui/skeleton';
-import { BarChart3, Brain, Code, Cpu, Database, Eye, Rocket, Target } from 'lucide-react';
+import { BarChart3, BookOpenCheck, Brain, ChartNetwork, Code, Cpu, Database, Eye, Rocket, SquareChartGantt, Target } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
 import ScoreCard from './test-score-card';
 import TimeAnalytics from './test-time-analytics';
@@ -12,14 +12,13 @@ import NextSteps from './test-next-step';
 import AICompetencyBreakdown from './test-ai-competency-breakdown';
 import DetailedQuestionReview from './test-detailed-question-review';
 import AICareerPathway from './test-ai-career-pathway';
-import { quizService } from '@/services/quizService';
 import { useAuth } from '@/providers/auth-provider';
-import { attemptService } from '@/services/attemptService';
 import { Test } from '@/types/interfaces/model';
 import { TestAttempt } from '@/types/interfaces/test';
 import { testService } from '@/services/test/testService';
 import { testAttemptService } from '@/services/test/testAttemptService';
 import TestResultHeader from './test-result-header';
+import { AiReviewService } from '@/services/ai-review/AIReviewService';
 
 interface TestResultDetailProps {
   test_id: number,
@@ -39,7 +38,7 @@ interface Insight {
   description: string;
 }
 
-// this component is used for the quiz result detail page (main component)
+// this component is used for the test result detail page (main component)
 const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
   const [test, setTest] = useState<Test | null>(null);
   const [attempt, setAttempt] = useState<TestAttempt | null>(null);
@@ -47,9 +46,8 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  // not complete
   useEffect(() => {
-    const loadQuizResult = async () => {
+    const loadTestResult = async () => {
       try {
         const testData = await testService.getTestById(test_id);
         const attemptData = await testAttemptService.getTestAttemptById(attempt_id);
@@ -67,7 +65,16 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
       }
     };
 
-    loadQuizResult();
+
+    const fetchResult = async () => {
+      const res = await AiReviewService.getAiReviewById(24);
+      console.log(JSON.parse(res.data.phan_tich))
+      return res.data;
+    }
+
+    loadTestResult();
+    fetchResult();
+
   }, []);
 
   if (loading) {
@@ -100,17 +107,27 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
       <div className="flex min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Test Result Not Found</h1>
-          <p className="text-muted-foreground">The test results you're looking for doesn't exist.</p>
+          <p className="text-white">The test results you're looking for doesn't exist.</p>
         </div>
       </div>
     );
   }
 
   // Calculate metrics from API data
-  const totalQuestions = test?.cau_hoi.length;
+  const answers = attempt?.cau_tra_loi ? JSON.parse(attempt.cau_tra_loi) : {};
+
+  const totalQuestions = test?.cau_hoi.length ?? 0;
+
   const correctAnswers = test?.cau_hoi.filter(q =>
-    attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()] === q.dap_an_dung
-  ).length;
+    answers[q.ma_cau_hoi]?.toString() === q.dap_an_dung
+  ).length ?? 0;
+
+  // console.log('cau hoi: ', test.cau_hoi);
+  // console.log('attempt: ', JSON.parse(attempt.cau_tra_loi));
+  // console.log(totalQuestions);
+  // console.log(correctAnswers);
+
+
   const incorrectAnswers = test?.cau_hoi.filter(q =>
     attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()] !== undefined &&
     attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()] !== q.dap_an_dung
@@ -351,22 +368,26 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto border border-gray-300">
-            <TabsTrigger value="overview" className="flex items-center gap-2 p-3 cursor-pointer">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Overview</span>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto border border-gray-300 rounded-[3px]">
+            <TabsTrigger value="overview" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
+              <SquareChartGantt className="h-4 w-4" />
+              <span className="hidden sm:inline">Tổng quan</span>
             </TabsTrigger>
-            <TabsTrigger value="competency" className="flex items-center gap-2 p-3 cursor-pointer">
+            <TabsTrigger value="analytics" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
+              <ChartNetwork className="h-4 w-4" />
+              <span className="hidden sm:inline">Phân tích chi tiết</span>
+            </TabsTrigger>
+            <TabsTrigger value="competency" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
               <Brain className="h-4 w-4" />
-              <span className="hidden sm:inline">AI Skills</span>
+              <span className="hidden sm:inline">Kỹ năng AI</span>
             </TabsTrigger>
-            <TabsTrigger value="detailed" className="flex items-center gap-2 p-3 cursor-pointer">
-              <Eye className="h-4 w-4" />
-              <span className="hidden sm:inline">Questions</span>
+            <TabsTrigger value="detailed" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
+              <BookOpenCheck className="h-4 w-4" />
+              <span className="hidden sm:inline">Câu hỏi</span>
             </TabsTrigger>
-            <TabsTrigger value="career" className="flex items-center gap-2 p-3 cursor-pointer">
+            <TabsTrigger value="career" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
               <Rocket className="h-4 w-4" />
-              <span className="hidden sm:inline">Career</span>
+              <span className="hidden sm:inline">Việc làm</span>
             </TabsTrigger>
           </TabsList>
 
@@ -399,11 +420,6 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
                   skippedQuestions={skippedQuestions}
                   categoryPerformance={categoryPerformance}
                 />
-                <PerformanceInsights
-                  insights={insights}
-                  strengths={strengths}
-                  improvements={improvements}
-                />
               </div>
 
               {/* Right Column - Next Steps */}
@@ -418,6 +434,14 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
                 />
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value='analytics'>
+            <PerformanceInsights
+              insights={insights}
+              strengths={strengths}
+              improvements={improvements}
+            />
           </TabsContent>
 
           <TabsContent value="competency" className="space-y-6">

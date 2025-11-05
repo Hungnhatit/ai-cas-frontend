@@ -60,30 +60,6 @@ const TestManagementPage = () => {
     fetchData()
   }, []);
 
-  const addQuestion = () => {
-    setQuestions([
-      ...questions,
-      {
-        id: `q${questions.length + 1}`,
-        question: "",
-        type: "multiple-choice",
-        options: ["", "", "", ""],
-        correctAnswer: 0,
-        points: 10,
-      },
-    ])
-  }
-
-  console.log(tests);
-
-  const updateQuestion = (index: number, updates: Partial<QuizQuestion>) => {
-    setQuestions(questions.map((q, i) => (i === index ? { ...q, ...updates } : q)))
-  }
-
-  const removeQuestion = (index: number) => {
-    setQuestions(questions.filter((_, i) => i !== index))
-  }
-
   const handleCreateQuiz = async () => {
     try {
       const total_points = questions.reduce((sum, q) => sum + (q.points || 0), 0)
@@ -196,7 +172,7 @@ const TestManagementPage = () => {
     //   Student test management page
     // </>
     <div className="space-y-6">
-      <div className="flex items-center justify-between bg-[#232f3e] shadow-lg p-5">
+      <div className="flex items-center justify-between bg-[#232f3e] -mx-4 -mt-4 shadow-lg p-5">
         <div>
           <h1 className="text-3xl mb-2 font-bold text-white">Bài thi</h1>
           <p className="text-white">Xem tất cả các bài kiểm tra đã tham gia hoặc được giao bởi giảng viên của bạn</p>
@@ -252,7 +228,7 @@ const TestManagementPage = () => {
       </div>
 
       <Tabs defaultValue="active" className="space-y-4">
-        <TabsList>
+        <TabsList className="">
           <TabsTrigger value="active" className="cursor-pointer">Tất cả bài thi ({stats.active})</TabsTrigger>
           <TabsTrigger value="draft" className="cursor-pointer">Đã tham gia ({stats.draft})</TabsTrigger>
           <TabsTrigger value="archived" className="cursor-pointer">Được giao ({stats.archived})</TabsTrigger>

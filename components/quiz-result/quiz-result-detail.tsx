@@ -97,7 +97,7 @@ const QuizResultDetail = ({ quiz_id, quizAttempt_id }: QuizResultDetailProps) =>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Quiz Result Not Found</h1>
-          <p className="text-muted-foreground">The quiz result you're looking for doesn't exist.</p>
+          <p className="text-white">The quiz result you're looking for doesn't exist.</p>
         </div>
       </div>
     );

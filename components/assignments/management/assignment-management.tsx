@@ -93,6 +93,7 @@ const AssignmentManagement = () => {
   const { user } = useAuth();
 
   useEffect(() => {
+    if (!user) return;
     const fetchAssignment = async () => {
       try {
         const [resAssignment] = await Promise.all([

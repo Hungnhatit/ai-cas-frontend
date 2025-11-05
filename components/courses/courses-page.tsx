@@ -72,8 +72,8 @@ export function CoursesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Courses</h1>
-          <p className="text-muted-foreground">Discover and learn new skills</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Courses</h1>
+          <p className="text-white">Discover and learn new skills</p>
         </div>
       </div>
 

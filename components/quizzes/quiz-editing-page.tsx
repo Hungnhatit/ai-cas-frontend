@@ -340,7 +340,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
       </div>
 
       {/* quiz info */}
-      <div className='bg-card p-4 rounded-xs shadow-sm mb-4 border border-gray-300'>
+      <div className='bg-card p-4 rounded-[3px] shadow-sm mb-4 border border-gray-300'>
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -411,7 +411,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
       </div>
 
       {/* assign quiz section */}
-      <div className='bg-card p-4 rounded-xs shadow-sm mb-4 border border-gray-300'>
+      <div className='bg-card p-4 rounded-[3px] shadow-sm mb-4 border border-gray-300'>
         <div className="flex items-center justify-between mb-3">
           <Label className='text-xl font-bold'>Assign to</Label>
         </div>
@@ -459,7 +459,7 @@ const QuizEditor = ({ quiz_id, setup }: QuizEditorProp) => {
       </div>
 
       {/* question section */}
-      <div className='bg-card p-4 rounded-xs shadow-sm mb-4 border border-gray-300'>
+      <div className='bg-card p-4 rounded-[3px] shadow-sm mb-4 border border-gray-300'>
         <div className="flex items-center justify-between">
           <Label className='text-xl font-bold'>Questions</Label>
           <Button type="button" variant="outline" onClick={addQuestion} className='cursor-pointer'>

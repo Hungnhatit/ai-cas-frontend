@@ -99,6 +99,7 @@ const AssignmentForm = () => {
 
   // handle select one or more students
   useEffect(() => {
+    if (!user) return;
     const fetchStudent = async () => {
       try {
         const [getStudents] = await Promise.all([

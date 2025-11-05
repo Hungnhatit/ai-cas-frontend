@@ -97,7 +97,7 @@ const QuizResultsPage = ({ quiz_id }: QuizResultsPageProps) => {
       <div>
         <div>
           <h1 className="text-2xl font-bold">Recent Attempts</h1>
-          <p className="text-muted-foreground">Result of all your attempt</p>
+          <p className="text-white">Result of all your attempt</p>
         </div>
 
         <div className=''>

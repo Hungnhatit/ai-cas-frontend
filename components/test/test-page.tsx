@@ -1,12 +1,11 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
 import { testService } from '@/services/test/testService';
-import Layout from './layout/layout';
 import ProgressBar from '../ui/ProgressBar';
 import { TestSession, UserAnswer } from '@/types/interfacess/test';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Clock, Send } from 'lucide-react';
+import { ArrowLeft, Ban, Clock, Send, Trash2 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
@@ -18,6 +17,7 @@ import { Test } from '@/types/interfaces/model';
 import { testAttemptService } from '@/services/test/testAttemptService';
 import { useAuth } from '@/providers/auth-provider';
 import { TestAttempt } from '@/types/interfaces/test';
+import { Separator } from '../ui/separator';
 
 interface TestPageProps {
   test_id: number,
@@ -37,24 +37,11 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
   const { user } = useAuth();
   const router = useRouter();
 
-  // /**
-  //  * Time effect
-  //  */
-  // useEffect(() => {
-  //   if (timeRemaining > 0) {
-  //     const timer = setTimeout(() => {
-  //       setTimeRemaining((prev) => prev - 1)
-  //     }, 1000);
-  //     return () => clearTimeout(timer);
-  //   } else if (timeRemaining === 0 && test && attempt) {
-  //     handleSubmitTest();
-  //   }
-  // }, [timeRemaining, test, attempt]);
-
   /**
    * handle load test
    */
   useEffect(() => {
+    if (!user) return;
     const loadTest = async () => {
       try {
         // Check for custom tests first
@@ -63,9 +50,7 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
         if (!testData) {
           throw new Error('Test not found');
         }
-
         setTest(testData.data);
-        // setTimeRemaining(testData.duration * 60);
 
         if (attempt_id) {
           const res = await testAttemptService.getTestAttempts(test_id, user?.ma_nguoi_dung);
@@ -147,12 +132,34 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
       const timeSpent = (test.thoi_luong * 60) - timeRemaining;
       const result = await testAttemptService.submitTestAttempt(Number(attempt_id));
       router.push(`/tests/${id}/result-overview?attempt=${attempt_id}`)
-      localStorage.setItem('testResult', JSON.stringify(result));
+      // localStorage.setItem('testResult', JSON.stringify(result));
 
     } catch (error) {
       console.error('Failed to submit test:', error);
     }
   };
+
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [exiting, setExiting] = useState(false);
+
+  const handleCancelTest = async () => {
+    if (!attempt || !attempt.ma_lan_lam) {
+      setShowExitConfirm(false);
+      return;
+    }
+
+    setExiting(true);
+
+    try {
+      await testAttemptService.abortAttempt(attempt.ma_lan_lam);
+      router.push('/student/tests-management');
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setExiting(false);
+      setShowExitConfirm(false);
+    }
+  }
 
   const scrollToQuestion = (question_id: number) => {
     const element = questionRefs.current[question_id];
@@ -165,27 +172,38 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
     return Object.keys(answers).length;
   };
 
+
+
+  // if (loading) {
+  //   return (
+  //     <div className="text-center py-12">
+  //       <div className="text-center">
+  //         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+  //         <p className="text-gray-600">Loading test...</p>
+  //       </div>
+  //     </div>
+  //     // <Layout currentPage="test" title="Loading Test...">
+  //     // </Layout>
+  //   );
+  // }
+
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading test...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-      // <Layout currentPage="test" title="Loading Test...">
-      // </Layout>
-    );
+    )
   }
 
   // if (!test || !session) {
   if (!test) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Test not found</h2>
-        <p className="text-gray-600 mb-4">The requested test could not be loaded.</p>
-        <Button asChild>
-          <a href="/">Back to Tests</a>
+        <h2 className="text-xl font-semibold mb-2">Test result not found</h2>
+        <p className="text-muted-foreground mb-4">The test result you're looking for don't exist.</p>
+        <Button onClick={() => router.push("/tests-management")}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to tests
         </Button>
       </div>
       // <Layout currentPage="test" title="Test Not Found">
@@ -200,27 +218,21 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="flex gap-6">
+    <div className="max-w-8xl mx-auto px-4 py-4">
+      <div className="flex gap-6 space-y-4 py-4">
         {/* Main Content */}
         <div className="flex-1 space-y-6">
           {/* Test Header */}
           <Card>
             <CardHeader>
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-c">
                 <div>
-                  <CardTitle className="text-2xl">{test.tieu_de}</CardTitle>
+                  <CardTitle className="text-2xl">Bài thi: {test.tieu_de}</CardTitle>
                   <p className="text-gray-600 mt-2">{test.mo_ta}</p>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2 bg-red-50 px-3 py-2 rounded-lg">
-                    <Clock className="h-4 w-4 text-red-600" />
-                    <span className="text-red-600 font-mono font-medium">
-                      {formatTime(timeRemaining)}
-                    </span>
-                  </div>
-                  <Badge variant="secondary">
-                    {test.tong_diem} Total Points
+                <div className="">
+                  <Badge variant="secondary" className='px-3 py-1 text-sm'>
+                    {test.tong_diem} điểm
                   </Badge>
                 </div>
               </div>
@@ -229,26 +241,26 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
               <ProgressBar
                 current={getAnsweredCount()}
                 total={test?.cau_hoi?.length}
-                label="Questions Answered"
+                label="Câu hỏi đã trả lời"
               />
             </CardContent>
           </Card>
 
           {/* All Questions */}
-          <div className="space-y-6">
+          <div className="space-y-6 ">
             {test?.cau_hoi?.map((question, index) => (
               <Card
                 key={question.ma_cau_hoi}
-                className="relative"
+                className="relative gap-10"
                 ref={(el) => { questionRefs.current[question.ma_cau_hoi] = el; }}
               >
-                <CardHeader>
-                  <div className="flex justify-between items-start">
+                <CardHeader className='bg-gray-200 -my-6 gap-0 py-3'>
+                  <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">
-                      Question {index + 1} of {test?.cau_hoi?.length}
+                      Câu hỏi {index + 1}
                     </CardTitle>
                     <div className="flex items-center space-x-2">
-                      <Badge variant="outline">{question.diem} points</Badge>
+                      <Badge variant="outline" className='bg-blue-500 text-white'>{question.diem} points</Badge>
                       {answers[question.ma_cau_hoi] !== undefined && (
                         <Badge variant="default" className="bg-green-100 text-green-800">
                           Answered
@@ -267,16 +279,20 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
                     <RadioGroup
                       value={answers[question.ma_cau_hoi]?.toString() || ''}
                       onValueChange={(value) => handleAnswerChange(question.ma_cau_hoi, parseInt(value))}
-                      className="space-y-3"
+                      className=""
                     >
                       {question.lua_chon.map((option, optionIndex) => (
-                        <div key={optionIndex} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-gray-50">
-                          <RadioGroupItem value={optionIndex.toString()} id={`${question.ma_cau_hoi}-option-${optionIndex}`} />
+                        <div key={optionIndex} className="flex items-center space-x-3 p-3 text-md rounded-[3px] border border-gray-300 hover:bg-gray-100">
+                          <RadioGroupItem
+                            value={optionIndex.toString()}
+                            id={`${question.ma_cau_hoi}-option-${optionIndex}`}
+                            className='border-gray-300'
+                          />
                           <Label
                             htmlFor={`${question.ma_cau_hoi}-option-${optionIndex}`}
                             className="flex-1 cursor-pointer text-sm leading-relaxed"
                           >
-                            {option}
+                            {String.fromCharCode(65 + Number(optionIndex))}. {option}
                           </Label>
                         </div>
                       ))}
@@ -306,7 +322,7 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
           </div>
 
           {/* Submit Section */}
-          <Card className="bg-gray-50">
+          {/* <Card className="bg-gray-50">
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
                 <div className="text-sm text-gray-600">
@@ -322,30 +338,36 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
                 </Button>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Question Navigation Grid - Right Sidebar */}
-        <div className=" sticky top-6 h-fit">
-          <Card>
+        <div className="sticky h-fit top-20 self-start">
+          <Card className=''>
             <CardHeader>
-              <CardTitle className="text-lg">Question Navigation</CardTitle>
-              <p className="text-sm text-gray-600">
-                {getAnsweredCount()}/{test?.cau_hoi?.length} answered
+              <CardTitle className='text-lg text-center'>Thời gian làm bài</CardTitle>
+              <p className='text-2xl text-center font-bold'>
+                {formatTime(timeRemaining)}
               </p>
             </CardHeader>
+            <Separator />
             <CardContent className="space-y-4">
+              <div>
+                <CardTitle className="text-lg">Điều hướng câu hỏi</CardTitle>
+                <p className="text-md text-gray-600">
+                  {getAnsweredCount()}/{test?.cau_hoi?.length} đã trả lời
+                </p>
+              </div>
               <div className="grid grid-cols-5 gap-2">
                 {test?.cau_hoi?.map((question, index) => {
                   const isAnswered = answers[question.ma_cau_hoi] !== undefined;
-
                   return (
                     <Button
                       key={question.ma_cau_hoi}
                       variant={isAnswered ? "default" : "outline"}
                       size="sm"
                       className={cn(
-                        "h-10 w-10 p-0 text-sm font-medium",
+                        "h-10 w-10 text-md font-medium rounded-[3px] shadow-none border-gray-400",
                         isAnswered
                           ? "bg-green-600 hover:bg-green-700 text-white"
                           : "hover:bg-gray-100"
@@ -362,28 +384,37 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 bg-green-600 rounded"></div>
-                    <span>Answered</span>
+                    <span className='text-sm'>Đã trả lời</span>
                   </div>
                   <span>{getAnsweredCount()}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 border border-gray-300 rounded"></div>
-                    <span>Unanswered</span>
+                    <span className='text-sm'>Chưa trả lời</span>
                   </div>
                   <span>{test?.cau_hoi?.length - getAnsweredCount()}</span>
                 </div>
               </div>
 
-              <div className="pt-3 border-t">
+              <div className="space-y-3 pt-3 border-t">
                 <Button
                   onClick={() => setShowSubmitModal(true)}
-                  className="w-full bg-green-600 hover:bg-green-700 cursor-pointer"
-                  size="sm"
+                  className="w-full rounded-sm flex items-center bg-blue-500 hover:bg-blue-700 cursor-pointer"
                 >
-                  <Send className="h-4 w-4 mr-2" />
-                  Submit Test
+                  <Send className="" />
+                  Nộp bài thi
                 </Button>
+                <div>
+                  <Button
+                    variant='destructive'
+                    onClick={() => setShowExitConfirm(true)}
+                    className='w-full rounded-sm cursor-pointer'
+                  >
+                    <Ban />
+                    Thoát bài thi
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -399,6 +430,16 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
         description={`Are you sure you want to submit your test? You have answered ${getAnsweredCount()} out of ${test?.cau_hoi?.length} questions. This action cannot be undone.`}
         confirmText="Submit Test"
         cancelText="Continue Test"
+      />
+
+      <ConfirmModal
+        isOpen={showExitConfirm}
+        onClose={() => setShowExitConfirm(false)}
+        onConfirm={handleCancelTest}
+        title="Thoát bài thi"
+        description='Bạn chắc chắn muốn thoát? Hành động này sẽ kết thúc bài làm và không thể tiếp tục làm bài. Nếu bạn muốn bảo lưu và tiếp tục sau, hãy chọn "Tiếp tục làm bài".'
+        confirmText={exiting ? 'Đang thoát' : 'Thoát bài thi'}
+        cancelText="Tiếp tục làm bài"
       />
     </div>
   );

@@ -2,7 +2,7 @@
 import { useAuth } from '@/providers/auth-provider';
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Clock, Edit, GraduationCap, MessageCircleQuestion, MessageCircleQuestionIcon, Notebook, ShieldQuestion, Sigma, Trash2, Trophy } from 'lucide-react';
+import { Check, Clock, Edit, GraduationCap, Info, MessageCircleQuestion, MessageCircleQuestionIcon, Notebook, ShieldQuestion, Sigma, Trash2, Trophy } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useParams, useRouter } from 'next/navigation';
 import { testService } from '@/services/test/testService';
@@ -10,9 +10,8 @@ import { Test, TestAttempt } from '@/types/interfaces/model';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { getStatusLabel } from '@/utils/test';
 import { calculateDuration, formatDate } from '@/utils/formatDate';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import Link from 'next/link';
-import { QuestionMarkCircleSolidIcon } from '../ui/icons/heroicons-question-mark-circle-solid';
 
 
 interface TestResultsProps {
@@ -29,6 +28,7 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
   const router = useRouter();
 
   useEffect(() => {
+    if (!user) return;
     const fetchTestResults = async () => {
       try {
         const [test, testResults] = await Promise.all([
@@ -57,11 +57,13 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
     return Math.max(...results.map(r => r.diem || 0))
   }
 
+  console.log(results)
+
   return (
     <div className='space-y-6'>
       <div className='bg-[#232f3e] p-5'>
         <h1 className="text-2xl font-bold text-white mb-2">Kết quả của bài thi <span>"{test?.tieu_de}"</span> </h1>
-        <p className="text-white">Test your knowledge and track your progress</p>
+        <p className="text-white">Trang kết quả "Đánh giá năng lực sử dụng AI" cho phép bạn theo dõi tiến độ học tập, xem điểm chi tiết, lịch sử kiểm tra và số liệu thống kê về hiệu suất.</p>
       </div>
 
       {/* Stats Cards */}
@@ -115,7 +117,7 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
             <span className='mr-2'>Lịch sử làm bài</span>
             <Tooltip>
               <TooltipTrigger className='cursor-pointer'>
-                <QuestionMarkCircleSolidIcon size={18} className=' font-light text-gray-500' />
+                <Info size={18} className=' font-light text-gray-500' />
               </TooltipTrigger>
               <TooltipContent side='right'>
                 <p>Toàn bộ lịch sử làm bài và các thông tin liên quan</p>
@@ -131,55 +133,75 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
               <TableHead className="border-r border-gray-300">
                 <span className='flex items-center justify-start'>
                   Lần làm
-                  <QuestionMarkCircleSolidIcon size={16} className='ml-2 font-light text-gray-500' />
+                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
               <TableHead className="border-r border-gray-300">
                 <span className='flex items-center justify-start'>
                   Điểm số
-                  <QuestionMarkCircleSolidIcon size={16} className='ml-2 font-light text-gray-500' />
+                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
               <TableHead className="border-r border-gray-300">
                 <span className='flex items-center justify-start'>
                   Số câu đúng
-                  <QuestionMarkCircleSolidIcon size={16} className='ml-2 font-light text-gray-500' />
+                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
               <TableHead className="border-r border-gray-300">
                 <span className='flex items-center justify-start'>
                   Số câu sai
-                  <QuestionMarkCircleSolidIcon size={16} className='ml-2 font-light text-gray-500' />
+                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
               <TableHead className="border-r border-gray-300">
                 <span className='flex items-center justify-start'>
                   Trạng thái
-                  <QuestionMarkCircleSolidIcon size={16} className='ml-2 font-light text-gray-500' />
+                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
               <TableHead className="border-r border-gray-300">
-                <span className='flex items-center justify-start'>
+                <span className='flex items-center justify-start cursor-pointer'>
                   Thời gian bắt đầu
-                  <QuestionMarkCircleSolidIcon size={16} className='ml-2 font-light text-gray-500' />
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info size={16} className='ml-2 font-light text-gray-500' />
+                      </TooltipTrigger>
+                      <TooltipContent>Định dạng: giờ:phút:giây ngày/tháng/năm</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </span>
               </TableHead>
               <TableHead className="border-r border-gray-300">
-                <span className='flex items-center justify-start'>
+                <span className='flex items-center justify-start cursor-pointer'>
                   Thời gian nộp bài
-                  <QuestionMarkCircleSolidIcon size={16} className='ml-2 font-light text-gray-500' />
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info size={16} className='ml-2 font-light text-gray-500' />
+                      </TooltipTrigger>
+                      <TooltipContent>Định dạng: giờ:phút:giây ngày/tháng/năm</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </span>
               </TableHead>
               <TableHead className="border-r border-gray-300">
                 <span className='flex items-center justify-start'>
                   Thời gian làm
-                  <QuestionMarkCircleSolidIcon size={16} className='ml-2 font-light text-gray-500' />
+                  <Info size={16} className='ml-2 font-light text-gray-500' />
+                </span>
+              </TableHead>
+              <TableHead>
+                <span className='flex items-center justify-start'>
+                  Đánh giá
+                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
               <TableHead className="text-right">
                 <span className='flex items-center justify-start'>
                   Hành động
-                  <QuestionMarkCircleSolidIcon size={16} className='ml-2 font-light text-gray-500' />
+                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
             </TableRow>
@@ -198,13 +220,16 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
                   <TableCell className='border-r border-gray-300'>
                     {calculateDuration(item.thoi_gian_bat_dau, item.thoi_gian_ket_thuc)}
                   </TableCell>
+                  <TableCell className='border-r border-gray-300 flex items-center justify-center'>
+                    <Check size={20} className=''/>
+                  </TableCell>
                   <TableCell className="text-right">
                     <Link
                       href={`/tests/${item.ma_kiem_tra}/result-detail?attempt=${item.ma_lan_lam}`}
-                      className='cursor-pointer hover:text-sky-600'
+                      className='cursor-pointer font-semibold hover:text-blue-700 transition-all'
                     // onClick={() => handleResultPage(item.ma_kiem_tra, item.ma_lan_lam)}
                     >
-                      Xem chi tiết
+                      Xem chi tiết 
                     </Link>
                   </TableCell>
                 </TableRow>

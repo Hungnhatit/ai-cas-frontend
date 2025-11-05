@@ -38,10 +38,10 @@ export default function ConfirmModal({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>
+          <AlertDialogCancel onClick={onClose} className='cursor-pointer'>
             {cancelText}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>
+          <AlertDialogAction onClick={onConfirm} className='cursor-pointer'>
             {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>

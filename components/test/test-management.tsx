@@ -11,13 +11,14 @@ import { testAttemptService } from '@/services/test/testAttemptService';
 import { useAuth } from '@/providers/auth-provider';
 import { testService } from '@/services/test/testService';
 import { formatDate } from '@/utils/formatDate';
-import { Award, Calendar, Clock, NotebookPen, Slash, Users } from 'lucide-react';
+import { Award, Brain, BrainCircuit, Calendar, Clock, NotebookPen, RotateCcw, Sparkles, SquarePen, Trash, Trash2, Users } from 'lucide-react';
 import { getDifficultyLabel, getStatusLabel } from '@/utils/test';
 import TestDataTable from './table/test-data-table';
 import { getVisibilityIcon } from '@/utils/tests';
 import { Input } from '../ui/input';
 import Link from 'next/link';
 import ConfirmModal from '../modals/confirm-modal';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 interface Question {
   id: string;
@@ -71,8 +72,9 @@ const TestManagement = () => {
     drafts: tests.filter(t => t.trang_thai === 'ban_nhap').length,
     totalAttempts: tests.reduce((sum, t) => sum + t.so_lan_lam_toi_da, 0),
   };
-
+  console.log(user)
   useEffect(() => {
+    if (!user) return;
     const fetchTests = async () => {
       setLoading(false);
       try {
@@ -165,7 +167,7 @@ const TestManagement = () => {
       setTests((prev) => prev.filter((test) => test.ma_kiem_tra !== test_id));
       toast.success('Test deleted successfully!');
     } catch (error) {
-      toast.success(`Failed to force delete test: ${error}`)
+      toast.error(`Failed to force delete test: ${error}`)
     }
   }
 
@@ -186,21 +188,25 @@ const TestManagement = () => {
     <div className="">
       {/* Header Section */}
       <div className="mb-4">
-        <div className="bg-[#232f3e] flex flex-col lg:flex-row p-5 lg:items-center justify-between gap-4 mb-6">
+        <div className="-m-4 bg-[#232f3e] flex flex-col lg:flex-row p-5 lg:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-3xl font-bold text-white">Tests Management</h2>
+            <h2 className="text-3xl font-bold text-white">Quản lý bài thi</h2>
             <p className="text-white mt-2">Tạo, chỉnh sửa và theo dõi bài thi của bạn</p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={() => handleCreatePage()} className="bg-blue-600 hover:bg-blue-700 cursor-pointer">
-              + Create new test
+            <Button className='rounded-[3px] cursor-pointer' onClick={() => router.push('/tests/ai-generation')}>
+              <Sparkles />
+              Sử dụng AI để tạo bài thi
+            </Button>
+            <Button onClick={() => handleCreatePage()} className="bg-blue-600 hover:bg-blue-700 cursor-pointer rounded-[3px]">
+              + Tạo bài thi mới
             </Button>
           </div>
         </div>
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className='gap-0'>
+          <Card className='gap-0 rounded-[3px] hover:shadow-lg transition-all cursor-pointer'>
             <CardHeader>
               <CardTitle className='flex items-center justify-between'>
                 Số bài kiểm tra
@@ -213,7 +219,7 @@ const TestManagement = () => {
               <div className="text-sm text-gray-600">Tổng số bài test đã được tạo</div>
             </CardContent>
           </Card>
-          <Card className='gap-1'>
+          <Card className='gap-1 rounded-[3px] hover:shadow-lg transition-all cursor-pointer'>
             <CardHeader>
               <CardTitle className='flex items-center justify-between'>
                 Tổng số lượt nộp
@@ -226,7 +232,7 @@ const TestManagement = () => {
               <div className="text-sm text-gray-600">Trên tất cả các bài test</div>
             </CardContent>
           </Card>
-          <Card className='gap-1'>
+          <Card className='gap-1 rounded-[3px] hover:shadow-lg transition-all cursor-pointer'>
             <CardHeader>
               <CardTitle className='flex items-center justify-between'>
                 Đang chờ chấm điểm
@@ -239,11 +245,11 @@ const TestManagement = () => {
               <div className="text-sm text-gray-600">Drafts</div>
             </CardContent>
           </Card>
-          <Card className='gap-1'>
+          <Card className='gap-1 rounded-[3px] hover:shadow-lg transition-all cursor-pointer'>
             <CardHeader>
               <CardTitle className='flex items-center justify-between'>
                 Điểm trung bình
-                <span><Award size={18} className='mr-2' color='orange' /></span>
+                <span><Award size={18} className='mr-2 font-bold' color='orange' /></span>
               </CardTitle>
               <CardDescription></CardDescription>
             </CardHeader>
@@ -257,15 +263,15 @@ const TestManagement = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="all" className='gap-1'>
-        <div className="flex items-center bg-white mb-2">
+        <div className="flex items-center mb-2">
           <Input
             placeholder="Tìm kiếm theo tên bài test..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="max-w-sm shadow-none border border-gray-300 rounded-xs"
+            className="max-w-sm shadow-none border border-gray-300 rounded-[3px]"
           />
           <select
-            className="ml-4 h-9 rounded-xc border border-gray-300 bg-background px-3 py-2 text-sm cursor-pointer"
+            className="ml-4 h-9 rounded-[3px] border border-gray-300 bg-background px-3 py-2 text-sm cursor-pointer"
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value as "all" | "hoat_dong" | "ban_nhap" | "luu_tru")}
           >
@@ -277,23 +283,25 @@ const TestManagement = () => {
         </div>
 
         <TabsContent value="all" className="">
-          <div className="bg-white rounded-xs border overflow-x-auto">
+          <div className="bg-white rounded-[3px] border overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Tên bài kiểm tra</th>
-                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Trạng thái</th>
+                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">#</th>
+                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Tên bài kiểm tra</th>
+                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Trạng thái</th>
                   {/* <th className="p-3 text-left text-sm font-medium text-gray-600">Số lượng câu hỏi</th> */}
-                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Số lần làm</th>
-                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Điểm trung bình</th>
-                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Tỉ lệ pass</th>
-                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Chỉnh sửa lần cuối</th>
-                  <th className="border-r border-gray-200 p-3 text-left text-sm font-medium text-gray-600">Hành động</th>
+                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Số lần làm</th>
+                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Điểm trung bình</th>
+                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Tỉ lệ pass</th>
+                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Chỉnh sửa lần cuối</th>
+                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Hành động</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {filteredTests.map(test => (
+                {filteredTests.map((test, index) => (
                   <tr key={test.ma_kiem_tra} className="hover:bg-gray-50">
+                    <td className='border-r border-gray-200 text-center'>{index + 1}</td>
                     <td className="border-r border-gray-200 w-96 p-3">
                       <div className="flex items-center font-medium text-gray-900 hover:underline mb-1 cursor-pointer transition-all">
                         <Link href={`/tests/${test.ma_kiem_tra}/detail`}>{test.tieu_de}</Link>
@@ -312,7 +320,7 @@ const TestManagement = () => {
                       </div>
                       <div className='flex flex-wrap gap-2'>
                         {(JSON.parse(test?.danh_muc))?.map((item: string, index: number) => (
-                          <span key={index} className='text-xs border border-blue-400 px-2 py-1 rounded-xs'>
+                          <span key={index} className='text-xs border border-blue-400 px-2 py-1 rounded-[3px]'>
                             {item}
                           </span>
                         ))}
@@ -338,26 +346,50 @@ const TestManagement = () => {
                     </td>
                     <td className="border-r border-gray-200 p-3 ">
                       <div className="flex gap-1">
-                        {/* <Button onClick={() => handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Edit</Button> */}
+                        <Button onClick={() => handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>
+                          <SquarePen />
+                        </Button>
                         {/* <Button onClick={() => handleViewResultDetail(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Results</Button> */}
                         {/* <Button onClick={() => handleDetailTest(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Detail</Button> */}
-                        {test.trang_thai !== 'luu_tru' &&
-                          <Button
-                            onClick={() => handleDeleteTest(test.ma_kiem_tra)}
-                            variant="ghost"
-                            size="sm"
-                            className='cursor-pointer text-red-600'>
-                            Xoá
+                        {
+                          test.trang_thai === 'luu_tru' &&
+                          <Button onClick={() => handleRestore(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>
+                            <RotateCcw />
                           </Button>
                         }
+                        {test.trang_thai !== 'luu_tru' && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  onClick={() => handleDeleteTest(test.ma_kiem_tra)}
+                                  variant="ghost"
+                                  size="sm"
+                                  className='cursor-pointer text-red-600'>
+                                  <Trash2 />
+                                  {/* Xoá */}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Xoá</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
 
                         {test.trang_thai === 'luu_tru' &&
                           <ConfirmModal
                             onConfirm={() => handleForceDelete(test.ma_kiem_tra)}
-                            title="Are you sure to delete this test permantly? This action can't be undone!"
-                            description='Delete permantly test'
+                            title="Bạn chắc chắn muốn xoá bài thi? Hành động này không thể hoàn tác"
+                            description='Xoá vĩnh viễn bài thi'
                           >
-                            <Button variant="ghost" size="sm" className='cursor-pointer text-red-600'>Xoá vĩnh viễn</Button>
+                            <Button
+                              onClick={() => handleDeleteTest(test.ma_kiem_tra)}
+                              variant="ghost"
+                              size="sm"
+                              className='cursor-pointer text-red-600'>
+                              <Button variant="ghost" size="sm" className='cursor-pointer text-red-600'>
+                                <Trash />
+                              </Button>
+                            </Button>
                           </ConfirmModal>
                         }
                       </div>
@@ -414,7 +446,7 @@ const TestManagement = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="archived" className="mt-6">          
+        <TabsContent value="archived" className="mt-6">
           {/* <p className="text-gray-600 text-center py-8">No archived tests</p> */}
           <TestDataTable
             tests={archivedTests}

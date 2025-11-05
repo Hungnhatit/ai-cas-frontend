@@ -69,8 +69,8 @@ export function StudentsManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Students</h1>
-          <p className="text-muted-foreground">Manage and track student progress</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Students</h1>
+          <p className="text-white">Manage and track student progress</p>
         </div>
       </div>
 

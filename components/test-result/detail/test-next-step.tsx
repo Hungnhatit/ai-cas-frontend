@@ -35,17 +35,17 @@ export default function NextSteps({
         <CardHeader className="">
           <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <ArrowRight className="h-5 w-5 text-blue-500 flex-shrink-0" />
-            Next Steps
+            Bước tiếp theo
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
             {canRetake && (
-              <div className='h-auto p-3 sm:p-4 flex flex-col items-start gap-2 text-left border rounded-lg'>
+              <div className='h-auto p-3 sm:p-4 flex flex-col items-start gap-2 text-left border rounded-[3px]'>
                 <div className='w-full flex items-center justify-between'>
-                  <Button variant="outline" className="cursor-pointer">
+                  <Button variant="outline" className="cursor-pointer rounded-[3px] shadow-none">
                     <RotateCcw className="h-4 w-4 flex-shrink-0" />
-                    Retake test
+                    Làm lại bài thi
                   </Button>
                   <div className="flex items-center gap-2 w-full">
                     <Badge variant="secondary" className="ml-auto flex-shrink-0">
@@ -54,16 +54,15 @@ export default function NextSteps({
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground text-left w-full whitespace-normal break-words">
-                  Improve your score with another attempt
+                  Cải thiện điểm số, kiến thức của bạn với một lần thử khác
                 </p>
               </div>
-
             )}
 
-            <Button className="h-auto p-3 sm:p-4 flex flex-col items-start gap-2 text-left">
+            <Button className="h-auto p-3 sm:p-4 flex flex-col items-start gap-2 text-left rounded-[3px] cursor-pointer">
               <div className="flex items-center gap-2 w-full">
                 <BookOpen className="h-4 w-4 flex-shrink-0" />
-                <span className="font-medium">Continue Learning</span>
+                <span className="font-medium">Tiếp tục học</span>
               </div>
               <p className="text-sm text-blue-100 text-left text-wrap">
                 Next: {nextLessonTitle}
@@ -71,30 +70,34 @@ export default function NextSteps({
             </Button>
 
             {hasExplanations && (
-              <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col items-start gap-2 text-left">
+              <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col items-start gap-2 text-left rounded-[3px] cursor-pointer">
                 <div className="flex items-center gap-2 w-full">
                   <FileText className="h-4 w-4 flex-shrink-0" />
-                  <span className="font-medium">View Explanations</span>
+                  <span className="font-medium">
+                    Xem giải thích
+                  </span>
                 </div>
                 <p className="text-sm text-muted-foreground text-left w-full whitespace-normal break-words">
-                  Review detailed answer explanations
+                  Xem lại lời giải thích chi tiết của các câu hỏi
                 </p>
               </Button>
             )}
 
-            <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col items-start gap-2 text-left">
+            <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col items-start gap-2 text-left rounded-[3px] cursor-pointer">
               <div className="flex items-center gap-2 w-full">
                 <Download className="h-4 w-4 flex-shrink-0" />
-                <span className="font-medium">Download Report</span>
+                <span className="font-medium">
+                  Tải xuống báo cáo
+                </span>
               </div>
               <p className="text-sm text-muted-foreground text-left w-full whitespace-normal break-words">
-                Save your results as PDF
+                Lưu kết quả của bạn dưới dạng PDF
               </p>
             </Button>
           </div>
 
           {certificateEarned && (
-            <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
+            <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-[3px] border border-yellow-400">
               <div className="flex items-center gap-3 mb-2">
                 <Award className="h-5 w-5 text-yellow-600 flex-shrink-0" />
                 <span className="font-semibold text-yellow-800">Congratulations!</span>
@@ -111,17 +114,17 @@ export default function NextSteps({
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg">
+      <Card className="shadow-lg gap-2">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <Calendar className="h-5 w-5 text-purple-500 flex-shrink-0" />
-            Study Recommendations
+            Đề xuất lộ trình học tập
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {studyRecommendations.map((recommendation, index) => (
-              <div key={index} className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+              <div key={index} className="flex items-start gap-3 p-3 bg-purple-50 rounded-[3px] cursor-pointer">
                 <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
                 <p className="text-sm text-purple-800 break-words">{recommendation}</p>
               </div>
@@ -130,7 +133,7 @@ export default function NextSteps({
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg">
+      {/* <Card className="shadow-lg">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <span className="text-sm text-muted-foreground">Share your achievement</span>
@@ -140,7 +143,7 @@ export default function NextSteps({
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

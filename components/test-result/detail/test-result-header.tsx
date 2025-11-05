@@ -12,7 +12,7 @@ interface TestResultHeaderProps {
 
 export default function TestResultHeader({ courseName, attempt, testTitle, completedAt, isPassed }: TestResultHeaderProps) {
   return (
-    <Card className="p-4 sm:p-6 bg-gradient-to-r bg-[#232f3e] border-none">
+    <Card className="p-4 -mx-4 -mt-4 rounded-none sm:p-6 bg-gradient-to-r bg-[#232f3e] border-none">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="space-y-2 flex-1 min-w-0">
           <div className="flex items-center text-white gap-2 text-sm ">
@@ -29,16 +29,16 @@ export default function TestResultHeader({ courseName, attempt, testTitle, compl
         <div className="flex items-center gap-3 flex-shrink-0">
           <Badge
             variant={isPassed ? "default" : "destructive"}
-            className={`px-3 sm:px-4 py-2 text-sm font-medium ${isPassed
+            className={`px-3 sm:px-4 py-2 text-sm rounded-[3px] font-medium ${isPassed
               ? "bg-green-100 text-green-800 hover:bg-green-200"
               : "bg-red-100 text-red-800 hover:bg-red-200"
               }`}
           >
             {isPassed ? (
-              <>
+              <span className='flex items-center font-bold'>
                 <CheckCircle className="h-4 w-4 mr-1 flex-shrink-0" />
                 Passed
-              </>
+              </span>
             ) : (
               <span className='flex items-center'>
                 <Ban size={16}/>

@@ -8,7 +8,7 @@ import { Separator } from '@radix-ui/react-separator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Test } from '@/types/interfaces/model';
+import { Test, TestQuestion } from '@/types/interfaces/model';
 import { formatDate } from '@/utils/formatDate';
 import { useRouter } from 'next/navigation';
 
@@ -27,21 +27,6 @@ export interface Instructor {
   ngay_tao: string;
   ngay_cap_nhat: string;
 }
-
-export interface TestQuestion {
-  ma_cau_hoi: number;
-  ma_kiem_tra: number;
-  loai: "trac_nghiem" | "tu_luan" | "dung_sai" | "tra_loi_ngan";
-  cau_hoi: string;
-  lua_chon?: string[];
-  dap_an_dung: string | number | boolean;
-  diem: number;
-  giai_thich?: string;
-  ngay_tao: string;
-  ngay_cap_nhat: string;
-  hinh_anh_cau_hoi?: string; // Property added
-}
-
 
 // --- MOCK DATA ---
 const mockInstructor: Instructor = {
@@ -76,6 +61,7 @@ const HighlightedText = ({ text, highlight }: { text: string; highlight: string 
   );
 };
 
+
 const QuestionCard = ({ question, index, searchTerm }: { question: TestQuestion, index: number, searchTerm: string }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -94,9 +80,9 @@ const QuestionCard = ({ question, index, searchTerm }: { question: TestQuestion,
       case 'trac_nghiem':
         return (
           <ul className="space-y-3 mt-4">
-            {question.lua_chon?.map((option, index) => (
+            {question.lua_chon && question.lua_chon.map((option, index) => (
               <li key={index} className={
-                `flex items-center p-3 rounded-xs border border-gray-300 text-sm hover:bg-blue-50 cursor-pointer
+                `flex items-center p-3 rounded-[3px] border border-gray-300 text-sm hover:bg-blue-50 cursor-pointer
                  ${index.toString() === question.dap_an_dung
                 && 'bg-blue-100 border-blue-500 dark:bg-blue-900/50 dark:border-blue-700'}`} >
                 {String.fromCharCode(65 + index)}.
@@ -135,7 +121,7 @@ const QuestionCard = ({ question, index, searchTerm }: { question: TestQuestion,
   }
 
   return (
-    <Card className="mb-6 pt-0 overflow-hidden gap-0 rounded-xs shadow-none border-gray-300">
+    <Card className="mb-6 pt-0 overflow-hidden gap-0 rounded-[3px] shadow-none border-gray-300">
       <CardHeader className="flex items-center justify-between shadow-none bg-gray-100 dark:bg-gray-900/50 py-2">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
           <h4 className="font-bold text-md text-gray-800 dark:text-gray-100">
@@ -158,7 +144,7 @@ const QuestionCard = ({ question, index, searchTerm }: { question: TestQuestion,
             <HighlightedText text={question.cau_hoi} highlight={searchTerm} />
           </p>
           {renderAnswer()}
-          <div className="mt-4 p-4 rounded-xs bg-gray-100 dark:bg-gray-700/50 border border-dashed border-gray-300 dark:border-gray-600">
+          <div className="mt-4 p-4 rounded-[3px] bg-gray-100 dark:bg-gray-700/50 border border-dashed border-gray-300 dark:border-gray-600">
             <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
               Giải thích:
             </p>
@@ -176,8 +162,8 @@ const QuestionCard = ({ question, index, searchTerm }: { question: TestQuestion,
 }
 
 const InfoCard = ({ icon: Icon, title, value, className = '' }: { icon: React.ElementType, title: string, value: number, className?: string }) => (
-  <div className={`flex items-center gap-4 p-3 rounded-xs border border-gray-300 bg-gray-50 dark:bg-gray-700/50 ${className}`}>
-    <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-md">
+  <div className={`flex items-center gap-4 p-3 rounded-[3px] border border-gray-300 bg-gray-50 dark:bg-gray-700/50 ${className}`}>
+    <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-sm">
       <Icon className="w-5 h-5 text-blue-600 dark:text-blue-300" />
     </div>
     <div>
@@ -227,6 +213,8 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
     });
   }, [test?.cau_hoi, searchTerm]);
 
+  console.log(filteredQuestions);
+
   const getDifficultyBadge = (difficulty: Test['do_kho'] | null) => {
     switch (difficulty) {
       case 'de': return <Badge variant='default' className="capitalize">De</Badge>;
@@ -249,18 +237,18 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
         {/* Header */}
         <header className="flex items-start justify-between mb-4">
           <div>
-            <CardDescription>Chi tiết bài kiểm tra</CardDescription>
+            <CardDescription className='text-lg'>Chi tiết bài kiểm tra</CardDescription>
             <CardTitle className="text-3xl font-bold mt-1 mb-2">{test?.tieu_de}</CardTitle>
             <div className='flex flex-wrap gap-2 items-center'>
-              <Tag size={18} className='' />
-              {danh_muc.map((item: any, index: number) =>
+              <Tag size={17} className='' />
+              {danh_muc && danh_muc.map((item: any, index: number) =>
                 <Badge key={index} className=''>{item}</Badge>
               )}
             </div>
             <p className="mt-2 text-gray-600 dark:text-gray-400 max-w-3xl">{test?.mo_ta}</p>
           </div>
           <div>
-            <Button onClick={() => router.push(`/tests/${test_id}/edit`)} className='cursor-pointer'>Sửa</Button>
+            <Button onClick={() => router.push(`/tests/${test_id}/edit`)} className='cursor-pointer rounded-[3px]'>Chỉnh sửa</Button>
           </div>
         </header>
 
@@ -273,7 +261,7 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
                 <Input
                   type="text"
                   placeholder="Tìm kiếm trong câu hỏi, đáp án, giải thích,..."
-                  className="pl-12 py-2 text-[15px] rounded-xs shadow-none border border-gray-300 italic"
+                  className="pl-12 py-2 text-[15px] rounded-[3px] shadow-none border border-gray-300 italic"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -300,7 +288,7 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
           {/* Sidebar: Exam Info */}
           <aside className="lg:col-span-1">
             <div className="sticky top-6">
-              <Card className='rounded-xs shadow-none'>
+              <Card className='rounded-[3px] shadow-none'>
                 <CardHeader>
                   <CardTitle>Thông tin tổng quan</CardTitle>
                 </CardHeader>
@@ -310,8 +298,8 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
                     {getDifficultyBadge(test?.do_kho)}
                   </div>
                   <Separator />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-                    <InfoCard icon={Clock} title="Thời lượng" value={`${test?.thoi_luong} phút`} />
+                  <div className="grid grid-cols-1 gap-4">
+                    <InfoCard icon={Clock} title="Thời gian làm bài" value={`${test?.thoi_luong} phút`} />
                     <InfoCard icon={CheckCircle} title="Tổng điểm" value={test?.tong_diem} />
                     <InfoCard icon={HelpCircle} title="Số câu hỏi" value={test?.cau_hoi_kiem_tra.length} />
                     <InfoCard icon={Star} title="Số lần làm tối đa" value={test?.so_lan_lam_toi_da} />

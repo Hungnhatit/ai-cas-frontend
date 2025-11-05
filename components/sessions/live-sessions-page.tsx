@@ -128,8 +128,8 @@ export function LiveSessionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Live Sessions</h1>
-          <p className="text-muted-foreground">Conduct live classes and interact with students</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Live Sessions</h1>
+          <p className="text-white">Conduct live classes and interact with students</p>
         </div>
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>

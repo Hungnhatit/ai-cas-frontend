@@ -37,6 +37,7 @@ export function AssignmentsPage() {
   const { user } = useAuth();
 
   useEffect(() => {
+    if (!user) return;
     const fetchAssignments = async () => {
       try {
         const res = await assignmentService.fetchAssignmentsForStudent(user?.ma_nguoi_dung);
@@ -137,10 +138,10 @@ export function AssignmentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-[#232f3e] -mx-4 -mt-4 p-5">
         <div>
-          <h1 className="text-3xl font-bold">Assignments</h1>
-          <p className="text-muted-foreground">Track your assignments and submissions</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Assignments</h1>
+          <p className="text-white">Track your assignments and submissions</p>
         </div>
       </div>
 

@@ -104,7 +104,7 @@ export function QuizzesPage() {
     // <>Quiz page</>
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Quizzes</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Quizzes</h1>
         <p className="text-muted-foreground">Test your knowledge and track your progress</p>
       </div>
 
