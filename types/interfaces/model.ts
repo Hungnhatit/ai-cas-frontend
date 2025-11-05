@@ -40,7 +40,7 @@ export interface TestSection {
   ma_kiem_tra: number;
   ten_phan: string;
   mo_ta: string
-  loai_phan: 'trac_nghiem' | 'tu_luan' | 'viet_prompt' | 'xu_ly_tinh_huong' | 'dung_sai' | 'khac';
+  loai_phan: 'trac_nghiem' | 'tu_luan' | 'viet_prompt' | 'xu_ly_tinh_huong' | 'dung_sai' | 'tra_loi_ngan' | 'khac';
   diem: number
   thu_tu: number;
   diem_toi_da: number;
@@ -48,6 +48,7 @@ export interface TestSection {
   tieu_chi_danh_gia?: string | null;
   ngay_tao: string;
   ngay_cap_nhat: string;
+  cau_hoi: Partial<TestQuestion>[]
 }
 
 
@@ -80,8 +81,9 @@ export interface TestQuestion {
   ma_cau_hoi: number;             // question_id
   ma_kiem_tra: number;           // test_id
   ma_phan: number;          // section_id
-  loai: "trac_nghiem" | "tu_luan" | "dung_sai" | "tra_loi_ngan";
+  loai: "trac_nghiem" | "tu_luan" | 'viet_prompt' | "dung_sai" | "tra_loi_ngan" | 'xu_ly_tinh_huong' | 'khac';
   cau_hoi: string;                   // question
+  mo_ta: string;
   lua_chon: string[];               // options
   dap_an_dung?: string | number;     // correctAnswer
   diem: number;                      // points
