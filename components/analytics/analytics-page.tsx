@@ -49,6 +49,7 @@ export function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState("30d");
 
   useEffect(() => {
+    if (!user) return;
     const fetchStudents = async () => {
       const [resTests, resStudent] = await Promise.all([
         testService.getTestsByInstructorId(user?.ma_nguoi_dung),
@@ -71,20 +72,20 @@ export function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="bg-[#232f3e] flex items-center justify-between -mx-4 -mt-4 p-5">
         <div>
-          <h1 className="text-3xl font-bold">Analytics</h1>
-          <p className="text-muted-foreground">Theo dõi hiệu suất làm bài kiểm tra và sự tham gia của học sinh.</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Analytics</h1>
+          <p className="text-white">Theo dõi hiệu suất làm bài kiểm tra và sự tham gia của học sinh</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-32 bg-white cursor-pointer">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">Last 7 days</SelectItem>
-              <SelectItem value="30d">Last 30 days</SelectItem>
-              <SelectItem value="90d">Last 90 days</SelectItem>
+            <SelectContent className="">
+              <SelectItem value="7d" className="cursor-pointer">Last 7 days</SelectItem>
+              <SelectItem value="30d" className="cursor-pointer">Last 30 days</SelectItem>
+              <SelectItem value="90d" className="cursor-pointer">Last 90 days</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline">
@@ -98,7 +99,7 @@ export function AnalyticsPage() {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
+            <CardTitle className="text-md font-medium">Total Students</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -112,7 +113,7 @@ export function AnalyticsPage() {
         {/* Total test */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total tests</CardTitle>
+            <CardTitle className="text-md font-medium">Total tests</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -125,7 +126,7 @@ export function AnalyticsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
+            <CardTitle className="text-md font-medium">Active Courses</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -136,7 +137,7 @@ export function AnalyticsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Rating</CardTitle>
+            <CardTitle className="text-md font-medium">Avg. Rating</CardTitle>
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -149,7 +150,7 @@ export function AnalyticsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+            <CardTitle className="text-md font-medium">Completion Rate</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>

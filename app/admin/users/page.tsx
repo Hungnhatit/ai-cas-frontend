@@ -1,16 +1,14 @@
 import { AuthGuard } from "@/components/auth/auth-guard"
 import { UserManagement } from "@/components/admin/user-management"
+import { DashboardLayout } from "@/components/layout/dashboard-layout"
 
 export default function AdminUsersPage() {
   return (
-    <AuthGuard allowedRoles={["admin"]}>
-      <div className="container mx-auto py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground">User Management</h1>
-          <p className="text-white">Manage all users, roles, and permissions</p>
-        </div>
+    <AuthGuard requiredRole='admin'>
+      <DashboardLayout>
         <UserManagement />
-      </div>
+      </DashboardLayout>
+     
     </AuthGuard>
   )
 }
