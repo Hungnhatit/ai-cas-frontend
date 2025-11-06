@@ -33,6 +33,7 @@ export interface Test {
   giang_vien: Instructor | null
   danh_muc: string
   so_phan: number
+  phan_kiem_tra: TestSection[]
 }
 
 export interface TestSection {
