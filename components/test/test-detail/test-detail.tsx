@@ -290,7 +290,7 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
             <div className="sticky top-6">
               <Card className='rounded-[3px] shadow-none'>
                 <CardHeader>
-                  <CardTitle>Thông tin tổng quan</CardTitle>
+                  <CardTitle className='text-lg'>Thông tin tổng quan</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">

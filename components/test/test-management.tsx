@@ -29,16 +29,6 @@ interface Question {
   userAnswer?: string | string[];
 }
 
-interface TestResult {
-  test_id: string;
-  testName: string;
-  score: number;
-  correctAnswers: number;
-  incorrectAnswers: number;
-  totalQuestions: number;
-  timeSpent: number;
-  questions: Question[];
-}
 const TestManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -48,12 +38,22 @@ const TestManagement = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
   const router = useRouter();
   const { user } = useAuth();
-
-  /**
-   * Search
-   */
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<"all" | "hoat_dong" | "ban_nhap" | "luu_tru">('all');
+
+  const statusBadge = (status: string) => {
+    switch (status) {
+      case "ban_nhap":
+        return "bg-gray-200 text-gray-800";
+      case "hoat_dong":
+        return "bg-sky-200 text-blue-800";
+      case "luu_tru":
+        return "bg-yellow-200 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
 
   const filteredTests = useMemo(() => {
     return tests
@@ -72,7 +72,7 @@ const TestManagement = () => {
     drafts: tests.filter(t => t.trang_thai === 'ban_nhap').length,
     totalAttempts: tests.reduce((sum, t) => sum + t.so_lan_lam_toi_da, 0),
   };
-  console.log(user)
+
   useEffect(() => {
     if (!user) return;
     const fetchTests = async () => {
@@ -314,23 +314,27 @@ const TestManagement = () => {
                         </div>
                         <span className='px-1'>|</span>
                         <div>
-                          <span>Số câu hỏi: </span>
+                          <span>Số phần: </span>
+                          {test?.phan_kiem_tra?.length}
+                        </div>
+                        <span className='px-1'>|</span>
+                        <div>
+                          <span>Tổng số câu hỏi: </span>
                           {test?.cau_hoi_kiem_tra?.length}
                         </div>
                       </div>
                       <div className='flex flex-wrap gap-2'>
                         {(JSON.parse(test?.danh_muc))?.map((item: string, index: number) => (
-                          <span key={index} className='text-xs border border-blue-400 px-2 py-1 rounded-[3px]'>
+                          <span key={index} className='text-xs border border-blue-400 px-2 py-0.5 rounded-[3px]'>
                             {item}
                           </span>
                         ))}
                       </div>
                     </td>
                     <td className="border-r border-gray-200 p-3 ">
-                      <span className={`px-2 py-1 text-nowrap rounded-full text-xs font-medium ${test.trang_thai === 'hoat_dong' ? 'bg-green-100 text-green-700' :
-                        test.trang_thai === 'ban_nhap' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-gray-100 text-gray-700'
-                        }`}>
+                      <span className={`px-2 py-1 text-nowrap rounded-full text-xs text-black font-medium 
+                     ${statusBadge(test.trang_thai)}
+                        `}>
                         {getStatusLabel(test.trang_thai)}
                       </span>
                     </td>

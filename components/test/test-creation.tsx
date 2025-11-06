@@ -145,13 +145,13 @@ const CreateTestPage = () => {
       console.log("[v0] Creating test:", testData)
       const res = await testService.createTest(testData);
 
-      if (res.status) {
-        setIsCreateDialogOpen(false)
-        setNewTest({ ...newTest, tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 });
-        setQuestions([]);
-        toast.success('Test has been created successfully!');
-        window.history.back();
-      }
+      // if (res.status) {
+      //   setIsCreateDialogOpen(false)
+      //   setNewTest({ ...newTest, tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 });
+      //   setQuestions([]);
+      //   toast.success('Test has been created successfully!');
+      //   window.history.back();
+      // }
     } catch (error) {
       console.error("Failed to create test:", error)
     }
