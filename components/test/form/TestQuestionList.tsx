@@ -15,10 +15,12 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 interface QuestionListProps {
   questions: Partial<TestQuestion>[]
   setQuestions: (value: Partial<TestQuestion>[]) => void;
+  onAddQuestion: () => void
 }
 
-const QuestionList = ({ questions, setQuestions }: QuestionListProps) => {
+const QuestionList = ({ questions, setQuestions, onAddQuestion }: QuestionListProps) => {
   const addQuestion = () => {
+    console.log('first')
     setQuestions([
       ...questions,
       {
@@ -46,23 +48,23 @@ const QuestionList = ({ questions, setQuestions }: QuestionListProps) => {
   return (
     <div className='space-y-4 bg-card p-4 rounded-[3px] shadow-xs mb-4 border border-gray-300'>
       <div className="flex items-center justify-between">
-        <Label className='text-xl font-bold'>Danh sách câu hỏi</Label>
-        <Button type="button" variant="outline" onClick={addQuestion} className='cursor-pointer rounded-[3px]'>
+        {/* <Label className='text-xl font-bold'>Danh sách câu hỏi</Label> */}
+        <Button type="button" variant="outline" onClick={onAddQuestion} className='cursor-pointer rounded-[3px]'>
           <Plus className="h-4 w-4 mr-2" />
           Thêm câu hỏi
         </Button>
       </div>
 
       {questions.length === 0 && (
-          <div>
-            <Card className='shadow-none'>
-              <CardHeader className='justify-centerF'>
-                <CardTitle className='text-center text-xl font-bold'>Chưa có câu hỏi nào được thêm vào</CardTitle>
-                <CardDescription className='text-center text-md'>Click 'Thêm câu hỏi' để tạo câu hỏi của bạn</CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-        )}
+        <div>
+          <Card className='shadow-none'>
+            <CardHeader className='justify-centerF'>
+              <CardTitle className='text-center text-xl font-bold'>Chưa có câu hỏi nào được thêm vào</CardTitle>
+              <CardDescription className='text-center text-md'>Click 'Thêm câu hỏi' để tạo câu hỏi của bạn</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      )}
 
       {/* <div className="space-y-4 mt-3"> */}
       <div className='grid lg:grid-cols-2 gap-4'>
@@ -112,13 +114,8 @@ const QuestionList = ({ questions, setQuestions }: QuestionListProps) => {
                 </div>
                 <div>
                   <Label className='mb-3'>Điểm</Label>
-                  <Input
-                    type="number"
-                    value={question.diem}
-                    onChange={(e) => updateQuestion(index, { diem: Number.parseInt(e.target.value) })}
-                    min="1"
-                    max="50"
-                    className='rounded-[3px] border-gray-300'
+                  <Input type="number" value={question.diem} min="1" max="50"
+                    onChange={(e) => updateQuestion(index, { diem: Number.parseInt(e.target.value) })} className='rounded-[3px] border-gray-300'
                   />
                 </div>
               </div>
@@ -210,7 +207,7 @@ const QuestionList = ({ questions, setQuestions }: QuestionListProps) => {
                 </Label>
                 <Textarea
                   id="question-description"
-                  value={question.giai_thich}
+                  value={question.giai_thich || ''}
                   onChange={(e) => updateQuestion(index, { giai_thich: e.target.value })}
                   placeholder="Describe what this test covers"
                   className="rounded-[3px] h-12 text-base border-gray-300/70 shadow-none"
