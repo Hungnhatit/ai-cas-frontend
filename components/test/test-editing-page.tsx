@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/auth-provider';
 import { testService } from '@/services/test/testService';
 import { studentService } from '@/services/studentService';
-import { Course, Test, TestQuestion } from '@/types/interfaces/model';
+import { Course, Test, TestQuestion, TestSection } from '@/types/interfaces/model';
 import { TestSetup } from '@/types/interfacess/quiz';
 import { Student } from '@/types/interfaces/model';
 
@@ -13,6 +13,8 @@ import HeaderBar from './form/HeaderBar';
 import TestInfoForm from './form/TestInfoForm';
 import AssignStudents from './form/AssignStudents';
 import QuestionList from './form/TestQuestionList';
+import TestSectionList from './form/TestSectionList';
+import { Label } from '../ui/label';
 
 interface TestEditProp {
   test_id: number;
@@ -29,7 +31,9 @@ const TestEditor = ({ test_id }: TestEditProp) => {
   const [testStatus, setTestStatus] = useState('');
   const [selectedTest, setSelectedTest] = useState<Test | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([])
+  const [sections, setSections] = useState<Partial<TestSection>[]>([]);
+  const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([]);
+
   const { user } = useAuth();
   const { id } = useParams();
   const isEditMode = Boolean(id);
@@ -61,18 +65,31 @@ const TestEditor = ({ test_id }: TestEditProp) => {
           dap_an_dung: question.dap_an_dung !== undefined ? Number(question.dap_an_dung) : undefined
         }));
 
+        const parsedQuestions = (data.data.cau_hoi || []).map((q: any) => ({
+          ...q,
+          lua_chon: typeof q.lua_chon === 'string' ? JSON.parse(q.lua_chon) : q.lua_chon,
+          dap_an_dung: q.dap_an_dung !== undefined ? Number(q.dap_an_dung) : undefined,
+        }));
+
+        const mergedSections = (data.data.phan_kiem_tra || []).map((section: any) => ({
+          ...section,
+          cau_hoi: parsedQuestions.filter((q: any) => q.ma_phan === section.ma_phan),
+        }));
+
+
+
         const res = await studentService.getStudentByInstructorId(user?.ma_nguoi_dung);
 
         setStudents(res.data.hoc_vien);
         setTest(data.data);
         setNewTest({
           tieu_de: data.data.tieu_de || "",
-          // course: data.data.course || "",
           giai_thich: data.data.giai_thich || '',
           mo_ta: data.data.mo_ta || "",
           thoi_luong: data.data.thoi_luong || 30,
           so_lan_lam_toi_da: data.data.so_lan_lam_toi_da || 3,
         });
+        setSections(mergedSections);
         setQuestions(parsedData);
       } catch (error) {
         console.error("Failed to fetch data:", error)
@@ -82,6 +99,9 @@ const TestEditor = ({ test_id }: TestEditProp) => {
     }
     fetchData()
   }, [id, test_id]);
+
+  console.log(sections);
+
 
   const addQuestion = () => {
     setQuestions([
@@ -213,9 +233,6 @@ const TestEditor = ({ test_id }: TestEditProp) => {
     }
   }
 
-  console.log(selectedStudents);
-
-
   // TODO: implement duplication API when backend ready
   const duplicateTest = async (test: Test) => {
     try {
@@ -310,9 +327,10 @@ const TestEditor = ({ test_id }: TestEditProp) => {
         setSelectedStudents={setSelectedStudents}
       />
 
-      <QuestionList
-        questions={questions}
-        setQuestions={setQuestions}
+      <Label className='text-lg mb-4' >Nội dung bài kiểm tra</Label>
+      <TestSectionList
+        sections={sections}
+        setSections={setSections}
       />
     </div>
   );
