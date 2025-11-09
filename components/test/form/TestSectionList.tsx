@@ -15,6 +15,7 @@ interface TestSectionProps {
 
 const TestSectionList = ({ sections, setSections }: TestSectionProps) => {
   const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([]);
+  console.log(sections);
 
   // handle add question
   const addQuestion = (sectionIndex: number) => {
@@ -22,8 +23,7 @@ const TestSectionList = ({ sections, setSections }: TestSectionProps) => {
     const section = updatedSections[sectionIndex];
     section.cau_hoi = [
       ...(section.cau_hoi || []),
-      {
-        ma_cau_hoi: (section.cau_hoi?.length || 0) + 1,
+      {        
         cau_hoi: "",
         loai: "trac_nghiem",
         lua_chon: ["", "", "", ""],
