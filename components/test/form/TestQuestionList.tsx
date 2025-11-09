@@ -69,7 +69,7 @@ const QuestionList = ({ questions, setQuestions, onAddQuestion }: QuestionListPr
       {/* <div className="space-y-4 mt-3"> */}
       <div className='grid lg:grid-cols-2 gap-4'>
         {questions.map((question, index) => (
-          <Card key={question.ma_cau_hoi} className='gap-2 py-3 shadow-none border-gray-300'>
+          <Card key={index} className='gap-2 py-3 shadow-none border-gray-300'>
             <CardHeader className='gap-0'>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Câu hỏi {index + 1}</CardTitle>
@@ -84,34 +84,12 @@ const QuestionList = ({ questions, setQuestions, onAddQuestion }: QuestionListPr
                 <Textarea
                   value={question.cau_hoi}
                   onChange={(e) => updateQuestion(index, { cau_hoi: e.target.value })}
-                  placeholder="Enter your question"
+                  placeholder="Nhập nội dung câu hỏi"
                   className='rounded-[3px] shadow-none border-gray-300'
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className='mb-3'>Loại câu hỏi</Label>
-                  <Select
-                    value={question.loai}
-                    onValueChange={(value) =>
-                      updateQuestion(index, {
-                        loai: value as TestQuestion["loai"],
-                        lua_chon: value === "trac_nghiem" ? ["", "", "", ""] : undefined,
-                      })
-                    }
-                  >
-                    <SelectTrigger className='rounded-[3px] border-gray-300 cursor-pointer'>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className='rounded-[3px] cursor-pointer'>
-                      <SelectItem value="trac_nghiem" className='rounded-[3px] cursor-pointer'>Trắc nghiệm</SelectItem>
-                      <SelectItem value="dung_sai" className='rounded-[3px] cursor-pointer'>Đúng/Sai</SelectItem>
-                      <SelectItem value="tra_loi_ngan" className='rounded-[3px] cursor-pointer'>Trả lời ngắn</SelectItem>
-                      <SelectItem value="thuc_hanh_prompt" className='rounded-[3px] cursor-pointer'>Thực hành prompt</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
                 <div>
                   <Label className='mb-3'>Điểm</Label>
                   <Input type="number" value={question.diem} min="1" max="50"
@@ -153,7 +131,7 @@ const QuestionList = ({ questions, setQuestions, onAddQuestion }: QuestionListPr
                                 newOptions[optionIndex] = e.target.value;
                                 updateQuestion(index, { lua_chon: newOptions });
                               }}
-                              placeholder={`Option ${optionLabel}`}
+                              placeholder={`Lựa chọn ${optionLabel}`}
                               className="flex-1 rounded-[3px] border-none shadow-none"
                             />
                             {isCorrect && (

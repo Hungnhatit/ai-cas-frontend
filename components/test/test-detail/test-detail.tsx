@@ -142,7 +142,7 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content: Questions */}
-          <main className="lg:col-span-2">
+          <main className="lg:col-span-2 space-y-4">
             <div className="sticky top-0 bg-gray-50 dark:bg-gray-900 z-10">
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -159,10 +159,10 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
                   Tìm thấy {filteredQuestions?.length} kết quả cho '{searchTerm}'
                 </p>
               )}
-            </div>
-            <div className="mt-6">
+            </div>            
+            <div className="">
               {mergedSections.length > 0 && (
-                <Tabs defaultValue={mergedSections[0]?.ma_phan?.toString()} className=''>
+                <Tabs defaultValue={mergedSections[0]?.ma_phan?.toString()} className='space-y-2'>
                   <TabsList className='rounded-[3px] bg-gray-200'>
                     {mergedSections.map((section, index) => (
                       <TabsTrigger key={index} value={section?.ma_phan?.toString()} className='rounded-[3px] cursor-pointer'>
@@ -173,8 +173,8 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
                   {mergedSections.map((section, index) => (
                     <TabsContent key={index} value={section?.ma_phan?.toString()}>
                       <div className='space-y-3'>
-                        <div className='px-4 py-4 bg-gray-200'>
-                          <div className='space-y-1'>
+                        <div className='space-y-1 px-4 py-4 bg-gray-200'>
+                          <div>
                             <span className='font-bold'>Tên phần: </span>
                             {section.ten_phan}
                           </div>
@@ -185,6 +185,7 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
                         </div>
                         <div>
                           <DetailQuestionList
+                            searchTerm={searchTerm}
                             questions={section.cau_hoi}
                           />
                         </div>
@@ -219,9 +220,6 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
                 />
               ))} */}
             </div>
-
-
-
           </main>
 
           {/* Sidebar: Exam Info */}

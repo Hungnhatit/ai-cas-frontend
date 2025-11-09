@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Plus, Edit, Trash2, Eye, Users, Clock, Trophy, Copy, Earth, Lock, NotebookPen, Play, FileWarning } from "lucide-react"
+import { Plus, Edit, Trash2, Eye, Users, Clock, Trophy, Copy, Earth, Lock, NotebookPen, Play, FileWarning, LayoutTemplate } from "lucide-react"
 import { type Quiz, type QuizQuestion, type Course } from "@/services/api"
 import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
@@ -23,7 +23,7 @@ import { capitalizeFirstLetter } from "@/utils/string"
 import { testService } from "@/services/test/testService"
 import { Test } from "@/types/interfaces/model"
 import { testAttemptService } from "@/services/test/testAttemptService"
-import { getStatusLabel } from "@/utils/test"
+import { getStatusLabel, getVisibilityLabel } from "@/utils/test"
 
 const TestManagementPage = () => {
   const [tests, setTests] = useState<Test[]>([])
@@ -167,6 +167,8 @@ const TestManagementPage = () => {
     )
   }
 
+  console.log(tests[0]);
+
   return (
     // <>
     //   Student test management page
@@ -248,7 +250,7 @@ const TestManagementPage = () => {
                       </div>
                       <Badge variant="default">{getStatusLabel(test.trang_thai)}</Badge>
                     </div>
-                    <Button className="cursor-pointer bg-blue-600 text-white" variant="outline" size="sm" onClick={() => handleStartTest(test.ma_kiem_tra, user?.ma_nguoi_dung)}>
+                    <Button className="cursor-pointer bg-blue-600 text-white rounded-[3px]" variant="outline" size="sm" onClick={() => handleStartTest(test.ma_kiem_tra, user?.ma_nguoi_dung)}>
                       <Play />
                       Vào thi
                     </Button>
@@ -266,6 +268,10 @@ const TestManagementPage = () => {
                         {test.tong_diem} điểm
                       </div>
                       <div className="flex items-center gap-1">
+                        <LayoutTemplate className="h-4 w-4" />
+                        {test.so_phan} phần
+                      </div>
+                      <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
                         {test?.cau_hoi_kiem_tra?.length} câu hỏi
                       </div>
@@ -273,16 +279,16 @@ const TestManagementPage = () => {
                         {test.pham_vi_hien_thi === 'cong_khai' && <Earth className="h-4 w-4" />}
                         {test.pham_vi_hien_thi === 'rieng_tu' && <Lock className="h-4 w-4" />}
                         {test.pham_vi_hien_thi === 'lop_hoc' && <NotebookPen className="h-4 w-4" />}
-                        {capitalizeFirstLetter(test.pham_vi_hien_thi)}
+                        {capitalizeFirstLetter(getVisibilityLabel(test.pham_vi_hien_thi))}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <Button className="cursor-pointer" variant="outline" size="sm" onClick={() => router.push(`/tests/${test.ma_kiem_tra}/preview`)}>
+                      <Button className="cursor-pointer rounded-[3px]" variant="outline" size="sm" onClick={() => router.push(`/tests/${test.ma_kiem_tra}/preview`)}>
                         <Eye className="h-4 w-4 mr-1" />
                         Xem trước
                       </Button>
-                      <Button className="cursor-pointer" variant="outline" size="sm" onClick={() => { router.push(`/tests/${test.ma_kiem_tra}/results`) }}>
+                      <Button className="cursor-pointer rounded-[3px]" variant="outline" size="sm" onClick={() => { router.push(`/tests/${test.ma_kiem_tra}/results`) }}>
                         <Copy className="h-4 w-4 mr-1" />
                         Xem kết quả
                       </Button>

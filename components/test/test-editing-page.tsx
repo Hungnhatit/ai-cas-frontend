@@ -76,8 +76,6 @@ const TestEditor = ({ test_id }: TestEditProp) => {
           cau_hoi: parsedQuestions.filter((q: any) => q.ma_phan === section.ma_phan),
         }));
 
-
-
         const res = await studentService.getStudentByInstructorId(user?.ma_nguoi_dung);
 
         setStudents(res.data.hoc_vien);
@@ -100,22 +98,21 @@ const TestEditor = ({ test_id }: TestEditProp) => {
     fetchData()
   }, [id, test_id]);
 
-  console.log(sections);
-
-
-  const addQuestion = () => {
-    setQuestions([
-      ...questions,
-      {
-        ma_cau_hoi: questions.length + 1,
-        cau_hoi: "",
-        loai: "trac_nghiem",
-        lua_chon: ["", "", "", ""],
-        dap_an_dung: 0,
-        diem: 10,
-      },
-    ])
-  }
+  const addQuestion = (sectionIndex: number) => {
+    const updatedSections = [...sections];
+    if (!updatedSections[sectionIndex].cau_hoi) {
+      updatedSections[sectionIndex].cau_hoi = [];
+    }
+    updatedSections[sectionIndex].cau_hoi!.push({
+      ma_cau_hoi: (updatedSections[sectionIndex].cau_hoi!.length || 0) + 1,
+      cau_hoi: "",
+      loai: updatedSections[sectionIndex].loai_phan || "trac_nghiem",
+      lua_chon: ["", "", "", ""],
+      dap_an_dung: 0,
+      diem: 10,
+    });
+    setSections(updatedSections);
+  };
 
   const updateQuestion = (index: number, updates: Partial<TestQuestion>) => {
     setQuestions(questions.map((q, i) => (
@@ -176,40 +173,46 @@ const TestEditor = ({ test_id }: TestEditProp) => {
         trang_thai: "draft" as const,
         ngay_ket_thuc: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 7 days from now
       }
-      console.log(testData);
 
-      // console.log("[v0] Creating test:", testData)
-      // const res = await testService.createTest(testData);
-      // // In a real app, you would call api.createQuiz(quizData)
+      console.log("[v0] Creating test:", testData)
+      const res = await testService.createTest(testData);
 
-      // setIsCreateDialogOpen(false)
-      // setNewTest({ tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 })
-      // setQuestions([]);
-      // toast.success('Test has been created successfully!');
-      // router.push('/tests');
+      setIsCreateDialogOpen(false)
+      setNewTest({ ...newTest, tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 })
+      setQuestions([]);
+      toast.success('Test has been created successfully!');
+      router.push('/tests');
     } catch (error) {
       console.error("Failed to create test:", error)
     }
   }
 
+  console.log('test:', test);
+
   const handleUpdateTest = async () => {
     try {
-      const total_points = test?.cau_hoi?.reduce((sum, q) => sum + (q.diem || 0), 0) ?? 0;
+      const allQuestions = sections.flatMap((s) => s.cau_hoi || [])
+      // const total_points = test?.cau_hoi?.reduce((sum, q) => sum + (q.diem || 0), 0) ?? 0;
+      const total_points = allQuestions.reduce((sum, q) => sum + (q.diem || 0), 0);
       const updatedData = {
         ...newTest,
         ma_giang_vien: user?.ma_nguoi_dung,
-        cau_hoi: questions as TestQuestion[],
         tong_diem: total_points,
+        // cau_hoi: questions as TestQuestion[],
+        cau_hoi: allQuestions,
+        phan: sections as TestSection[],
         trang_thai: 'hoat_dong',
         ngay_het_han: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-          .toISOString().split('T')[0]
+          .toISOString()
+          .split('T')[0]
       }
+
+      console.log(updatedData)
 
       const assignData = {
         // test_id: test_id,
         instructor_id: user?.ma_nguoi_dung,
         student_ids: selectedStudents,
-        // han_nop: 
       }
 
       console.log("[v0] Updating test:", updatedData);
@@ -283,25 +286,6 @@ const TestEditor = ({ test_id }: TestEditProp) => {
     if (!test) return;
     setTest({ ...test, questions } as Test);
   };
-
-  // const handleCancel = () => {
-  //   if (test?.cau_hoi_kiem_tra?.length > 0) {
-  //     if (window.confirm('Are you sure you want to cancel? All changes will be lost.')) {`
-  //       setTest({
-  //         setup: {
-  //           title: '',
-  //           course: '',
-  //           description: '',
-  //           duration: 60,
-  //           attemptsAllowed: 3
-  //         },
-  //         questions: [],
-  //         quiz: []
-  //       });
-  //       toast.success('Quiz creation cancelled');
-  //     }
-  //   }
-  // };
 
   const total_points = test?.cau_hoi?.reduce((sum, q) => sum + (q.diem || 0), 0) ?? 0;
 

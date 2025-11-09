@@ -165,19 +165,22 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
       }
       console.log(testData);
 
-      // console.log("[v0] Creating test:", testData)
-      // const res = await testService.createTest(testData);
-      // // In a real app, you would call api.createQuiz(quizData)
+      console.log("[v0] Creating test:", testData)
+      const res = await testService.createTest(testData);
 
-      // setIsCreateDialogOpen(false)
-      // setNewTest({ tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 })
-      // setQuestions([]);
-      // toast.success('Test has been created successfully!');
-      // router.push('/tests');
+      if (res.status) {
+        setIsCreateDialogOpen(false)
+        setNewTest({ ...newTest, tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 })
+        setQuestions([]);
+        toast.success('Test has been created successfully!');
+        router.push('/tests');
+      }
     } catch (error) {
       console.error("Failed to create test:", error)
     }
   }
+
+  console.log('test: ', test);
 
   const handleUpdateTest = async () => {
     try {
@@ -189,7 +192,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
         tong_diem: total_points,
         trang_thai: 'hoat_dong',
         ngay_het_han: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-          .toISOString().split('T')[0]
+          .toISOString().split('T')[0],
       }
 
       const assignData = {
@@ -556,7 +559,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
                 {question.loai === "trac_nghiem" && (
                   <div>
                     <Label className="mb-3">
-                      Tuỳ chọn trả lời (click vào để chỉnh sửa)
+                      Tuỳ chọn trả ≈≈çvlời (click vào để chỉnh sửa)
                     </Label>
                     <div className="space-y-2">
                       <RadioGroup
