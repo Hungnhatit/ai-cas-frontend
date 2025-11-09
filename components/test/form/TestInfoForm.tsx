@@ -18,6 +18,19 @@ export default function TestInfoForm({ newTest, setNewTest }: any) {
               className="rounded-[3px] h-10 text-base border-gray-300/70 shadow-none"
             />
           </div>
+
+          <div>
+            <Label htmlFor="test-duration" className='mb-2'>Thời gian làm bài</Label>
+            <Input
+              id="test-duration"
+              type="number"
+              value={newTest.thoi_luong}
+              onChange={(e) => setNewTest({ ...newTest, thoi_luong: Number.parseInt(e.target.value) })}
+              min="5"
+              max="180"
+              className="rounded-[3px] h-12 text-base border-gray-300/80 shadow-none"
+            />
+          </div>
         </div>
 
         <div>
@@ -32,19 +45,8 @@ export default function TestInfoForm({ newTest, setNewTest }: any) {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="test-duration" className='mb-2'>Thời gian làm bài</Label>
-            <Input
-              id="test-duration"
-              type="number"
-              value={newTest.thoi_luong}
-              onChange={(e) => setNewTest({ ...newTest, thoi_luong: Number.parseInt(e.target.value) })}
-              min="5"
-              max="180"
-              className="rounded-[3px] h-12 text-base border-gray-300/80 shadow-none"
-            />
-          </div>
-          <div>
+
+          {/* <div>
             <Label htmlFor="test-attempts" className='mb-2'>Số lần làm tối đa</Label>
             <Input
               id="test-attempts"
@@ -55,7 +57,7 @@ export default function TestInfoForm({ newTest, setNewTest }: any) {
               max="10"
               className="rounded-[3px] h-12 text-base border-gray-300/80 shadow-none"
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
