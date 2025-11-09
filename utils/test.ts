@@ -12,10 +12,20 @@ export const STATUS_LABEL: Record<string, string> = {
   luu_tru: 'Lưu trữ'
 };
 
+export const VISIBILITY_LABEL: Record<string, string> = {
+  cong_khai: 'Công khai',
+  rieng_tu: 'Riêng tư',
+  lop_hoc: 'Lớp học'
+}
+
 export const getDifficultyLabel = (value: string): string => {
   return TEST_DIFFICULTY_LABEL[value] || value;
 }
 
 export const getStatusLabel = (value: string): string => {
   return STATUS_LABEL[value] || value;
+}
+
+export const getVisibilityLabel = (value: string): string => {
+  return VISIBILITY_LABEL[value] ||value;
 }
