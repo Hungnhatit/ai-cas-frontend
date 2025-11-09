@@ -409,7 +409,7 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center justify-center gap-4">
-            <Button onClick={() => router.push("/tests")}>
+            <Button onClick={() => router.push("/student/tests-management")} className="cursor-pointer">
               <BookOpen className="h-4 w-4 mr-2" />
               View All tests
             </Button>
