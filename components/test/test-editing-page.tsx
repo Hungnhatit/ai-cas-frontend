@@ -114,6 +114,16 @@ const TestEditor = ({ test_id }: TestEditProp) => {
     setSections(updatedSections);
   };
 
+  const updateSection = (index: number, updates: Partial<TestSection>) => {
+    const updateSections = [...sections];
+    updateSections[index] = {
+      ...updateSections[index],
+      ...updates
+    };
+
+    setSections(updateSections);
+  }
+
   const updateQuestion = (index: number, updates: Partial<TestQuestion>) => {
     setQuestions(questions.map((q, i) => (
       i === index
@@ -312,9 +322,11 @@ const TestEditor = ({ test_id }: TestEditProp) => {
       />
 
       <Label className='text-lg mb-4' >Nội dung bài kiểm tra</Label>
+      {/* Render section */}
       <TestSectionList
         sections={sections}
         setSections={setSections}
+        updateSection={updateSection}
       />
     </div>
   );
