@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 
 export default function HeaderBar({ test, loading, total_points, router, onSave, onCancel }: any) {
   return (
-    <div className="bg-[#232f3e] sticky top-0 z-10 mb-4 -mx-4 -mt-4">
+    <div className="bg-[#232f3e] top-0 z-10 mb-4 -mx-4 -mt-4">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">

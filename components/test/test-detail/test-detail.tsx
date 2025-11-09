@@ -159,14 +159,14 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
                   Tìm thấy {filteredQuestions?.length} kết quả cho '{searchTerm}'
                 </p>
               )}
-            </div>            
+            </div>
             <div className="">
               {mergedSections.length > 0 && (
                 <Tabs defaultValue={mergedSections[0]?.ma_phan?.toString()} className='space-y-2'>
                   <TabsList className='rounded-[3px] bg-gray-200'>
                     {mergedSections.map((section, index) => (
                       <TabsTrigger key={index} value={section?.ma_phan?.toString()} className='rounded-[3px] cursor-pointer'>
-                        {section.ten_phan}
+                        Phần {index + 1}
                       </TabsTrigger>
                     ))}
                   </TabsList>
