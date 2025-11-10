@@ -76,7 +76,7 @@ const navItems: NavItem[] = [
     roles: ['admin']
   },
   {
-    title: 'Manage tests',
+    title: 'Quản lý bài thi',
     href: '/tests',
     icon: BookType,
     roles: ['instructor']

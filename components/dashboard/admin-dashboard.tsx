@@ -43,17 +43,17 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="bg-[#232f3e] -mx-4 -mt-4 p-4 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
           <p className="text-white">System overview and management</p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline">
+          <Button variant="outline" className="rounded-[3px] cursor-pointer">
             <UserPlus className="mr-2 h-4 w-4" />
             Add User
           </Button>
-          <Button>System Settings</Button>
+          <Button className="rounded-[3px] cursor-pointer">System Settings</Button>
         </div>
       </div>
 
@@ -115,13 +115,12 @@ export function AdminDashboard() {
             {systemAlerts.map((alert) => (
               <div key={alert.id} className="flex items-start space-x-3">
                 <AlertTriangle
-                  className={`h-5 w-5 mt-0.5 ${
-                    alert.priority === "high"
-                      ? "text-red-500"
-                      : alert.priority === "medium"
-                        ? "text-yellow-500"
-                        : "text-blue-500"
-                  }`}
+                  className={`h-5 w-5 mt-0.5 ${alert.priority === "high"
+                    ? "text-red-500"
+                    : alert.priority === "medium"
+                      ? "text-yellow-500"
+                      : "text-blue-500"
+                    }`}
                 />
                 <div className="flex-1">
                   <p className="font-medium">{alert.message}</p>
