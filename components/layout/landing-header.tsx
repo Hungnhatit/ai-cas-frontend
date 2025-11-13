@@ -18,20 +18,49 @@ export function LandingHeader() {
 
   const navigationItems = [
     { name: t.features, href: "#features" },
-    { name: t.pricing, href: "#pricing" },
-    { name: t.about, href: "#about" },
+    { name: 'Đề thi', href: "/test-library" },
+    { name: 'Blog', href: "#about" },
     { name: t.contact, href: "#contact" },
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
+    <header className="top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="bg-slate-200 px-8 flex items-center justify-between">
+        <div>Trường Đại học Sư phạm Kỹ thuật - Đại học Đà Nẵng</div>
+        <div className="flex">
+          <LanguageToggle />
+          <ThemeToggle />
+          <Button
+            variant="ghost"
+            className="cursor-pointer rounded-[3px]"
+            onClick={() => {
+              router.push("/auth/login")
+              setMobileMenuOpen(false)
+            }}
+          >
+            Đăng nhập
+          </Button>
+          <Button
+            variant="ghost"
+            className="cursor-pointer rounded-[3px]"
+            onClick={() => {
+              router.push("/auth/register")
+              setMobileMenuOpen(false)
+            }}
+          >
+            Đăng ký
+          </Button>
+        </div>
+
+      </div>
+
+      <div className=" bg-[#232f3e] flex h-16 items-center justify-between px-8">
         {/* Logo */}
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">E</span>
           </div>
-          <span className="font-bold text-lg md:text-xl">AI-CAS</span>
+          <span className="font-bold text-white text-lg md:text-xl">AI-CAS</span>
         </div>
 
         {/* Desktop Navigation */}
@@ -41,7 +70,7 @@ export function LandingHeader() {
               <a
                 key={item.name}
                 href={item.href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm font-medium text-white hover:text-gray-400 transition-colors"
               >
                 {item.name}
               </a>
@@ -50,21 +79,21 @@ export function LandingHeader() {
         )}
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-2">
-          <LanguageToggle />
-          <ThemeToggle />
+        {isMobile && (
+          <div className="flex items-center gap-2">
+            {/* <LanguageToggle />
+          <ThemeToggle /> */}
 
-          {!isMobile && (
+            {/* {!isMobile && (
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" onClick={() => router.push("/auth/login")}>
                 {t.signIn}
               </Button>
               <Button onClick={() => router.push("/auth/register")}>{t.getStarted}</Button>
             </div>
-          )}
+          )} */}
 
-          {/* Mobile Menu */}
-          {isMobile && (
+            {/* Mobile Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
@@ -91,11 +120,12 @@ export function LandingHeader() {
                       {item.name}
                     </a>
                   ))}
+
                   <div className="border-t pt-4 mt-4">
                     <div className="flex flex-col gap-2">
                       <Button
                         variant="ghost"
-                        className="justify-start"
+                        className="justify-start cursor-pointer"
                         onClick={() => {
                           router.push("/auth/login")
                           setMobileMenuOpen(false)
@@ -104,7 +134,7 @@ export function LandingHeader() {
                         {t.signIn}
                       </Button>
                       <Button
-                        className="justify-start"
+                        className="justify-start cursor-pointer"
                         onClick={() => {
                           router.push("/auth/register")
                           setMobileMenuOpen(false)
@@ -117,8 +147,8 @@ export function LandingHeader() {
                 </div>
               </SheetContent>
             </Sheet>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </header>
   )
