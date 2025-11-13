@@ -75,14 +75,14 @@ export default function RegisterPage() {
             </div>
             <span className="font-bold text-2xl">AI-CAS</span>
           </div>
-          <h1 className="text-2xl font-bold">Create your account</h1>
-          <p className="text-white">Join thousands of learners and educators</p>
+          <h1 className="text-2xl font-bold">Tạo tài khoản</h1>
+          <p className="">Tham gia cùng hàng ngàn người học và nhà giáo dục</p>
         </div>
 
         <Card className="border-border">
           <CardHeader>
             <CardTitle>Sign Up</CardTitle>
-            <CardDescription>Create your account to get started</CardDescription>
+            <CardDescription>Tạo tài khoản của bạn để bắt đầu</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -93,11 +93,11 @@ export default function RegisterPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">Tên người dùng</Label>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="Enter your full name"
+                  placeholder="Nhập họ tên của bạn"
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   required
@@ -110,7 +110,7 @@ export default function RegisterPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Nhập email của bạn"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   required
@@ -119,26 +119,26 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
+                <Label htmlFor="role">Vai trò</Label>
                 <Select value={formData.role} onValueChange={(value) => handleInputChange("role", value)}>
-                  <SelectTrigger className="bg-muted/50">
-                    <SelectValue placeholder="Select your role" />
+                  <SelectTrigger className="bg-muted/50 rounded-[3px] shadow-none border-gray-300 cursor-pointer">
+                    <SelectValue placeholder="Select your role" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="student">Student</SelectItem>
-                    <SelectItem value="instructor">Instructor</SelectItem>
-                    <SelectItem value="admin">Administrator</SelectItem>
+                  <SelectContent className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">
+                    <SelectItem value="student" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">Student</SelectItem>
+                    <SelectItem value="instructor" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">Instructor</SelectItem>
+                    <SelectItem value="admin" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">Administrator</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Mật khẩu</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
+                    placeholder="Tạo mật khẩu"
                     value={formData.password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
                     required
@@ -157,7 +157,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
