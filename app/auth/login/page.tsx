@@ -58,14 +58,14 @@ export default function LoginPage() {
             </div>
             <span className="font-bold text-2xl">AI-CAS</span>
           </div>
-          <h1 className="text-2xl font-bold">Welcome back</h1>
-          <p className="text-white">Sign in to your account to continue</p>
+          <h1 className="text-2xl font-bold">Chào mừng quay trở lại</h1>
+          <p className="">Đăng nhập để tiếp tục</p>
         </div>
 
         <Card className="border-border">
           <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>Enter your credentials to access your account</CardDescription>
+            <CardTitle className="text-center">Đăng nhập</CardTitle>
+            <CardDescription>Nhập thông tin đăng nhập để truy cập vào tài khoản của bạn</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -80,25 +80,25 @@ export default function LoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Nhập email của bạn"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-muted/50"
+                  className="bg-muted/50 rounded-[3px] border-gray-300 shadow-none"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Mật khẩu</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder="Nhập mật khẩu của bạn"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="bg-muted/50 pr-10"
+                    className="bg-muted/50 pr-10 rounded-[3px] shadow-none border-gray-300"
                   />
                   <Button
                     type="button"
@@ -113,34 +113,34 @@ export default function LoginPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
-                  Forgot password?
+                <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline font-bold">
+                  Quên mật khẩu?
                 </Link>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full bg-[#2d66e0] rounded-[3px] shadow-none" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign In
+                Đăng nhập
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                {"Don't have an account? "}
+                {"Chưa có tài khoản? "}
                 <Link href="/auth/register" className="text-primary hover:underline">
-                  Sign up
+                  Đăng ký ngay
                 </Link>
               </p>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-border">
+            {/* <div className="mt-6 pt-6 border-t border-border">
               <div className="text-xs text-muted-foreground space-y-1">
                 <p>Demo accounts:</p>
                 <p>Student: student@demo.com / password</p>
                 <p>Instructor: instructor@demo.com / password</p>
                 <p>Admin: admin@demo.com / password</p>
               </div>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
       </div>
