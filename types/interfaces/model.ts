@@ -11,7 +11,6 @@ export interface User {
   ngay_cap_nhat: string
 }
 
-
 export interface Test {
   ma_kiem_tra: number;           // test_id
   ma_giang_vien: number;             // instructor_id
@@ -36,6 +35,16 @@ export interface Test {
   phan_kiem_tra: TestSection[]
 }
 
+export interface TestCategory {
+  ma_danh_muc: number;
+  ten_danh_muc: string;
+  mo_ta?: string | null; 
+  trang_thai: "cho_duyet" | "da_duyet" | "tu_choi";
+  nguoi_tao_danh_muc: number | null;
+  ngay_tao: string;
+  ngay_cap_nhat: string;
+}
+
 export interface TestSection {
   ma_phan: number;
   ma_kiem_tra: number;
@@ -50,6 +59,17 @@ export interface TestSection {
   ngay_tao: string;
   ngay_cap_nhat: string;
   cau_hoi: Partial<TestQuestion>[]
+}
+
+export interface TestComment {
+  ma_binh_luan: number;                    // ma_binh_luan
+  ma_kiem_tra: number;             // ma_kiem_tra
+  ma_nguoi_dung: number;              // thông tin người dùng
+  ma_binh_luan_goc?: number | null;      // ma_binh_luan_goc
+  noi_dung: string;               // nội dung comment
+  ngay_tao: string;               // ISO date
+  ngay_cap_nhat: string;           // ISO date
+  reply?: TestComment[]
 }
 
 
