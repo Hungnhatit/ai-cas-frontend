@@ -7,8 +7,7 @@ export default function AdminUsersPage() {
     <AuthGuard requiredRole='admin'>
       <DashboardLayout>
         <UserManagement />
-      </DashboardLayout>
-     
+      </DashboardLayout>    
     </AuthGuard>
   )
 }
