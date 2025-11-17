@@ -65,11 +65,14 @@ export interface TestComment {
   ma_binh_luan: number;                    // ma_binh_luan
   ma_kiem_tra: number;             // ma_kiem_tra
   ma_nguoi_dung: number;              // thông tin người dùng
+  nguoi_dung: User
   ma_binh_luan_goc?: number | null;      // ma_binh_luan_goc
   noi_dung: string;               // nội dung comment
   ngay_tao: string;               // ISO date
   ngay_cap_nhat: string;           // ISO date
   reply?: TestComment[]
+  binh_luan_phan_hoi?: TestComment[]
+  reply_to_user_name: string
 }
 
 
