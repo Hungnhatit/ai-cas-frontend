@@ -29,13 +29,13 @@ export const testService = {
     }
   },
 
-  getAllTests: async () => {
-    try {
-      const res = await api.get('/test/all-tests');
-      return res.data;
-    } catch (error) {
-      console.log(error);
-    }
+  getAllTests: async (page = 1, limit = 10, query = '', category = 'all') => {
+    const params: any = { page, limit };
+    if (query) params.query = query;
+    if (category && category !== 'all') params.category = category;
+
+    const response = await api.get('/test/all-tests', { params });
+    return response.data;
   },
 
   getTestResults: async (test_id: number, student_id: number) => {
@@ -101,6 +101,19 @@ export const testService = {
       console.log('Error when restoring test: ', error.res?.data || error.message);
       throw error;
     }
+  },
+
+  /**
+   * Comment
+   */
+  createComment: async (data: any) => {
+    const res = await api.post('/comment', data);
+    return res.data;
+  },
+
+  getCommentsByTestId: async (test_id: number) => {
+    const res = await api.get(`/comment/test/${test_id}`);
+    return res.data;
   }
 
 }
