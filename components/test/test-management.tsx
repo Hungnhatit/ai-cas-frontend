@@ -287,7 +287,7 @@ const TestManagement = () => {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">#</th>
+                  <th className="border-r border-gray-200 px-3 py-2 text-center text-sm font-medium text-gray-600">#</th>
                   <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Tên bài kiểm tra</th>
                   <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Trạng thái</th>
                   {/* <th className="p-3 text-left text-sm font-medium text-gray-600">Số lượng câu hỏi</th> */}

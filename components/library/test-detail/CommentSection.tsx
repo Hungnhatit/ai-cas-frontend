@@ -20,7 +20,6 @@ interface CommentSectionProps {
 export const CommentSection = ({ test_id, user_id }: CommentSectionProps) => {
   const [comments, setComments] = useState<TestComment[]>([]);
   const [newComment, setNewComment] = React.useState("");
-
   const { user } = useAuth();
 
   useEffect(() => {
@@ -79,7 +78,7 @@ export const CommentSection = ({ test_id, user_id }: CommentSectionProps) => {
     });
   };
 
-
+  console.log(user)
   return (
     <Card className=" gap-3 mt-8 rounded-[3px] border shadow-none ">
       <CardHeader>
@@ -93,9 +92,9 @@ export const CommentSection = ({ test_id, user_id }: CommentSectionProps) => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex gap-3">
             <Avatar className="h-10 w-10 border">
-              <AvatarImage src="https://placehold.co/40x40/94A3B8/FFFFFF?text=ME" />
+              {/* <AvatarImage src="https://placehold.co/40x40/94A3B8/FFFFFF?text=ME" /> */}
               <AvatarFallback>
-                <User className="h-5 w-5" />
+                {user?.ten.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <Textarea
@@ -139,7 +138,6 @@ interface CommentItemProps {
 }
 
 function CommentItem({ comment, user_id, addReply, level = 1 }: CommentItemProps) {
-  // State to manage reply box visibility and content for each comment
   const [isReplying, setIsReplying] = React.useState(false);
   const [replyText, setReplyText] = React.useState("");
 
@@ -184,27 +182,29 @@ function CommentItem({ comment, user_id, addReply, level = 1 }: CommentItemProps
         </div>
 
         <div>
-          <div className='bg-gray-100 p-2 rounded-[3px]'>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold">{comment.nguoi_dung.ten} level={level}</span>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {formatDate(comment.ngay_tao)}
-              </span>
+          <div className='space-y-2'>
+            <div className='bg-gray-100 p-3 rounded-[3px]'>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold">{comment.nguoi_dung.ten} level={level}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {formatDate(comment.ngay_tao)}
+                </span>
+              </div>
+              <p className="text-sm text-gray-800 dark:text-gray-200 mt-1">
+                <span className='text-[#295fe6] font-bold'>{comment.reply_to_user_name && `@${comment.reply_to_user_name}`} </span>
+                <span>{comment.noi_dung}</span>
+              </p>
             </div>
-            <p className="text-sm text-gray-800 dark:text-gray-200 mt-1">
-              <span className='text-[#35519A] font-bold'>{comment.reply_to_user_name && `@${comment.reply_to_user_name}`}</span>
-              <span>{comment.noi_dung}</span>
-            </p>
-          </div>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className=" rounded-[3px] cursor-pointer"
-            onClick={() => setIsReplying(!isReplying)}
-          >
-            Phản hồi
-          </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className=" rounded-[3px] cursor-pointer text-sky-800"
+              onClick={() => setIsReplying(!isReplying)}
+            >
+              Phản hồi
+            </Button>
+          </div>
 
           {/* Conditional Reply Form */}
           {isReplying && (

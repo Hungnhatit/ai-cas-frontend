@@ -92,7 +92,7 @@ const TestManagementPage = () => {
         router.push(`/tests/${test_id}/take?attempt=${attempt_id}`)
       }
     } catch (error) {
-      console.error("Failed to start quiz:", error)
+      console.error("Failed to start test:", error)
     }
   }
 
