@@ -88,7 +88,7 @@ export const CommentSection = ({ test_id, user_id }: CommentSectionProps) => {
           Bình luận ({comments.length})
         </h2>
       </CardHeader>
-      <CardContent>
+      <CardContent className='space-y-4'>
         {/* New Comment Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex gap-3">

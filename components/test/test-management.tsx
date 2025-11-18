@@ -350,14 +350,14 @@ const TestManagement = () => {
                     </td>
                     <td className="border-r border-gray-200 p-3 ">
                       <div className="flex gap-1">
-                        <Button onClick={() => handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>
+                        <Button onClick={() => handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer rounded-[3px]'>
                           <SquarePen />
                         </Button>
                         {/* <Button onClick={() => handleViewResultDetail(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Results</Button> */}
                         {/* <Button onClick={() => handleDetailTest(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Detail</Button> */}
                         {
                           test.trang_thai === 'luu_tru' &&
-                          <Button onClick={() => handleRestore(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>
+                          <Button onClick={() => handleRestore(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer rounded-[3px]'>
                             <RotateCcw />
                           </Button>
                         }
@@ -369,7 +369,7 @@ const TestManagement = () => {
                                   onClick={() => handleDeleteTest(test.ma_kiem_tra)}
                                   variant="ghost"
                                   size="sm"
-                                  className='cursor-pointer text-red-600'>
+                                  className='cursor-pointer text-red-600 rounded-[3px]'>
                                   <Trash2 />
                                   {/* Xoá */}
                                 </Button>
@@ -389,10 +389,8 @@ const TestManagement = () => {
                               onClick={() => handleDeleteTest(test.ma_kiem_tra)}
                               variant="ghost"
                               size="sm"
-                              className='cursor-pointer text-red-600'>
-                              <Button variant="ghost" size="sm" className='cursor-pointer text-red-600'>
-                                <Trash />
-                              </Button>
+                              className='cursor-pointer text-red-600 rounded-[3px]'>
+                              <Trash />
                             </Button>
                           </ConfirmModal>
                         }

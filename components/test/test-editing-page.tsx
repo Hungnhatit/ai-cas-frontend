@@ -131,6 +131,10 @@ const TestEditor = ({ test_id }: TestEditProp) => {
         : q)))
   }
 
+  const removeSection = (index: number) => {
+
+  }
+
   const removeQuestion = (index: number) => {
     setQuestions(questions.filter((_, i) => i !== index))
   }
@@ -327,6 +331,7 @@ const TestEditor = ({ test_id }: TestEditProp) => {
         sections={sections}
         setSections={setSections}
         updateSection={updateSection}
+        removeSectoin={removeSection}
       />
     </div>
   );
