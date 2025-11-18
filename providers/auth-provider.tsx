@@ -1,6 +1,7 @@
 "use client"
 
 import { authService } from "@/services/authService"
+import { useRouter } from "next/navigation"
 import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 
@@ -24,7 +25,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     // Check for existing session
@@ -84,7 +86,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null)
     localStorage.removeItem("lms-user");
-    localStorage.removeItem("token")
+    localStorage.removeItem("token");
+    router.push('/auth/login')
   }
 
   return <AuthContext.Provider value={{ user, login, logout, register, loading }}>{children}</AuthContext.Provider>
