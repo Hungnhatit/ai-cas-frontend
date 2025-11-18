@@ -283,17 +283,22 @@ const TestLibrary = () => {
   }
 
   useEffect(() => {
-    const loadExams = async () => {
-      setIsLoading(true);
-      const res = await testService.getAllTests(currentPage, 10, searchQuery, selectedCategory);
-      console.log(res.pagination.totalItems);
-      setExams(res.data);
-      setTotalExams(res.pagination.totalItems);
-      setExamPerPage(res.pagination.pageSize);
+    try {
+      const loadExams = async () => {
+        setIsLoading(true);
+        const res = await testService.getAllTests(currentPage, 10, searchQuery, selectedCategory);
+        console.log(res.pagination.totalItems);
+        setExams(res.data);
+        setTotalExams(res.pagination.totalItems);
+        setExamPerPage(res.pagination.pageSize);
+      };
+      loadExams();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false)
+    }
 
-      setIsLoading(false);
-    };
-    loadExams();
   }, [currentPage, searchQuery, selectedCategory]);
 
   console.log('total exam: ', totalPages);
@@ -319,6 +324,8 @@ const TestLibrary = () => {
 
     router.push(`/test-library?page=${page}&query=${query}&category=${category}`)
   };
+
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
