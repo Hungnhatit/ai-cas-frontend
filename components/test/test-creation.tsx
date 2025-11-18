@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, CalendarDays, ChevronLeft, Save } from 'lucide-react';
 import React, { useEffect } from 'react'
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
@@ -14,17 +14,20 @@ import { api, Course, Quiz, QuizQuestion } from '@/services/api'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/auth-provider'
 import toast from 'react-hot-toast';
-import { Test, TestQuestion, TestSection } from '@/types/interfaces/model';
+import { Test, TestCategory, TestQuestion, TestSection } from '@/types/interfaces/model';
 import { testService } from '@/services/test/testService';
 import FormField from '../assignments/assignment-form-field';
 import { Separator } from '../ui/separator';
+import { categoryService } from '@/services/categoryService';
 
 const CreateTestPage = () => {
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([])
-  const [sections, setSections] = useState<Partial<TestSection>[]>([])
+  const [sections, setSections] = useState<Partial<TestSection>[]>([]);
+  const [categories, setCategories] = useState<TestCategory[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
 
   const [newSection, setNewSection] = useState<Partial<TestSection>>({
     ten_phan: '',
@@ -50,8 +53,12 @@ const CreateTestPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [coursesData] = await Promise.all([api.getCourses()])
-        setCourses(coursesData)
+        const [coursesData, cates] = await Promise.all([
+          api.getCourses(),
+          categoryService.getCategories()
+        ])
+        setCourses(coursesData);
+        setCategories(cates.data);
       } catch (error) {
         console.error("Failed to fetch data:", error)
       } finally {
@@ -59,7 +66,9 @@ const CreateTestPage = () => {
       }
     }
     fetchData()
-  }, [])
+  }, []);
+
+  console.log(categories);
 
   // const addQuestion = () => {
   //   setQuestions([
@@ -135,6 +144,7 @@ const CreateTestPage = () => {
         cau_hoi: allQuestions,
         tong_diem: total_points,
         so_phan: sections.length,
+        danh_muc: selectedCategoryIds,
         sections: sections as TestSection[],
         trang_thai: 'ban_nhap' as const,
         ngay_bat_dau: new Date(newTest.ngay_bat_dau).toISOString(),
@@ -155,7 +165,7 @@ const CreateTestPage = () => {
       console.error("Failed to create test:", error)
     }
   }
-  
+
   const duplicateQuiz = async (test: Test) => {
     try {
       console.log("[v0] Duplicating test:", test.ma_kiem_tra)
@@ -223,6 +233,40 @@ const CreateTestPage = () => {
                 className="rounded-[3px] h-12 text-base border-gray-300 shadow-none"
               />
             </div>
+
+            <div>
+              <FormField label="Danh mục" className='text-black'>
+                <Select>
+                  <SelectTrigger className='w-full h-12 rounded-[3px] shadow-none border-gray-300'>
+                    <SelectValue placeholder={selectedCategoryIds.length > 0 ? `${selectedCategoryIds.length} danh mục đã chọn` : "Chọn danh mục"} />
+                  </SelectTrigger>
+                  <SelectContent className='rounded-[3px] shadow-none border-gray-300'>
+                    <SelectGroup>
+                      <SelectLabel>Danh mục</SelectLabel>
+                      {categories.map((cate) => (
+                        <div key={cate.ma_danh_muc} className="flex items-center px-3 py-1 cursor-pointer hover:bg-gray-100 rounded">
+                          <input
+                            type="checkbox"
+                            checked={selectedCategoryIds.includes(cate.ma_danh_muc)}
+                            onChange={() => {
+                              if (selectedCategoryIds.includes(cate.ma_danh_muc)) {
+                                setSelectedCategoryIds(selectedCategoryIds.filter(id => id !== cate.ma_danh_muc));
+                              } else {
+                                setSelectedCategoryIds([...selectedCategoryIds, cate.ma_danh_muc]);
+                              }
+                            }}
+                            className="mr-2"
+                          />
+                          <span>{cate.ten_danh_muc}</span>
+                        </div>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormField>
+
+            </div>
+
             {/* <div>
               <Label className='mb-2 text-black' htmlFor="test-course">Course</Label>
               <Select value={newTest.course} onValueChange={(value) => setNewTest({ ...newTest, course: value })}>
