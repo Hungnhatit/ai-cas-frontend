@@ -20,6 +20,24 @@ export const testAttemptService = {
     }
   },
 
+  getTestsAttemptByStudent: async (student_id: number) => {
+    try {
+      const res = await api.get(`/test-attempt/student/${student_id}/test`);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  getTestAttemptByStudentId: async (student_id: number, test_id: number) => {
+    try {
+      const res = await api.get(`/test-attempt/student/${student_id}/test/${test_id}`);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
   getTestAttempts: async (test_id: number, student_id: number) => {
     try {
       const res = await api.get(`/test-attempt?test_id=${test_id}&student_id=${student_id}`);
