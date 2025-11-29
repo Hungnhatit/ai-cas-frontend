@@ -27,7 +27,7 @@ export const testAttemptService = {
     } catch (error) {
       console.log(error);
     }
-  },
+  }, 
 
   getTestAttemptByStudentId: async (student_id: number, test_id: number) => {
     try {

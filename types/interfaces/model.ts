@@ -120,7 +120,7 @@ export interface TestQuestion {
   giai_thich_dap_an: string;               // explanation
   ngay_tao: string;                  // createdAt
   ngay_cap_nhat: string;             // updatedAt
-  cau_hoi_trac_nghiem: MultipleChoiceQuestion
+  cau_hoi_trac_nghiem: MultipleChoiceQuestion[]
   cau_hoi_tu_luan: EssayQuestion
 }
 

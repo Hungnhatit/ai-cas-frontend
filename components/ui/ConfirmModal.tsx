@@ -25,8 +25,8 @@ export default function ConfirmModal({
   onConfirm,
   title,
   description,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel'
+  confirmText = 'Xác nhận',
+  cancelText = 'Huỷ'
 }: ConfirmModalProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
