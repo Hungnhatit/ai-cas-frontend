@@ -114,6 +114,20 @@ export const testService = {
   getCommentsByTestId: async (test_id: number) => {
     const res = await api.get(`/comment/test/${test_id}`);
     return res.data;
-  }
+  },
 
+  deleteComment: async (comment_id: number) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await api.delete(`/comment/${comment_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      return res.data;
+    } catch (error: any) {
+      console.log('Delete comment error: ', error.res?.data || error.message)
+      throw error;
+    }
+  },
 }
