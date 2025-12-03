@@ -1,16 +1,16 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { MessageSquare, Send, User } from "lucide-react";
+import { MailOpen, MessageCircleDashed, MessageSquare, Send, Trash, User } from "lucide-react";
 import { testService } from "@/services/test/testService";
 import { useAuth } from "@/providers/auth-provider";
 import toast from "react-hot-toast";
 import { TestComment } from '@/types/interfaces/model';
 import { formatDate } from '@/utils/formatDate';
+import ConfirmModal from '@/components/modals/confirm-modal';
 
 interface CommentSectionProps {
   test_id: number,
@@ -19,22 +19,29 @@ interface CommentSectionProps {
 
 export const CommentSection = ({ test_id, user_id }: CommentSectionProps) => {
   const [comments, setComments] = useState<TestComment[]>([]);
-  const [newComment, setNewComment] = React.useState("");
+  const [newComment, setNewComment] = useState("");
+  const [countComment, setCountComment] = useState(0);
   const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      const res = await testService.getCommentsByTestId(test_id);
-      if (res.success) {
-        setComments(res.data);
-      }
+  const fetchComments = async () => {
+    const res = await testService.getCommentsByTestId(test_id);
+    if (res.success) {
+      setCountComment(res.total_comments)
+      setComments(res.data);
     }
+  }
+  useEffect(() => {
     fetchComments();
-  }, [])
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim() === "") return;
+
+    if (!user) {
+      toast.error("Bạn cần đăng nhập để bình luận.");
+      return;
+    }
 
     const newCommentData = {
       ma_kiem_tra: test_id,
@@ -44,21 +51,23 @@ export const CommentSection = ({ test_id, user_id }: CommentSectionProps) => {
 
     const res = await testService.createComment(newCommentData);
     if (res.success) {
-      toast.success('Comment posted!');
+      toast.success('Đã bình luận!');
+      const postedComment: TestComment = {
+        ...res.data,
+        nguoi_dung: {
+          ma_nguoi_dung: user.ma_nguoi_dung,
+          ten: user.ten,
+        }
+      };
+
+      setComments([postedComment, ...comments]);
+      setNewComment("");
     } else {
       toast.error("Error when posting comment");
     }
-
-    // Add new comment to the top of the list
-    setComments([newCommentData, ...comments]);
-    setNewComment(""); // Clear the textarea
   };
 
-  const addReplyToTree = (
-    tree: TestComment[],
-    parentId: number,
-    reply: TestComment
-  ): TestComment[] => {
+  const addReplyToTree = (tree: TestComment[], parentId: number, reply: TestComment): TestComment[] => {
     return tree.map(comment => {
       if (comment.ma_binh_luan === parentId) {
         return {
@@ -78,24 +87,44 @@ export const CommentSection = ({ test_id, user_id }: CommentSectionProps) => {
     });
   };
 
-  console.log(user)
+  const handleDeleteComment = async (comment_id: number) => {
+    try {
+      const res = await testService.deleteComment(comment_id);
+      if (res.success) {
+        toast.success('Bình luận đã xoá thành công!');
+        fetchComments();
+      }
+      setComments((prev) => prev.filter((comment) => comment.ma_binh_luan !== comment_id));
+    } catch (error) {
+      console.log(error);
+      toast.error('Lỗi khi xoá bình luận');
+    }
+  }
+
   return (
     <Card className=" gap-3 mt-8 rounded-[3px] border shadow-none ">
       <CardHeader>
         <h2 className="text-xl font-semibold flex items-center gap-2">
-          <MessageSquare className="h-5 w-5" />
+          <MailOpen className="h-5 w-5" />
           Bình luận ({comments.length})
         </h2>
       </CardHeader>
       <CardContent className='space-y-4'>
         {/* New Comment Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
             <Avatar className="h-10 w-10 border">
               {/* <AvatarImage src="https://placehold.co/40x40/94A3B8/FFFFFF?text=ME" /> */}
-              <AvatarFallback>
-                {user?.ten.charAt(0)}
-              </AvatarFallback>
+              {user
+                ? (
+                  <AvatarFallback>
+                    {user?.ten.charAt(0)}
+                  </AvatarFallback>
+                )
+                : (<AvatarFallback>
+                  <User />
+                </AvatarFallback>)}
+
             </Avatar>
             <Textarea
               value={newComment}
@@ -113,16 +142,29 @@ export const CommentSection = ({ test_id, user_id }: CommentSectionProps) => {
           </div>
         </form>
 
+        {comments.length == 0 && (
+          <div>
+            <div className='flex flex-col items-center gap-4'>
+              <MessageCircleDashed />
+              <p className='text-center text-lg'>Chưa có bình luận nào</p>
+            </div>
+          </div>
+        )}
+
         {/* Existing Comments List */}
         <div className="space-y-1">
           {comments.map((comment) => (
-            <CommentItem
-              key={comment.ma_binh_luan}
-              comment={comment}
-              user_id={user_id}
-              addReply={(parentId, reply) => {
-                setComments(prev => addReplyToTree(prev, parentId, reply));
-              }} />
+            <div key={comment.ma_binh_luan}>
+              <CommentItem
+                key={comment.ma_binh_luan}
+                comment={comment}
+                user_id={comment.ma_nguoi_dung}
+                addReply={(parentId, reply) => {
+                  setComments(prev => addReplyToTree(prev, parentId, reply));
+                }}
+                handleDeleteComment={handleDeleteComment}
+              />
+            </div>
           ))}
         </div>
       </CardContent>
@@ -135,11 +177,13 @@ interface CommentItemProps {
   comment: TestComment;
   addReply: (parent_id: number, reply: TestComment) => void
   level?: number
+  handleDeleteComment: (comment_id: number) => void
 }
 
-function CommentItem({ comment, user_id, addReply, level = 1 }: CommentItemProps) {
+function CommentItem({ comment, user_id, addReply, level = 1, handleDeleteComment }: CommentItemProps) {
   const [isReplying, setIsReplying] = React.useState(false);
   const [replyText, setReplyText] = React.useState("");
+  const { user } = useAuth();
 
   const handleReplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,26 +213,41 @@ function CommentItem({ comment, user_id, addReply, level = 1 }: CommentItemProps
     setIsReplying(false);
   };
 
+  console.log(user)
+
   return (
-    <div className="flex flex-col gap-3">
+    <div key={comment.ma_binh_luan} className="flex flex-col gap-2">
       <div className={`flex gap-2 flex-1 space-y-2 ${level !== 1 ? 'ml-12' : ''}`}>
         <div>
           <Avatar className="h-10 w-10 border">
             {/* <AvatarImage src={comment.user.avatarUrl || undefined} /> */}
             <AvatarFallback>
-              {comment.nguoi_dung.ten.charAt(0)}
+              {comment.nguoi_dung?.ten.charAt(0)}
             </AvatarFallback>
           </Avatar>
         </div>
 
-        <div>
-          <div className='space-y-2'>
+        <div className='w-full'>
+          <div className='w-fit space-y-1'>
             <div className='bg-gray-100 p-3 rounded-[3px]'>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold">{comment.nguoi_dung.ten} level={level}</span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {formatDate(comment.ngay_tao)}
-                </span>
+              <div className="flex items-center justify-between gap-4">
+                <div className='flex items-center gap-2'>
+                  <span className="text-sm font-semibold">{comment.nguoi_dung?.ten}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {formatDate(comment.ngay_tao)}
+                  </span>
+                </div>
+                {user && user?.ma_nguoi_dung === user_id && (
+                  <ConfirmModal
+                    onConfirm={() => handleDeleteComment(comment.ma_binh_luan)}
+                    title='Bạn muốn xoá bình luận? Hành động này không thể hoàn tác!'
+                    description='Xoá bình luận'
+                  >
+                    <Button variant="ghost" size="sm" className='h-4 w-4 cursor-pointer rounded-[3px] bg-transparent shadow-none'>
+                      <Trash size={16} className='text-slate-500' />
+                    </Button>
+                  </ConfirmModal>
+                )}
               </div>
               <p className="text-sm text-gray-800 dark:text-gray-200 mt-1">
                 <span className='text-[#295fe6] font-bold'>{comment.reply_to_user_name && `@${comment.reply_to_user_name}`} </span>
@@ -223,7 +282,7 @@ function CommentItem({ comment, user_id, addReply, level = 1 }: CommentItemProps
                 <Textarea
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-                  placeholder={`Phản hồi ${comment.nguoi_dung.ten}...`}
+                  placeholder={`Phản hồi ${comment.nguoi_dung?.ten}...`}
                   className="flex-1 rounded-[3px] shadow-none border-gray-300"
                   rows={2}
                   autoFocus
@@ -259,12 +318,13 @@ function CommentItem({ comment, user_id, addReply, level = 1 }: CommentItemProps
           <CommentItem
             key={reply.ma_binh_luan}
             comment={reply}
-            user_id={user_id}
+            user_id={reply.ma_nguoi_dung}
             addReply={addReply}
             level={2}
+            handleDeleteComment={() => handleDeleteComment(reply.ma_binh_luan)}
           />
         ))}
       </div>
-    </div>
+    </div >
   );
 }
