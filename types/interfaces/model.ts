@@ -15,6 +15,81 @@ export interface User {
   ngay_cap_nhat: string
 }
 
+/**
+ * Competency and related model
+ * Description: 
+ */
+export interface Competency {
+  ma_khung_nang_luc: number;
+  ten_nang_luc: string | null;
+  mo_ta: string | null;
+  ngay_tao: string;
+  ngay_cap_nhat: string;
+}
+
+export interface Criteria {
+  ma_tieu_chi: number;
+  ma_khung_nang_luc: number;
+  ten_tieu_chi: string | null;
+  mo_ta: string | null;
+  trong_so: number | null;
+  ngay_tao: string;
+  ngay_cap_nhat: string;
+}
+
+export type NguoiCham = "AI" | "GIANG_VIEN" | "QUAN_TRI";
+
+export type TrangThaiCham = "DANG_CHAM" | "HOAN_THANH" | "CHO_DUYET";
+
+export interface AssessmentResult {
+  ma_danh_gia: number;
+  ma_lan_lam: number;
+  tong_diem: number | null;
+  xep_loai: string | null;
+  nhan_xet: string | null;
+  nguoi_cham: NguoiCham;
+  trang_thai: TrangThaiCham;
+  ngay_danh_gia: string | null;
+  ngay_tao: string;
+  ngay_cap_nhat: string;
+}
+
+export interface ReviewDetail {
+  ma_chi_tiet: number;
+  ma_khung_nang_luc: number;
+  ma_danh_gia: number;
+  diem: number | null;
+  nhan_xet: string | null;
+  diem_manh: string | null;
+  diem_yeu: string | null;
+  ngay_tao: string;
+  ngay_cap_nhat: string;
+}
+
+export interface AnalysisEvaluation {
+  ma_phan_tich: number;
+  ma_danh_gia: number;
+  de_xuat_cai_thien: string | null;
+  huong_phat_trien: string | null;
+  ke_hoach_ngan_han: string | null;
+  ke_hoach_dai_han: string | null;
+  tai_nguyen_de_xuat: string | null;
+  ngay_tao: string;
+  ngay_cap_nhat: string;
+}
+
+export interface AttachmentDocument {
+  ma_dinh_kem: number;
+  ma_tai_lieu: number | null;
+  ten_tep: string | null;
+  duong_dan: string | null;
+  dung_luong: number | null;
+  dinh_dang: string | null;
+  ngay_tao: string;
+  ngay_cap_nhat: string;
+}
+
+
 export interface Test {
   ma_kiem_tra: number;
   ma_giang_vien: number;
@@ -35,9 +110,12 @@ export interface Test {
   cau_hoi_trac_nghiem: TestQuestion[];
   giang_vien: Instructor | null
   danh_muc: TestCategory[]
-  so_phan: number
+  tong_so_phan: number
   phan_kiem_tra: TestSection[]
   tong_so_cau_hoi: number
+  so_luong_hoc_vien: number
+  tong_so_luot_lam: number
+
 }
 
 export interface TestCategory {
@@ -57,7 +135,7 @@ export interface TestSection {
   mo_ta: string
   loai_phan: 'trac_nghiem' | 'tu_luan' | 'viet_prompt' | 'xu_ly_tinh_huong' | 'dung_sai' | 'tra_loi_ngan' | 'khac' | 'nhieu_lua_chon';
   diem: number
-  thu_tu: number;  
+  thu_tu: number;
   diem_toi_da: number;
   tieu_chi_danh_gia?: string | null;
   ngay_tao: string;
@@ -100,7 +178,7 @@ export interface TestAttempt {
   trang_thai: TestAttemptStatus;     // status
   ngay_tao: string;                  // createdAt
   ngay_cap_nhat: string;             // updatedAt
-
+  cau_tra_loi_hoc_vien: StudentAnswer[]
   bai_kiem_tra?: Test;               // test
   hoc_vien?: any;                    // student
 }
@@ -114,30 +192,33 @@ export interface TestSetup {
 }
 
 export interface TestQuestion {
-  ma_cau_hoi: number;            
-  ma_kiem_tra: number;          
-  ma_phan: number;         
+  ma_cau_hoi: number;
+  ma_kiem_tra: number;
+  ma_phan: number;
+  ma_tieu_chi: number
   loai: "trac_nghiem" | "tu_luan" | 'viet_prompt' | "dung_sai" | "tra_loi_ngan" | 'nhieu_lua_chon'
   loai_cau_hoi: QuestionType
   tieu_de: string
   mo_ta: string;
-  lua_chon: string[];              
-  dap_an_dung?: string | number;    
-  la_dap_an_dung?: string | number;    
-  diem: number;                     
-  giai_thich_dap_an: string;              
-  ngay_tao: string;                 
-  ngay_cap_nhat: string;            
+  lua_chon: string[];
+  dap_an_dung?: string | number;
+  la_dap_an_dung?: string | number;
+  diem: number;
+  giai_thich_dap_an: string;
+  ngay_tao: string;
+  ngay_cap_nhat: string;
   cau_hoi?: QuestionDetails
   cau_hoi_trac_nghiem: MultipleChoiceQuestion | null
   cau_hoi_tu_luan: EssayQuestion | null
   cau_hoi_nhieu_lua_chon: MultipleSelectQuestion | null
+  tieu_chi_danh_gia: Criteria | null
 }
 
 export interface QuestionDetails {
   tieu_de?: string;
   diem?: number;
   mo_ta?: string;
+  ma_tieu_chi: number
   loai_cau_hoi?: QuestionType;
   cau_hoi_trac_nghiem?: MultipleChoiceQuestion | null;
   cau_hoi_tu_luan?: EssayQuestion | null;
@@ -146,11 +227,12 @@ export interface QuestionDetails {
 
 export interface MultipleChoiceQuestion {
   ma_cau_hoi_trac_nghiem?: number;
-  dap_an_dung?: string;
+  la_dap_an_dung?: string;
   giai_thich_dap_an?: string;
   lua_chon_trac_nghiem?: MultipleChoiceOption[];
   ngay_tao?: string;
   ngay_cap_nhat?: string;
+
 }
 
 export interface MultipleChoiceOption {
@@ -175,6 +257,7 @@ export interface MultipleSelectQuestion {
   giai_thich?: string;
   ngay_tao?: string;
   ngay_cap_nhat?: string;
+  lua_chon?: MultipleSelectOption[]
 }
 
 export interface MultipleSelectOption {
@@ -236,59 +319,6 @@ export interface Student {
   tien_do: number;                // progress: number
   ngay_tham_gia: string;          // joinDate: string
   ma_giang_vien?: number;         // ma_giang_vien?: string
-  ngay_tao: string;
-  ngay_cap_nhat: string;
-}
-
-export interface Assignment {
-  ma_bai_tap: number;             // id: string
-  tieu_de: string;                // title: string
-  ma_khoa_hoc: number;            // course: string
-  han_nop: string;                // dueDate: string
-  trang_thai: "pending" | "submitted" | "graded"; // status
-  diem?: number;                  // grade?: number
-  mo_ta: string;                  // description: string
-  ngay_tao: string;
-  ngay_cap_nhat: string;
-}
-
-export interface QuizQuestion {
-  ma_cau_hoi_tn: number;          // quizQuestion_id: number
-  ma_bai_trac_nghiem: number;     // quiz_id: string
-  cau_hoi: string;                // question: string
-  loai: "trac_nghiem" | "dung_sai" | "tra_loi_ngan"; // type
-  lua_chon?: string[];            // options?: string[]
-  dap_an_dung: string | number;   // correctAnswer: string | number
-  diem: number;                   // points: number
-  ngay_tao: string;
-  ngay_cap_nhat: string;
-}
-
-export interface BaiTracNghiem {
-  ma_bai_trac_nghiem: number;     // id: string
-  tieu_de: string;                // title: string
-  ma_khoa_hoc: number;            // course: string
-  mo_ta: string;                  // description: string
-  thoi_luong: number;             // duration: number
-  tong_diem: number;              // total_points: number
-  so_lan_lam: number;             // attempts: number
-  trang_thai: "hoat_dong" | "ban_nhap" | "luu_tru"; // status
-  che_do_hien_thi: string;        // visibility: string
-  han_nop: string;                // dueDate: string
-  ngay_tao: string;
-  ngay_cap_nhat: string;
-  cau_hoi_trac_nghiem?: QuizQuestion[]; // quiz_questions
-}
-
-export interface QuizAttempt {
-  ma_lan_lam_tn: number;          // id: string
-  ma_bai_trac_nghiem: number;     // quizId: string
-  ma_hoc_vien: number;            // studentId: string
-  cau_tra_loi: Record<string, string | number>; // answers
-  diem?: number;                  // score?: number
-  bat_dau_luc: string;            // start_time
-  ket_thuc_luc?: string;          // end_time
-  trang_thai: "in-progress" | "completed" | "submitted"; // status
   ngay_tao: string;
   ngay_cap_nhat: string;
 }
