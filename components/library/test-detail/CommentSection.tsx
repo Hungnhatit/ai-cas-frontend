@@ -87,6 +87,20 @@ export const CommentSection = ({ test_id, user_id }: CommentSectionProps) => {
     });
   };
 
+  const removeCommentFromTree = (tree: TestComment[], comment_id: number): TestComment[] => {
+    return tree
+      .filter(comment => comment.ma_binh_luan !== comment_id)
+      .map(comment => {
+        if (comment.binh_luan_phan_hoi && comment.binh_luan_phan_hoi.length > 0) {
+          return {
+            ...comment,
+            binh_luan_phan_hoi: removeCommentFromTree(comment.binh_luan_phan_hoi, comment_id)
+          }
+        }
+        return comment;
+      })
+  }
+
   const handleDeleteComment = async (comment_id: number) => {
     try {
       const res = await testService.deleteComment(comment_id);
@@ -94,7 +108,7 @@ export const CommentSection = ({ test_id, user_id }: CommentSectionProps) => {
         toast.success('Bình luận đã xoá thành công!');
         fetchComments();
       }
-      setComments((prev) => prev.filter((comment) => comment.ma_binh_luan !== comment_id));
+      setComments((prev) => removeCommentFromTree(prev, comment_id));
     } catch (error) {
       console.log(error);
       toast.error('Lỗi khi xoá bình luận');
@@ -193,18 +207,26 @@ function CommentItem({ comment, user_id, addReply, level = 1, handleDeleteCommen
 
     const replyData = {
       ma_kiem_tra: comment.ma_kiem_tra,
-      ma_nguoi_dung: user_id,
+      ma_nguoi_dung: user?.ma_nguoi_dung,
       noi_dung: replyText,
       ma_binh_luan_goc: comment.ma_binh_luan,
     }
-
-    console.log('replyData: ', replyData);
 
     const res = await testService.createComment(replyData);
 
     if (res.success) {
       toast.success("Đã phản hồi!");
-      addReply(comment.ma_binh_luan, res.data);
+
+      const newReplyComment: TestComment = {
+        ...res.data,
+        nguoi_dung: {
+          ma_nguoi_dung: user?.ma_nguoi_dung,
+          ten: user?.ten || 'Bạn',
+          email: user?.email
+        },
+        reply_to_user_name: comment.nguoi_dung?.ten
+      }
+      addReply(comment.ma_binh_luan, newReplyComment);
     } else {
       toast.error("Lỗi khi gửi phản hồi");
     }
@@ -212,8 +234,6 @@ function CommentItem({ comment, user_id, addReply, level = 1, handleDeleteCommen
     setReplyText("");
     setIsReplying(false);
   };
-
-  console.log(user)
 
   return (
     <div key={comment.ma_binh_luan} className="flex flex-col gap-2">
@@ -321,7 +341,7 @@ function CommentItem({ comment, user_id, addReply, level = 1, handleDeleteCommen
             user_id={reply.ma_nguoi_dung}
             addReply={addReply}
             level={2}
-            handleDeleteComment={() => handleDeleteComment(reply.ma_binh_luan)}
+            handleDeleteComment={handleDeleteComment}
           />
         ))}
       </div>
