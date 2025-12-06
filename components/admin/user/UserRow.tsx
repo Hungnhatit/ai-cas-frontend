@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { User } from "@/types/interfaces/model"
 import { formatDate } from "@/utils/formatDate"
-import { capitalizeFirstLetter } from "@/utils/string"
+import { capitalizeFirstLetter, getAccountStatusLabel, getRoleLabel } from "@/utils/string"
 import { UserActions } from "../user-action/UserAction"
 
 const ROLE_COLORS: Record<string, string> = {
@@ -50,11 +50,11 @@ export function UserRow({ user, index, onEdit, onDelete, onForceDelete, onRestor
         <span
           className={`${ROLE_COLORS[user.vai_tro] || "bg-teal-400 text-white"} text-xs px-2 py-1 rounded-sm`}
         >
-          {capitalizeFirstLetter(user.vai_tro)}
+          {getRoleLabel(user.vai_tro)}
         </span>
       </TableCell>
       <TableCell>
-        <Badge variant={STATUS_VARIANTS[user.trang_thai]}>{user.trang_thai}</Badge>
+        <Badge variant={STATUS_VARIANTS[user.trang_thai]}>{getAccountStatusLabel(user.trang_thai)}</Badge>
       </TableCell>
       <TableCell>{formatDate(user.ngay_tao)}</TableCell>
       <TableCell>{formatDate(user.ngay_cap_nhat)}</TableCell>
