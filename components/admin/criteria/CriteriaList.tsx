@@ -45,7 +45,7 @@ const CriteriaList = ({ data }: Props) => {
             <TableHead className="">STT</TableHead>
             <TableHead className="">ID</TableHead>
             <TableHead className="">Tên tiêu chí</TableHead>
-            <TableHead className="">Mô tả</TableHead>
+            <TableHead className="">Mô tả chi tiết</TableHead>
             <TableHead className="flex items-center justify-between gap-1">
               Trọng số
               <Tooltip>
@@ -79,7 +79,7 @@ const CriteriaList = ({ data }: Props) => {
 
               <TableCell className="text-center">{item.ma_tieu_chi}</TableCell>
               <TableCell className="">{item.ten_tieu_chi}</TableCell>
-              <TableCell className="h-full whitespace-normal break-words line-clamp-2">{item.mo_ta}</TableCell>
+              <TableCell className="whitespace-normal break-words">{item.mo_ta}</TableCell>
               <TableCell className="text-center">{item.trong_so}</TableCell>
               <TableCell className="">{formatDate(item.ngay_tao)}</TableCell>
               <TableCell className="">{formatDate(item.ngay_cap_nhat)}</TableCell>
