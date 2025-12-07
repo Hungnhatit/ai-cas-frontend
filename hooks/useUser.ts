@@ -17,6 +17,21 @@ export function useUsers() {
     setLoading(false)
   }
 
+  const createUser = async (payload: any) => {
+    try {
+      setLoading(true);
+      const user = await userService.createUser(payload);
+
+      setUsers((prevUser) => [user, ...prevUser]);
+      toast.success("Tài khoản đã được tạo thành công!");
+    } catch (error) {
+      toast.error("Lỗi khi tạo người dùng");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const updateUser = async (id: number, data: Partial<User>) => {
     const res = await userService.updateUser(id, data)
     if (res.success) {
@@ -51,5 +66,5 @@ export function useUsers() {
     fetchUsers()
   }, [])
 
-  return { users, loading, fetchUsers, updateUser, softDeleteUser, forceDeleteUser, restoreUser }
+  return { users, loading, createUser, fetchUsers, updateUser, softDeleteUser, forceDeleteUser, restoreUser }
 }
