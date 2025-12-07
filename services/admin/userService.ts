@@ -6,6 +6,11 @@ export const userService = {
     return res.data;
   },
 
+  createUser: async (payload: any) => {
+    const res = await api.post('/auth/sign-up', payload);
+    return res.data
+  },
+
   getUserById: async (user_id: number) => {
     const res = await api.get(`/user/${user_id}`);
     return res.data;
