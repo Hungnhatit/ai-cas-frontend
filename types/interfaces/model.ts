@@ -21,10 +21,11 @@ export interface User {
  */
 export interface Competency {
   ma_khung_nang_luc: number;
-  ten_nang_luc: string | null;
+  ten_nang_luc: string;
   mo_ta: string | null;
   ngay_tao: string;
   ngay_cap_nhat: string;
+  tong_so_tieu_chi: number
 }
 
 export interface Criteria {
@@ -270,6 +271,7 @@ export interface MultipleSelectOption {
 }
 
 
+
 export interface StudentAnswer {
   ma_tra_loi: number;
   ma_lan_lam: number;
@@ -289,6 +291,17 @@ export interface Instructor {
   tieu_su?: string;          // bio (optional)
   ngay_tao: string;          // createdAt
   ngay_cap_nhat: string;     // updatedAt
+}
+
+export interface Post {
+  ma_bai_viet: number;
+  ma_tac_gia: number;
+  tieu_de: string;
+  tom_tat?: string | null;
+  noi_dung?: string | null;
+  trang_thai?: "nhap" | "cho_duyet" | "da_dang";
+  ngay_tao: string;
+  ngay_cap_nhat: string;
 }
 
 export interface Course {
