@@ -27,3 +27,26 @@ export const ROLE_LABEL: Record<string, string> = {
 export const getRoleLabel = (value: string): string => {
   return ROLE_LABEL[value] || value;
 }
+
+export const ATTEMPT_STATUS: Record<string, string> = {
+  da_nop: 'Đã nộp',
+  dang_lam: 'Đang làm',
+  da_cham: 'Đã chấm',
+  da_huy: 'Đã huỷ'
+}
+
+export const ATTEMPT_STATUS_BADGE: Record<string, string> = {
+  da_nop: 'bg-green-300',
+  dang_lam: 'bg-yellow-400',
+  da_cham: 'bg-blue-500 text-white',
+  da_huy: 'bg-red-600 text-white'
+}
+
+export const getAttemptStatusLabel = (value: string): string => {
+  return ATTEMPT_STATUS[value] || value;
+}
+
+export const getAttemptStatusBadge = (value: string): string => {
+  return ATTEMPT_STATUS_BADGE[value] || value;
+}
+
