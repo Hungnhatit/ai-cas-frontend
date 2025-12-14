@@ -32,12 +32,6 @@ const MetadataSidebar = ({ test }: MetadataSidebarProps) => {
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-500 dark:text-gray-400">
-            Danh mục
-          </span>
-          <Badge>{test.danh_muc}</Badge>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-500 dark:text-gray-400">
             Độ khó
           </span>
           <Badge className=''>
