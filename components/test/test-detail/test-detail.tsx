@@ -73,7 +73,7 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
     fetchTest();
   }, [test_id]);
 
-  const danh_muc = test ? JSON.parse(test?.danh_muc) : [];
+  const danh_muc = test ? test.danh_muc : [];
 
   const filteredQuestions = useMemo(() => {
     if (!searchTerm) return test?.cau_hoi;
@@ -100,6 +100,8 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
     cau_hoi: parsedQuestions.filter((q: any) => q.ma_phan === section.ma_phan),
   }));
 
+
+
   const getDifficultyBadge = (difficulty: Test['do_kho'] | null) => {
     switch (difficulty) {
       case 'de': return <Badge variant='default' className="capitalize">Dễ</Badge>;
@@ -116,6 +118,8 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
     }
   }
 
+  // console.log('test: ', test);
+
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans text-gray-900 dark:text-gray-100">
       <div className="">
@@ -131,7 +135,7 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
             <div className='flex flex-wrap gap-2 items-center mt-2'>
               <Tag size={17} className='' />
               {danh_muc && danh_muc.map((item: any, index: number) =>
-                <Badge key={index} className=''>{item}</Badge>
+                <Badge key={index} className=''>{item.ten_danh_muc}</Badge>
               )}
             </div>
           </div>
@@ -161,39 +165,34 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
               )}
             </div>
             <div className="">
-              {mergedSections.length > 0 && (
-                <Tabs defaultValue={mergedSections[0]?.ma_phan?.toString()} className='space-y-2'>
-                  <TabsList className='rounded-[3px] bg-gray-200'>
-                    {mergedSections.map((section, index) => (
-                      <TabsTrigger key={index} value={section?.ma_phan?.toString()} className='rounded-[3px] cursor-pointer'>
+              {test && test?.phan_kiem_tra?.length > 0 && (
+                <Tabs defaultValue={test.phan_kiem_tra[0].ma_phan.toString()} className="space-y-2">
+                  <TabsList className="rounded-[3px] bg-gray-200">
+                    {test.phan_kiem_tra.map((section, index) => (
+                      <TabsTrigger key={index} value={section.ma_phan.toString()} className="rounded-[3px] cursor-pointer">
                         Phần {index + 1}
                       </TabsTrigger>
                     ))}
                   </TabsList>
-                  {mergedSections.map((section, index) => (
-                    <TabsContent key={index} value={section?.ma_phan?.toString()}>
-                      <div className='space-y-3'>
-                        <div className='space-y-1 px-4 py-4 bg-gray-200'>
-                          <div>
-                            <span className='font-bold'>Tên phần: </span>
-                            {section.ten_phan}
-                          </div>
-                          <div>
-                            <span className='font-bold'>Mô tả: </span>
-                            {section.mo_ta}
-                          </div>
+
+                  {test.phan_kiem_tra.map((section, index) => (
+                    <TabsContent key={index} value={section.ma_phan.toString()}>
+                      <div className="space-y-3">
+                        <div className="space-y-1 px-4 py-4 bg-gray-200">
+                          <div><span className="font-bold">Tên phần: </span>{section.ten_phan}</div>
+                          <div><span className="font-bold">Mô tả: </span>{section.mo_ta}</div>
                         </div>
-                        <div>
-                          <DetailQuestionList
-                            searchTerm={searchTerm}
-                            questions={section.cau_hoi}
-                          />
-                        </div>
+
+                        <DetailQuestionList
+                          searchTerm={searchTerm}
+                          questions={section.phan_kiem_tra_cau_hoi}
+                        />
                       </div>
                     </TabsContent>
                   ))}
                 </Tabs>
               )}
+
               {/* <Tabs defaultValue={mergedSections[0]?.ma_phan?.toString()}>
                 <TabsList>
                   {mergedSections.map((section, index) => (
@@ -225,7 +224,7 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
           {/* Sidebar: Exam Info */}
           <aside className="lg:col-span-1">
             <div className="sticky top-6">
-              <Card className='rounded-[3px] shadow-none'>
+              <Card className='rounded-[3px] shadow-none gap-2'>
                 <CardHeader>
                   <CardTitle className='text-lg'>Thông tin tổng quan</CardTitle>
                 </CardHeader>
@@ -238,22 +237,9 @@ const ExamDetailsPage = ({ test_id }: TestDetailProps) => {
                   <div className="grid grid-cols-1 gap-4">
                     <InfoCard icon={Clock} title="Thời gian làm bài" value={`${test?.thoi_luong} phút`} />
                     <InfoCard icon={CheckCircle} title="Tổng điểm" value={test?.tong_diem} />
-                    <InfoCard icon={HelpCircle} title="Số câu hỏi" value={test?.cau_hoi_kiem_tra.length} />
-                    <InfoCard icon={Star} title="Số lần làm tối đa" value={test?.so_lan_lam_toi_da} />
-                  </div>
-                  <Separator />
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400 flex items-center gap-2"><Calendar className="w-4 h-4" /> Ngày bắt đầu</span>
-                      <span className="font-medium">
-                        {formatDate(test?.ngay_bat_dau)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400 flex items-center gap-2"><Calendar className="w-4 h-4" /> Ngày kết thúc</span>
-                      <span className="font-medium">{formatDate(test?.ngay_ket_thuc)}</span>
-                    </div>
-                  </div>
+                    <InfoCard icon={HelpCircle} title="Tổng số câu hỏi" value={test?.tong_so_cau_hoi} />
+                    {/* <InfoCard icon={Star} title="Số lần làm tối đa" value={test?.so_lan_lam_toi_da} /> */}
+                  </div>                                 
                   <Separator />
                   <div>
                     <h4 className="font-semibold mb-3">Giảng viên</h4>

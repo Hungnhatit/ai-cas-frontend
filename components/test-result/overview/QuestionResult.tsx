@@ -85,14 +85,13 @@ const renderQuestionResult = (attempt: TestAttempt, question: TestQuestion, inde
         )}
 
         {question.cau_hoi?.loai_cau_hoi === "tu_luan" && (
-
           <div className="space-y-2">
             <div className="space-y-2">
-              <div className="p-3 bg-gray-100 rounded-lg">
+              <div className="p-3 bg-gray-200 rounded-sm">
                 <p className="text-md font-medium mb-1">Câu trả lời của bạn:</p>
                 <p className="text-md">{userAnswerRaw || "Không có câu trả lời"}</p>
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
+              <div className="p-3 bg-green-200 rounded-sm">
                 <p className="text-md font-medium mb-1">Câu trả lời đúng:</p>
                 <p className="text-md">{question.dap_an_dung}</p>
               </div>
@@ -155,7 +154,7 @@ const QuestionResult = ({ test, attempt, review }: QuestionResultProps) => {
         <CardDescription className="text-md">Xem lại bài làm và câu trả lời của bạn kèm theo các giải thích cho câu hỏi</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Tabs defaultValue={test?.phan_kiem_tra[0].ma_phan.toString()} className='space-y-4'>
+        <Tabs defaultValue={test?.phan_kiem_tra[0].ma_phan.toString()} className='space-y-2'>
           <TabsList className='rounded-[3px] bg-gray-200'>
             {test?.phan_kiem_tra?.map((section, index) => (
               <TabsTrigger key={index} value={section.ma_phan.toString()} className='rounded-[3px] bg-gray-200 cursor-pointer'>
@@ -166,6 +165,16 @@ const QuestionResult = ({ test, attempt, review }: QuestionResultProps) => {
 
           {test?.phan_kiem_tra?.map((section, index) => (
             <TabsContent key={index} value={section.ma_phan.toString()} className='space-y-4'>
+              <div className="space-y-1">
+                <p>
+                  <span className="font-bold">Tên phần: {' '}</span>
+                  {section.ten_phan}
+                </p>
+                <p>
+                  <span className="font-bold">Nội dung: {' '}</span>
+                  {section.mo_ta}
+                </p>
+              </div>
               {section.phan_kiem_tra_cau_hoi.map((question, index) => {
                 const questionReview = review.find((r: any) => r.ma_cau_hoi === question.ma_cau_hoi)
                 return (

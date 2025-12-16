@@ -19,12 +19,12 @@ export default function HeaderBar({ test, loading, total_points, router, onSave,
             <div className='space-y-1'>
               <div className='flex items-center'>
                 <h1 className="text-xl font-semibold text-white mr-2">{test?.tieu_de}</h1>
-                {test?.trang_thai === 'hoat_dong'
-                  ? <Badge className={cn('bg-blue-500')}>Active</Badge>
-                  : <Badge className={cn('bg-gray-300')}>Draft</Badge>}
               </div>
               <p className="text-sm text-white">
-                {test?.cau_hoi?.length} câu hỏi{test?.cau_hoi?.length !== 1 ? 's' : ''} • {total_points} điểm
+                {test.tong_so_cau_hoi} câu hỏi • {test.tong_diem} điểm  {test?.trang_thai === 'hoat_dong'
+                  ? <Badge className={cn('bg-blue-500')}>Active</Badge>
+                  : <Badge className={cn('bg-gray-300')}>Draft</Badge>
+                }
               </p>
             </div>
           </div>

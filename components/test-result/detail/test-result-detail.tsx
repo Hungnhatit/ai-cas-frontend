@@ -2,7 +2,7 @@
 import { api, Course, Quiz, QuizAttempt } from '@/services/api';
 import React, { useEffect, useState } from 'react';
 import { Skeleton } from '../../ui/skeleton';
-import { BarChart3, BookOpenCheck, Brain, ChartNetwork, Code, Cpu, Database, Eye, Rocket, SquareChartGantt, Target } from 'lucide-react';
+import { BarChart3, BookOpenCheck, Brain, ChartNetwork, Code, Cpu, Database, Eye, Lightbulb, Rocket, SquareChartGantt, Target } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
 import ScoreCard from './test-score-card';
 import TimeAnalytics from './test-time-analytics';
@@ -19,6 +19,10 @@ import { testService } from '@/services/test/testService';
 import { testAttemptService } from '@/services/test/testAttemptService';
 import TestResultHeader from './test-result-header';
 import { AiReviewService } from '@/services/ai-review/AIReviewService';
+import QuestionResult from '../overview/QuestionResult';
+import { ChiTietDanhGia, PhanTichDanhGia } from '@/types/interfaces/ai-review';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Improvement from './Improvement';
 
 interface TestResultDetailProps {
   test_id: number,
@@ -42,6 +46,8 @@ interface Insight {
 const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
   const [test, setTest] = useState<Test | null>(null);
   const [attempt, setAttempt] = useState<TestAttempt | null>(null);
+  const [review, setReview] = useState<ChiTietDanhGia | null>(null);
+  const [performance, setPerformance] = useState<PhanTichDanhGia | null>(null);
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -51,20 +57,23 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
       try {
         const testData = await testService.getTestById(test_id);
         const attemptData = await testAttemptService.getTestAttemptById(attempt_id);
+        const reviewRes = await AiReviewService.getReviewByAttemptID(attempt_id);
 
-        if (testData && attemptData) {
+        if (testData && attemptData && reviewRes) {
           setTest(testData.data);
-          setAttempt(attemptData.data);
-          // const courseData = await api.getCourse("1");
-          // setCourse(courseData);
+          setAttempt(attemptData.data.attempt);
+          setReview(reviewRes.data.chi_tiet_danh_gia);
+          setPerformance(reviewRes.data.phan_tich);
         }
       } catch (error) {
-        console.error("Failed to load quiz result:", error);
+        console.error("Failed to load test result:", error);
       } finally {
         setLoading(false);
       }
     };
 
+
+    console.log('PERFORMANCE: ', performance);
 
     const fetchResult = async () => {
       const res = await AiReviewService.getAiReviewById(24);
@@ -74,7 +83,6 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
 
     loadTestResult();
     fetchResult();
-
   }, []);
 
   if (loading) {
@@ -116,19 +124,13 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
   // Calculate metrics from API data
   const answers = attempt?.cau_tra_loi ? JSON.parse(attempt.cau_tra_loi) : {};
 
-  const totalQuestions = test?.cau_hoi.length ?? 0;
+  const totalQuestions = test.tong_so_cau_hoi || 0;
 
-  const correctAnswers = test?.cau_hoi.filter(q =>
+  const correctAnswers = test?.cau_hoi?.filter(q =>
     answers[q.ma_cau_hoi]?.toString() === q.dap_an_dung
   ).length ?? 0;
 
-  // console.log('cau hoi: ', test.cau_hoi);
-  // console.log('attempt: ', JSON.parse(attempt.cau_tra_loi));
-  // console.log(totalQuestions);
-  // console.log(correctAnswers);
-
-
-  const incorrectAnswers = test?.cau_hoi.filter(q =>
+  const incorrectAnswers = test?.cau_hoi?.filter(q =>
     attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()] !== undefined &&
     attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()] !== q.dap_an_dung
   ).length;
@@ -139,7 +141,6 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
   const passingPercentage = 70;
   const isPassed = percentage >= passingPercentage;
 
-  // Calculate time metrics
   const startTime = new Date(attempt.thoi_gian_bat_dau);
   const endTime = new Date(attempt.thoi_gian_ket_thuc || new Date());
   const timeDiff = endTime.getTime() - startTime.getTime();
@@ -155,29 +156,29 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
   const categoryPerformance: CategoryPerformance[] = [
     {
       name: "Multiple Choice",
-      correct: test?.cau_hoi.filter(q =>
+      correct: test?.cau_hoi?.filter(q =>
         q.loai === 'trac_nghiem' &&
         attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()] === q.dap_an_dung
       ).length,
-      total: test?.cau_hoi.filter(q => q.loai === 'trac_nghiem').length,
+      total: test?.cau_hoi?.filter(q => q.loai === 'trac_nghiem').length,
       percentage: 0
     },
     {
       name: "True/False",
-      correct: test?.cau_hoi.filter(q =>
+      correct: test?.cau_hoi?.filter(q =>
         q.loai === 'dung_sai' &&
         attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()] === q.dap_an_dung
       ).length,
-      total: test?.cau_hoi.filter(q => q.loai === 'dung_sai').length,
+      total: test?.cau_hoi?.filter(q => q.loai === 'dung_sai').length,
       percentage: 0
     },
     {
       name: "Short Answer",
-      correct: test?.cau_hoi.filter(q =>
+      correct: test?.cau_hoi?.filter(q =>
         q.loai === 'tra_loi_ngan' &&
         attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()] === q.dap_an_dung
       ).length,
-      total: test?.cau_hoi.filter(q => q.loai === 'tra_loi_ngan').length,
+      total: test?.cau_hoi?.filter(q => q.loai === 'tra_loi_ngan').length,
       percentage: 0
     }
   ].map(cat => ({
@@ -238,24 +239,6 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
       skills: ["Bias Detection", "Fairness", "Transparency", "Privacy"]
     }
   ];
-
-  // Detailed question review data
-  const questionDetails = test?.cau_hoi.map((q, index) => ({
-    id: q.ma_cau_hoi,
-    question: q.cau_hoi,
-    type: q.loai,
-    category: index === 0 ? "Machine Learning" : index === 1 ? "Neural Networks" : "Data Processing",
-    difficulty: index === 0 ? 'Medium' as const : index === 1 ? 'Easy' as const : 'Hard' as const,
-    userAnswer: attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()],
-    correctAnswer: q.dap_an_dung,
-    isCorrect: attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()] === q.dap_an_dung,
-    timeSpent: `${Math.floor(Math.random() * 3) + 1}m ${Math.floor(Math.random() * 60)}s`,
-    points: attempt?.cau_tra_loi?.[q.ma_cau_hoi.toString()] === q.dap_an_dung ? q.diem : 0,
-    maxPoints: q.diem,
-    explanation: `This question tests your understanding of ${q.loai === 'trac_nghiem' ? 'fundamental concepts' : q.loai === 'dung_sai' ? 'key principles' : 'practical applications'} in AI and machine learning.`,
-    options: q.lua_chon,
-    aiConcept: index === 0 ? "Supervised Learning" : index === 1 ? "React Components" : "State Management"
-  }));
 
   // Career pathway data
   const recommendedRoles = [
@@ -356,37 +339,53 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
           courseName="AI Competency Assessment System"
           testTitle={test.tieu_de}
           attempt={attempt.ma_lan_lam}
-          completedAt={new Date(attempt.thoi_gian_ket_thuc || attempt.thoi_gian_bat_dau).toLocaleDateString('en-US', {
+          completedAt={new Date(attempt.thoi_gian_ket_thuc || attempt.thoi_gian_bat_dau).toLocaleDateString('vi-VN', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            timeZone: 'Asia/Ho_Chi_Minh'
           })}
           isPassed={isPassed}
         />
 
+        <Card className='gap-2'>
+          <CardHeader>
+            <CardTitle>Mô tả bài thi:</CardTitle>
+            <CardDescription></CardDescription>
+          </CardHeader>
+          <CardContent>{test.mo_ta}</CardContent>
+        </Card>
+
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto border border-gray-300 rounded-[3px]">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-6 h-auto border border-gray-300 rounded-[3px]">
             <TabsTrigger value="overview" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
-              <SquareChartGantt className="h-4 w-4" />
+              <SquareChartGantt className="!h-5 !w-5 text-blue-700" />
               <span className="hidden sm:inline">Tổng quan</span>
             </TabsTrigger>
+            <TabsTrigger value="question" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
+              <BookOpenCheck className="!h-5 !w-5 text-green-700" />
+              <span className="hidden sm:inline">Đánh giá chi tiết câu hỏi</span>
+            </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
-              <ChartNetwork className="h-4 w-4" />
+              <ChartNetwork className="!h-5 !w-5" />
               <span className="hidden sm:inline">Phân tích chi tiết</span>
             </TabsTrigger>
+
+            <TabsTrigger value="improvement" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
+              <Lightbulb className="!h-5 !w-5" />
+              <span className="hidden sm:inline">Đề xuất cải thiện</span>
+            </TabsTrigger>
+
             <TabsTrigger value="competency" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
-              <Brain className="h-4 w-4" />
+              <Brain className="!h-5 !w-5" />
               <span className="hidden sm:inline">Kỹ năng AI</span>
             </TabsTrigger>
-            <TabsTrigger value="detailed" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
-              <BookOpenCheck className="h-4 w-4" />
-              <span className="hidden sm:inline">Câu hỏi</span>
-            </TabsTrigger>
+
             <TabsTrigger value="career" className="flex items-center gap-2 p-3 cursor-pointer rounded-[3px]">
-              <Rocket className="h-4 w-4" />
+              <Rocket className="!h-5 !w-5" />
               <span className="hidden sm:inline">Việc làm</span>
             </TabsTrigger>
           </TabsList>
@@ -438,9 +437,7 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
 
           <TabsContent value='analytics'>
             <PerformanceInsights
-              insights={insights}
-              strengths={strengths}
-              improvements={improvements}
+              performance={performance}
             />
           </TabsContent>
 
@@ -452,10 +449,26 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
             />
           </TabsContent>
 
-          <TabsContent value="detailed" className="space-y-6">
-            <DetailedQuestionReview
+          <TabsContent value="question" className="space-y-6">
+            {/* <DetailedQuestionReview
               questions={questionDetails}
               showExplanations={true}
+            /> */}
+
+            <QuestionResult
+              test={test}
+              attempt={attempt}
+              review={review}
+            />
+          </TabsContent>
+
+          <TabsContent value='improvement'>
+            <Improvement
+              de_xuat_cai_thien={performance?.de_xuat_cai_thien}
+              huong_phat_trien={performance?.huong_phat_trien}
+              ke_hoach_ngan_han={performance?.ke_hoach_ngan_han}
+              ke_hoach_dai_han={performance?.ke_hoach_dai_han}
+              tai_nguyen_de_xuat={performance?.tai_nguyen_de_xuat}
             />
           </TabsContent>
 

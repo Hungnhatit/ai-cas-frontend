@@ -9,7 +9,11 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
   return (
     <div className="flex flex-col bg-background h-screen">
       <LandingHeader />
-      <main className="flex-1 max-w-7xl mx-auto">{children}</main>
+      <main className="flex-1 py-4 ">
+        <div className="mx-auto max-w-7xl">
+          {children}
+        </div>
+      </main>
       <Footer />
     </div>
   )

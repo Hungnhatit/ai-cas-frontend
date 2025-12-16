@@ -271,7 +271,7 @@ const Post = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className='rounded-[3px]'>
-                        <DropdownMenuItem className='rounded-[3px] cursor-pointer' onClick={() => router.push(`/admin/post/${post.ma_bai_viet}/edit`)}>Xem chi tiết</DropdownMenuItem>
+                        <DropdownMenuItem className='rounded-[3px] cursor-pointer' onClick={() => router.push(`/instructor/post/${post.ma_bai_viet}/edit`)}>Xem chi tiết</DropdownMenuItem>
                         <DropdownMenuItem className='rounded-[3px] cursor-pointer'>Chỉnh sửa</DropdownMenuItem>
 
                         <ConfirmModal

@@ -11,7 +11,7 @@ import { testAttemptService } from '@/services/test/testAttemptService';
 import { useAuth } from '@/providers/auth-provider';
 import { testService } from '@/services/test/testService';
 import { formatDate } from '@/utils/formatDate';
-import { Award, Brain, BrainCircuit, Calendar, Clock, NotebookPen, RotateCcw, Sparkles, SquarePen, Trash, Trash2, Users } from 'lucide-react';
+import { Award, Brain, BrainCircuit, Calendar, Clock, Info, NotebookPen, RotateCcw, Sparkles, SquarePen, Trash, Trash2, Users } from 'lucide-react';
 import { getDifficultyLabel, getStatusLabel } from '@/utils/test';
 import TestDataTable from './table/test-data-table';
 import { getVisibilityIcon } from '@/utils/tests';
@@ -19,6 +19,7 @@ import { Input } from '../ui/input';
 import Link from 'next/link';
 import ConfirmModal from '../modals/confirm-modal';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
 interface Question {
   id: string;
@@ -53,7 +54,6 @@ const TestManagement = () => {
         return "bg-gray-100 text-gray-800";
     }
   };
-
 
   const filteredTests = useMemo(() => {
     return tests
@@ -184,6 +184,10 @@ const TestManagement = () => {
 
   const stats = getQuizStats();
 
+  // ----------------< Return TSX >----------------
+
+  console.log('TESTS: ', tests);
+
   return (
     <div className="">
       {/* Header Section */}
@@ -282,132 +286,169 @@ const TestManagement = () => {
           </select>
         </div>
 
-        <TabsContent value="all" className="">
-          <div className="bg-white rounded-[3px] border overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="border-r border-gray-200 px-3 py-2 text-center text-sm font-medium text-gray-600">#</th>
-                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Tên bài kiểm tra</th>
-                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Trạng thái</th>
-                  {/* <th className="p-3 text-left text-sm font-medium text-gray-600">Số lượng câu hỏi</th> */}
-                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Số lần làm</th>
-                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Điểm trung bình</th>
-                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Tỉ lệ pass</th>
-                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Chỉnh sửa lần cuối</th>
-                  <th className="border-r border-gray-200 px-3 py-2 text-left text-sm font-medium text-gray-600">Hành động</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {filteredTests.map((test, index) => (
-                  <tr key={test.ma_kiem_tra} className="hover:bg-gray-50">
-                    <td className='border-r border-gray-200 text-center'>{index + 1}</td>
-                    <td className="border-r border-gray-200 w-96 p-3">
-                      <div className="flex items-center font-medium text-gray-900 hover:underline mb-1 cursor-pointer transition-all">
-                        <Link href={`/tests/${test.ma_kiem_tra}/detail`}>{test.tieu_de}</Link>
-                        {getVisibilityIcon(test?.pham_vi_hien_thi)}
-                      </div>
-                      <div className="text-sm text-gray-500 flex items-center mb-1">
-                        <div className=''>
-                          <span>Mức độ: </span>
-                          {getDifficultyLabel(test.do_kho)}
-                        </div>
-                        <span className='px-1'>|</span>
-                        <div>
-                          <span>Số phần: </span>
-                          {test?.phan_kiem_tra?.length}
-                        </div>
-                        <span className='px-1'>|</span>
-                        <div>
-                          <span>Tổng số câu hỏi: </span>
-                          {test?.cau_hoi_kiem_tra?.length}
-                        </div>
-                      </div>
-                      <div className='flex flex-wrap gap-2'>
-                        {(JSON.parse(test?.danh_muc))?.map((item: string, index: number) => (
-                          <span key={index} className='text-xs border border-blue-400 px-2 py-0.5 rounded-[3px]'>
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="border-r border-gray-200 p-3 ">
-                      <span className={`px-2 py-1 text-nowrap rounded-full text-xs text-black font-medium 
-                     ${statusBadge(test.trang_thai)}
-                        `}>
-                        {getStatusLabel(test.trang_thai)}
-                      </span>
-                    </td>
-                    {/* <td className="border-r border-gray-200 p-3 text-sm">{test?.cau_hoi_kiem_tra?.length}</td > */}
-                    <td className="border-r border-gray-200 p-3 text-sm">{test.so_lan_lam_toi_da}</td>
-                    <td className="border-r border-gray-200 p-3 text-sm font-medium">{test.avgScore}%</td>
-                    <td className="border-r border-gray-200 p-3 text-sm">{test.passRate}%</td>
-                    <td className="border-r border-gray-200 p-3 text-sm text-gray-500 ">
-                      <div className='flex items-center'>
-                        <Calendar size={16} className='mr-2' />
-                        {formatDate(test.ngay_cap_nhat)}
-                      </div>
-                    </td>
-                    <td className="border-r border-gray-200 p-3 ">
-                      <div className="flex gap-1">
-                        <Button onClick={() => handleEditingPage(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer rounded-[3px]'>
-                          <SquarePen />
-                        </Button>
-                        {/* <Button onClick={() => handleViewResultDetail(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Results</Button> */}
-                        {/* <Button onClick={() => handleDetailTest(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer'>Detail</Button> */}
-                        {
-                          test.trang_thai === 'luu_tru' &&
-                          <Button onClick={() => handleRestore(test.ma_kiem_tra)} variant="ghost" size="sm" className='cursor-pointer rounded-[3px]'>
-                            <RotateCcw />
-                          </Button>
-                        }
-                        {test.trang_thai !== 'luu_tru' && (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  onClick={() => handleDeleteTest(test.ma_kiem_tra)}
-                                  variant="ghost"
-                                  size="sm"
-                                  className='cursor-pointer text-red-600 rounded-[3px]'>
-                                  <Trash2 />
-                                  {/* Xoá */}
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Xoá</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        )}
+        <TooltipProvider>
+          <TabsContent value="all">
+            <div className="rounded-md border bg-white">
+              <Table>
+                <TableHeader className="bg-gray-50">
+                  <TableRow>
+                    <TableHead className="w-[50px] text-center border-r">#</TableHead>
+                    <TableHead className="w-[400px] border-r">Tên bài kiểm tra</TableHead>
+                    <TableHead className="border-r">Trạng thái</TableHead>
+                    <TableHead className="border-r flex items-center justify-between">
+                      Đã tham gia
 
-                        {test.trang_thai === 'luu_tru' &&
-                          <ConfirmModal
-                            onConfirm={() => handleForceDelete(test.ma_kiem_tra)}
-                            title="Bạn chắc chắn muốn xoá bài thi? Hành động này không thể hoàn tác"
-                            description='Xoá vĩnh viễn bài thi'
+                      <Tooltip>
+                        <TooltipTrigger asChild className='cursor-pointer'>
+                          <Info size={14} />
+                        </TooltipTrigger>
+                        <TooltipContent>Tổng số học viên đã tham gia</TooltipContent>
+                      </Tooltip>
+
+                    </TableHead>
+                    <TableHead className="border-r">Lượt làm</TableHead>
+                    <TableHead className="border-r">Ngày tạo</TableHead>
+                    <TableHead className="border-r">Cập nhật lần cuối</TableHead>
+                    <TableHead className="text-center">Hành động</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTests.length > 0 ? (
+                    filteredTests.map((test, index) => (
+                      <TableRow key={test.ma_kiem_tra} className="hover:bg-gray-50">
+                        <TableCell className="text-center font-medium border-r">
+                          {index + 1}
+                        </TableCell>
+
+                        <TableCell className="border-r">
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2 font-medium text-gray-900 hover:underline cursor-pointer transition-all">
+                              <Link href={`/tests/${test.ma_kiem_tra}/detail`}>
+                                {test.tieu_de}
+                              </Link>
+                              {getVisibilityIcon(test?.pham_vi_hien_thi)}
+                            </div>
+
+                            <div className="flex items-center text-sm text-gray-500 gap-2">
+                              <div className="flex items-center gap-1">
+                                <span>Mức độ:</span>
+                                {getDifficultyLabel(test.do_kho)}
+                              </div>
+                              <span className="text-gray-300">|</span>
+                              <div>Số phần: {test.tong_so_phan}</div>
+                              <span className="text-gray-300">|</span>
+                              <div>Số câu hỏi: {test.tong_so_cau_hoi}</div>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2 mt-1">
+                              {test?.danh_muc.slice(0, 2).map((item: any, idx: number) => (
+                                <span
+                                  key={idx}
+                                  className="text-xs border border-blue-400 px-2 py-0.5 rounded-[3px] text-blue-600 bg-blue-50"
+                                >
+                                  {item.ten_danh_muc}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </TableCell>
+
+                        <TableCell className="border-r">
+                          <span
+                            className={`px-2 py-1 text-nowrap rounded-full text-xs font-medium ${statusBadge(
+                              test.trang_thai
+                            )}`}
                           >
+                            {getStatusLabel(test.trang_thai)}
+                          </span>
+                        </TableCell>
+
+                        <TableCell className="border-r">{test.so_luong_hoc_vien}</TableCell>
+
+                        <TableCell className="border-r font-medium text-blue-600">
+                          {test.tong_so_luot_lam}
+                        </TableCell>
+
+                        <TableCell className="border-r">{formatDate(test.ngay_tao)}</TableCell>
+
+                        <TableCell className="border-r text-gray-500">
+                          <div className="flex items-center text-nowrap">
+                            <Calendar size={16} className="mr-2" />
+                            {formatDate(test.ngay_cap_nhat)}
+                          </div>
+                        </TableCell>
+
+                        <TableCell className="text-center">
+                          <div className="flex items-center justify-start gap-1">
                             <Button
-                              onClick={() => handleDeleteTest(test.ma_kiem_tra)}
+                              onClick={() => handleEditingPage(test.ma_kiem_tra)}
                               variant="ghost"
                               size="sm"
-                              className='cursor-pointer text-red-600 rounded-[3px]'>
-                              <Trash />
+                              className="h-8 w-8 p-0 rounded-[3px]"
+                            >
+                              <SquarePen className="h-4 w-4" />
                             </Button>
-                          </ConfirmModal>
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
 
-            {filteredTests.length === 0 && (
-              <div className='w-full text-center py-4 italic text-gray-500'>
-                Không tìm thấy bài test nào!
-              </div>
-            )}
-          </div>
-        </TabsContent>
+                            {test.trang_thai === "luu_tru" && (
+                              <Button
+                                onClick={() => handleRestore(test.ma_kiem_tra)}
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 rounded-[3px]"
+                              >
+                                <RotateCcw className="h-4 w-4" />
+                              </Button>
+                            )}
+
+                            {test.trang_thai !== "luu_tru" && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      onClick={() => handleDeleteTest(test.ma_kiem_tra)}
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-[3px]"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Xoá</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+
+                            {test.trang_thai === "luu_tru" && (
+                              <ConfirmModal
+                                onConfirm={() => handleForceDelete(test.ma_kiem_tra)}
+                                title="Bạn chắc chắn muốn xoá bài thi? Hành động này không thể hoàn tác"
+                                description="Xoá vĩnh viễn bài thi"
+                              >
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-[3px]"
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </ConfirmModal>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={8} className="h-24 text-center italic text-gray-500">
+                        Không tìm thấy bài test nào!
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </TabsContent>
+        </TooltipProvider>
 
         <TabsContent value="active" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">

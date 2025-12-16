@@ -278,7 +278,7 @@ const TestEditor = ({ test_id, setup }: TestEditProp) => {
   };
 
   const handleCancel = () => {
-    if (test?.cau_hoi_kiem_tra?.length > 0) {
+    if (test?.cau_hoi_trac_nghiem?.length > 0) {
       if (window.confirm('Are you sure you want to cancel? All changes will be lost.')) {
         setTest({
           setup: {

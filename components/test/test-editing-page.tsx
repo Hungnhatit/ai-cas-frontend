@@ -4,8 +4,7 @@ import { toast } from 'react-hot-toast';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/auth-provider';
 import { testService } from '@/services/test/testService';
-import { studentService } from '@/services/studentService';
-import { Course, Test, TestQuestion, TestSection } from '@/types/interfaces/model';
+import { Course, Criteria, Test, TestCategory, TestQuestion, TestSection } from '@/types/interfaces/model';
 import { TestSetup } from '@/types/interfacess/quiz';
 import { Student } from '@/types/interfaces/model';
 
@@ -15,6 +14,8 @@ import AssignStudents from './form/AssignStudents';
 import QuestionList from './form/TestQuestionList';
 import TestSectionList from './form/TestSectionList';
 import { Label } from '../ui/label';
+import { categoryService } from '@/services/categoryService';
+import { competencyService } from '@/services/competency/competencyService';
 
 interface TestEditProp {
   test_id: number;
@@ -24,15 +25,17 @@ interface TestEditProp {
 const TestEditor = ({ test_id }: TestEditProp) => {
   const [test, setTest] = useState<Test | null>(null)
   const [search, setSearch] = useState("")
-  const [courses, setCourses] = useState<Course[]>([])
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [criterias, setCriterias] = useState<Criteria[]>([]);
+  const [categories, setCategories] = useState<TestCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
   const [testStatus, setTestStatus] = useState('');
   const [selectedTest, setSelectedTest] = useState<Test | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [sections, setSections] = useState<Partial<TestSection>[]>([]);
-  const [questions, setQuestions] = useState<Partial<TestQuestion>[]>([]);
+  const [sections, setSections] = useState<TestSection[]>([]);
+  const [questions, setQuestions] = useState<TestQuestion[]>([]);
 
   const { user } = useAuth();
   const { id } = useParams();
@@ -43,52 +46,106 @@ const TestEditor = ({ test_id }: TestEditProp) => {
     tieu_de: "",
     mo_ta: "",
     giai_thich: '',
-    thoi_luong: 30,
-    so_lan_lam_toi_da: 3,
+    thoi_luong: 0,
+    danh_muc: []
   });
 
   const [newStudent, setNewStudent] = useState({
     ma_hoc_vien: '',
     ten: ''
-  })
+  });
 
-  // fetch data
+  const buildQuestionPayload = (q: any, section: any) => {
+    const base = {
+      ma_cau_hoi: q.ma_cau_hoi,
+      ma_tieu_chi: q.ma_tieu_chi,
+      tieu_de: q.cau_hoi.tieu_de,
+      mo_ta: q.cau_hoi.mo_ta,
+      diem: q.cau_hoi.diem,
+      loai_cau_hoi: section.loai_phan,
+    };
+
+    switch (section.loai_phan) {
+      case "trac_nghiem":
+        return {
+          ...base,
+          cau_hoi_trac_nghiem: {
+            lua_chon_trac_nghiem: q.cau_hoi.cau_hoi_trac_nghiem?.lua_chon_trac_nghiem.map((c: any) => ({
+              ma_lua_chon: c.ma_lua_chon,
+              noi_dung: c.noi_dung,
+              la_dap_an_dung: c.la_dap_an_dung,
+            }))
+          }
+        };
+
+      case "nhieu_lua_chon":
+        return {
+          ...base,
+          cau_hoi_nhieu_lua_chon: {
+            lua_chon: q.cau_hoi.cau_hoi_nhieu_lua_chon?.lua_chon || []
+          }
+        };
+
+      case "tu_luan":
+        return {
+          ...base,
+          cau_hoi_tu_luan: {
+            dap_an_mau: q.cau_hoi.cau_hoi_tu_luan.dap_an_mau || "",
+            giai_thich: q.cau_hoi.cau_hoi_tu_luan.giai_thich || ""
+          }
+        };
+
+      default:
+        return base;
+    }
+  };
+
+  // Fetch data
   useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
       try {
         const data = await testService.getTestById(test_id);
+        const cates = await categoryService.getCategories();
+        const criterias = await competencyService.getCriterias();
 
-        const parsedData = (data.data.cau_hoi || []).map((question: any) => ({
-          ...question,
-          lua_chon: typeof question.lua_chon === 'string' ? JSON.parse(question.lua_chon) : question.lua_chon,
-          dap_an_dung: question.dap_an_dung !== undefined ? Number(question.dap_an_dung) : undefined
-        }));
+        const mergedSections: Partial<TestSection>[] = (data.phan_kiem_tra || []).map((section: any) => {
+          const rawQuestions = section.phan_kiem_tra_cau_hoi || section.cau_hoi || [];
 
-        const parsedQuestions = (data.data.cau_hoi || []).map((q: any) => ({
-          ...q,
-          lua_chon: typeof q.lua_chon === 'string' ? JSON.parse(q.lua_chon) : q.lua_chon,
-          dap_an_dung: q.dap_an_dung !== undefined ? Number(q.dap_an_dung) : undefined,
-        }));
+          const parsedQuestions: Partial<TestQuestion>[] = rawQuestions.map((q: any) => ({
+            ma_cau_hoi: q.ma_cau_hoi,
+            ma_phan: q.ma_phan,
+            tieu_de: q.tieu_de,
+            mo_ta: q.mo_ta,
+            diem: q.diem || 10,
+            loai: q.loai || section.loai_phan || "trac_nghiem",
+            cau_hoi_trac_nghiem: q.cau_hoi_trac_nghiem || {
+              lua_chon_trac_nghiem: []
+            },
+            dap_an_dung: q.dap_an_dung,
+          }));
 
-        const mergedSections = (data.data.phan_kiem_tra || []).map((section: any) => ({
-          ...section,
-          cau_hoi: parsedQuestions.filter((q: any) => q.ma_phan === section.ma_phan),
-        }));
+          return {
+            ...section,
+            phan_kiem_tra_cau_hoi: parsedQuestions,
+          };
+        });
 
-        const res = await studentService.getStudentByInstructorId(user?.ma_nguoi_dung);
-
-        setStudents(res.data.hoc_vien);
         setTest(data.data);
+        setSections(data.data.phan_kiem_tra);
+        setCategories(cates.data);
+        setCriterias(criterias.data);
+
+        const cateIds = (data.data.danh_muc || []).map((item: any) => item.ma_danh_muc);
+        console.log('CATEIDS: ', cateIds)
+
         setNewTest({
           tieu_de: data.data.tieu_de || "",
-          giai_thich: data.data.giai_thich || '',
           mo_ta: data.data.mo_ta || "",
-          thoi_luong: data.data.thoi_luong || 30,
-          so_lan_lam_toi_da: data.data.so_lan_lam_toi_da || 3,
+          giai_thich: data.data.giai_thich || "",
+          thoi_luong: data.data.thoi_luong || 0,
+          danh_muc: data.data.danh_muc
         });
-        setSections(mergedSections);
-        setQuestions(parsedData);
       } catch (error) {
         console.error("Failed to fetch data:", error)
       } finally {
@@ -98,21 +155,20 @@ const TestEditor = ({ test_id }: TestEditProp) => {
     fetchData()
   }, [id, test_id]);
 
-  const addQuestion = (sectionIndex: number) => {
-    const updatedSections = [...sections];
-    if (!updatedSections[sectionIndex].cau_hoi) {
-      updatedSections[sectionIndex].cau_hoi = [];
-    }
-    updatedSections[sectionIndex].cau_hoi!.push({
-      ma_cau_hoi: (updatedSections[sectionIndex].cau_hoi!.length || 0) + 1,
-      cau_hoi: "",
-      loai: updatedSections[sectionIndex].loai_phan || "trac_nghiem",
-      lua_chon: ["", "", "", ""],
-      dap_an_dung: 0,
-      diem: 10,
-    });
-    setSections(updatedSections);
-  };
+  // const addQuestion = (sectionIndex: number) => {
+  //   const updatedSections = [...sections];
+  //   if (!updatedSections[sectionIndex].cau_hoi) {
+  //     updatedSections[sectionIndex].cau_hoi = [];
+  //   }
+  //   updatedSections[sectionIndex].cau_hoi!.push({
+  //     ma_cau_hoi: (updatedSections[sectionIndex].cau_hoi!.length || 0) + 1,
+  //     cau_hoi: "",
+  //     loai_cau_hoi: updatedSections[sectionIndex].loai_phan || "trac_nghiem",
+  //     lua_chon: ["", "", "", ""],
+  //     diem: 10,
+  //   });
+  //   setSections(updatedSections);
+  // };
 
   const updateSection = (index: number, updates: Partial<TestSection>) => {
     const updateSections = [...sections];
@@ -132,7 +188,8 @@ const TestEditor = ({ test_id }: TestEditProp) => {
   }
 
   const removeSection = (index: number) => {
-
+    const updated = sections.filter((_, i) => i !== index);
+    setSections(updated);
   }
 
   const removeQuestion = (index: number) => {
@@ -184,15 +241,14 @@ const TestEditor = ({ test_id }: TestEditProp) => {
         ma_giang_vien: user?.ma_nguoi_dung,
         cau_hoi: questions as TestQuestion[],
         tong_diem: total_points,
-        trang_thai: "draft" as const,
-        ngay_ket_thuc: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 7 days from now
+        trang_thai: "ban_nhap" as const,
       }
 
       console.log("[v0] Creating test:", testData)
       const res = await testService.createTest(testData);
 
       setIsCreateDialogOpen(false)
-      setNewTest({ ...newTest, tieu_de: "", mo_ta: "", thoi_luong: 30, so_lan_lam_toi_da: 3 })
+      setNewTest({ ...newTest, tieu_de: "", mo_ta: "", thoi_luong: 0 })
       setQuestions([]);
       toast.success('Test has been created successfully!');
       router.push('/tests');
@@ -201,60 +257,52 @@ const TestEditor = ({ test_id }: TestEditProp) => {
     }
   }
 
-  console.log('test:', test);
-
   const handleUpdateTest = async () => {
     try {
-      const allQuestions = sections.flatMap((s) => s.cau_hoi || [])
-      // const total_points = test?.cau_hoi?.reduce((sum, q) => sum + (q.diem || 0), 0) ?? 0;
-      const total_points = allQuestions.reduce((sum, q) => sum + (q.diem || 0), 0);
+      const parsedSections = sections.map((section) => {
+
+        const questions = (section.phan_kiem_tra_cau_hoi || []).map((q) =>
+          buildQuestionPayload(q, section)
+        );
+
+        return {
+          ma_phan: section.ma_phan,
+          mo_ta: section.mo_ta,
+          ten_phan: section.ten_phan,
+          loai_phan: section.loai_phan,
+          phan_kiem_tra_cau_hoi: questions
+        };
+      });
+
+      const total_points = parsedSections
+        .flatMap((s) => s.phan_kiem_tra_cau_hoi)
+        .reduce((sum, q) => sum + (q.diem || 0), 0);
+
       const updatedData = {
         ...newTest,
+        log: '[TAO LÀ UPDATE DATA]',
         ma_giang_vien: user?.ma_nguoi_dung,
         tong_diem: total_points,
-        // cau_hoi: questions as TestQuestion[],
-        cau_hoi: allQuestions,
-        phan: sections as TestSection[],
-        trang_thai: 'hoat_dong',
-        ngay_het_han: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-          .toISOString()
-          .split('T')[0]
-      }
+        trang_thai: "hoat_dong",
+        phan_kiem_tra: parsedSections,
+      };
 
-      console.log(updatedData)
+      console.log("Updating test with payload:", updatedData);
 
-      const assignData = {
-        // test_id: test_id,
-        instructor_id: user?.ma_nguoi_dung,
-        student_ids: selectedStudents,
-      }
+      await testService.updateTest(test_id, updatedData);
 
-      console.log("[v0] Updating test:", updatedData);
+      toast.success("Test updated!");
 
-      const res = await testService.updateTest(test_id, updatedData);
-      await testService.assignTestToStudent(test_id, assignData);
-
-      setIsCreateDialogOpen(false)
-      setNewTest({
-        tieu_de: "",
-        mo_ta: "",
-        giai_thich: '',
-        thoi_luong: 30,
-        so_lan_lam_toi_da: 3,
-      });
-      setQuestions([]);
-      toast.success("Test has been updated successfully!");
-      router.push("/tests");
-    } catch (error) {
-      console.log(error)
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update test");
     }
-  }
+  };
 
-  // TODO: implement duplication API when backend ready
+
   const duplicateTest = async (test: Test) => {
     try {
       console.log("[v0] Duplicating test:", test.ma_kiem_tra)
-      // In a real app, you would call api.duplicateTest(test.id)
     } catch (error) {
       console.error("Failed to duplicate test:", error)
     }
@@ -271,17 +319,6 @@ const TestEditor = ({ test_id }: TestEditProp) => {
       console.error("Failed to delete test:", error)
     }
   }
-
-  // const getQuizStats = () => {
-  //   const total = test?.length
-  //   const active = test?.filter((q) => q.trang_thai === "active")?.length
-  //   const draft = test?.filter((q) => q.trang_thai === "draft")?.length
-  //   const archived = test?.filter((q) => q.trang_thai === "archived")?.length
-
-  //   return { total, active, draft, archived }
-  // }
-
-  // const stats = getQuizStats()
 
   if (loading) {
     return (
@@ -314,24 +351,16 @@ const TestEditor = ({ test_id }: TestEditProp) => {
         onCancel={() => console.log('cancel')}
       />
 
-      <TestInfoForm newTest={newTest} setNewTest={setNewTest} courses={courses} />
+      <TestInfoForm categories={categories} newTest={newTest} setNewTest={setNewTest} />
 
-      <AssignStudents
-        students={students}
-        search={search}
-        placeholder={placeholder}
-        setSearch={setSearch}
-        selectedStudents={selectedStudents}
-        setSelectedStudents={setSelectedStudents}
-      />
-
-      <Label className='text-lg mb-4' >Nội dung bài kiểm tra</Label>
+      <Label className='text-lg mb-2' >Nội dung bài kiểm tra</Label>
       {/* Render section */}
       <TestSectionList
         sections={sections}
         setSections={setSections}
         updateSection={updateSection}
-        removeSectoin={removeSection}
+        removeSection={removeSection}
+        criterias={criterias}
       />
     </div>
   );

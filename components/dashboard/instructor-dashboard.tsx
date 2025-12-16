@@ -34,13 +34,13 @@ export function InstructorDashboard() {
     { id: "3", task: "Review project submissions", course: "UI/UX Design", due: "Dec 28" },
   ]
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-64">
+  //       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="">

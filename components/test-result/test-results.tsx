@@ -12,17 +12,22 @@ import { getStatusLabel } from '@/utils/test';
 import { calculateDuration, formatDate } from '@/utils/formatDate';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import Link from 'next/link';
+import { getAttemptStatusBadge, getAttemptStatusLabel } from '@/utils/string';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../ui/pagination';
 
 
 interface TestResultsProps {
   test_id: number
 }
 
+const ITEMS_PER_PAGE = 10;
+
 // general result page
 const TestResultsPage = ({ test_id }: TestResultsProps) => {
   const [loading, setLoading] = useState(true);
   const [results, setResults] = useState<TestAttempt[]>([]);
   const [test, setTest] = useState<Test | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const { id } = useParams();
   const { user } = useAuth();
   const router = useRouter();
@@ -45,7 +50,7 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
     }
 
     fetchTestResults();
-  }, []);
+  }, [user, test_id]);
 
   const handleResultPage = async (test_id: number, attempt_id: number) => {
     // router.push(`/quizzes/${test_id}/result?attempt=${attempt_id}`);
@@ -57,11 +62,23 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
     return Math.max(...results.map(r => r.diem || 0))
   }
 
-  console.log(results)
+  /**
+   * Pagination
+   */
+  const totalPages = Math.ceil(results.length / ITEMS_PER_PAGE);
+  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentResults = results.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  }
 
   return (
     <div className='space-y-6'>
-      <div className='bg-[#232f3e] p-5'>
+      <div className='bg-[#232f3e] p-5 -mx-4 -mt-4'>
         <h1 className="text-2xl font-bold text-white mb-2">Kết quả của bài thi <span>"{test?.tieu_de}"</span> </h1>
         <p className="text-white">Trang kết quả "Đánh giá năng lực sử dụng AI" cho phép bạn theo dõi tiến độ học tập, xem điểm chi tiết, lịch sử kiểm tra và số liệu thống kê về hiệu suất.</p>
       </div>
@@ -119,7 +136,7 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
               <TooltipTrigger className='cursor-pointer'>
                 <Info size={18} className=' font-light text-gray-500' />
               </TooltipTrigger>
-              <TooltipContent side='right'>
+              <TooltipContent side='right' className='text-sm'>
                 <p>Toàn bộ lịch sử làm bài và các thông tin liên quan</p>
               </TooltipContent>
             </Tooltip>
@@ -130,51 +147,52 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
           <TableCaption className='text-md'>Lịch sử các lần làm bài của <span className='font-medium italic'>{test?.tieu_de}</span></TableCaption>
           <TableHeader className='bg-gray-200/80'>
             <TableRow>
-              <TableHead className="border-r border-gray-300">
-                <span className='flex items-center justify-start'>
-                  Lần làm
-                  <Info size={16} className='ml-2 font-light text-gray-500' />
+              <TableHead className="border-r text-center border-gray-300">
+                <span className='text-center'>
+                  STT
                 </span>
               </TableHead>
-              <TableHead className="border-r border-gray-300">
-                <span className='flex items-center justify-start'>
+              <TableHead className="border-r text-center border-gray-300">
+                <span className='text-center'>
+                  ID
+                </span>
+              </TableHead>
+              <TableHead className="border-r text-center border-gray-300">
+                <span className='flex items-center justify-around text-center'>
                   Điểm số
-                  <Info size={16} className='ml-2 font-light text-gray-500' />
+                  <Info size={16} className='font-light text-gray-500' />
                 </span>
               </TableHead>
-              <TableHead className="border-r border-gray-300">
-                <span className='flex items-center justify-start'>
+              <TableHead className="border-r text-center border-gray-300">
+                <span className='text-center justify-start'>
                   Số câu đúng
-                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
-              <TableHead className="border-r border-gray-300">
-                <span className='flex items-center justify-start'>
+              <TableHead className="border-r text-center border-gray-300">
+                <span className='text-center'>
                   Số câu sai
-                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
-              <TableHead className="border-r border-gray-300">
-                <span className='flex items-center justify-start'>
+              <TableHead className="border-r text-center border-gray-300">
+                <span className='text-center'>
                   Trạng thái
-                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
-              <TableHead className="border-r border-gray-300">
-                <span className='flex items-center justify-start cursor-pointer'>
+              <TableHead className="border-r text-center border-gray-300">
+                <span className='flex items-center justify-evenly cursor-pointer'>
                   Thời gian bắt đầu
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Info size={16} className='ml-2 font-light text-gray-500' />
+                        <Info size={16} className='font-light text-gray-500' />
                       </TooltipTrigger>
-                      <TooltipContent>Định dạng: giờ:phút:giây ngày/tháng/năm</TooltipContent>
+                      <TooltipContent className='text-sm'>Định dạng: giờ:phút:giây ngày/tháng/năm</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </span>
               </TableHead>
-              <TableHead className="border-r border-gray-300">
-                <span className='flex items-center justify-start cursor-pointer'>
+              <TableHead className="border-r text-center border-gray-300">
+                <span className='flex items-center justify-evenly cursor-pointer'>
                   Thời gian nộp bài
                   <TooltipProvider>
                     <Tooltip>
@@ -186,51 +204,55 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
                   </TooltipProvider>
                 </span>
               </TableHead>
-              <TableHead className="border-r border-gray-300">
-                <span className='flex items-center justify-start'>
+              <TableHead className="border-r text-center border-gray-300">
+                <span className='text-center'>
                   Thời gian làm
-                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
-              <TableHead>
-                <span className='flex items-center justify-start'>
+              <TableHead className=' border-r border-gray-300'>
+                <span className='flex items-center justify-around text-center'>
                   Đánh giá
-                  <Info size={16} className='ml-2 font-light text-gray-500' />
+                  <Info size={16} className='font-light text-gray-500' />
                 </span>
               </TableHead>
-              <TableHead className="text-right">
-                <span className='flex items-center justify-start'>
+              <TableHead className="text-center ">
+                <span className=' text-center'>
                   Hành động
-                  <Info size={16} className='ml-2 font-light text-gray-500' />
                 </span>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {
-              results.map((item, index) => (
+              currentResults.map((item, index) => (
                 <TableRow key={item.ma_lan_lam} className='h-10'>
-                  <TableCell className="border-r border-gray-300">#{index + 1}</TableCell>
-                  <TableCell className="border-r border-gray-300">{item.diem}</TableCell>
-                  <TableCell className="border-r border-gray-300">{item.diem}</TableCell>
-                  <TableCell className="border-r border-gray-300">{item.diem}</TableCell>
-                  <TableCell className='border-r border-gray-300'>{getStatusLabel(item.trang_thai)}</TableCell>
-                  <TableCell className='border-r border-gray-300'>{formatDate(item.thoi_gian_bat_dau)}</TableCell>
-                  <TableCell className='border-r border-gray-300'>{formatDate(item.thoi_gian_ket_thuc) || (<span className='text-red-600 font-bold'>Không xác định</span>)}</TableCell>
-                  <TableCell className='border-r border-gray-300'>
+                  <TableCell className="border-r text-center border-gray-300">{index + 1}</TableCell>
+                  <TableCell className="border-r text-center border-gray-300">{item.ma_lan_lam}</TableCell>
+                  <TableCell className="border-r text-center border-gray-300">{item.diem}</TableCell>
+                  <TableCell className="border-r text-center border-gray-300">{item.diem}</TableCell>
+                  <TableCell className="border-r text-center border-gray-300">{item.diem}</TableCell>
+                  <TableCell className={`border-r text-center border-gray-300`}>
+                    <span className={`text-[13px] px-3 py-[3px] rounded-[4px] ${getAttemptStatusBadge(item.trang_thai)}`}>
+                      {getAttemptStatusLabel(item.trang_thai)}
+                    </span>
+                  </TableCell>
+                  <TableCell className='border-r text-center border-gray-300'>{formatDate(item.thoi_gian_bat_dau)}</TableCell>
+                  <TableCell className='border-r text-center border-gray-300'>{formatDate(item.thoi_gian_ket_thuc) || (<span className='text-red-700 font-bold'>Không xác định</span>)}</TableCell>
+                  <TableCell className='border-r text-center border-gray-300'>
                     {calculateDuration(item.thoi_gian_bat_dau, item.thoi_gian_ket_thuc)}
                   </TableCell>
                   <TableCell className='border-r border-gray-300 flex items-center justify-center'>
-                    <Check size={20} className=''/>
+                    <Check size={20} className='' />
                   </TableCell>
-                  <TableCell className="text-right">
-                    <Link
-                      href={`/tests/${item.ma_kiem_tra}/result-detail?attempt=${item.ma_lan_lam}`}
+                  <TableCell className="text-center text-blue-600">
+                    <Button
+                      variant='ghost'
+                      // href={`/tests/${item.ma_kiem_tra}/result-detail?attempt=${item.ma_lan_lam}`}
                       className='cursor-pointer font-semibold hover:text-blue-700 transition-all'
-                    // onClick={() => handleResultPage(item.ma_kiem_tra, item.ma_lan_lam)}
+                      onClick={() => handleResultPage(item.ma_kiem_tra, item.ma_lan_lam)}
                     >
-                      Xem chi tiết 
-                    </Link>
+                      Xem chi tiết
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
@@ -238,6 +260,50 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
 
           </TableBody>
         </Table>
+
+        {results.length > ITEMS_PER_PAGE && (
+          <div className="mt-5">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  />
+                </PaginationItem>
+
+                {/* Render số trang */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {                  
+                  if (totalPages > 7 && Math.abs(page - currentPage) > 2 && page !== 1 && page !== totalPages) {
+                    if (Math.abs(page - currentPage) === 3) {
+                      return <PaginationItem key={page}><PaginationEllipsis /></PaginationItem>
+                    }
+                    return null;
+                  }
+
+                  return (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        isActive={page === currentPage}
+                        onClick={() => handlePageChange(page)}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                })}
+
+                <PaginationItem>
+                  <PaginationNext
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   )

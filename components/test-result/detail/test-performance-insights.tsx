@@ -66,7 +66,6 @@ export default function PerformanceInsights({ performance }: PerformanceInsights
               </Card>
             </div>
           </div>
-
         </CardContent>
       </Card>
 

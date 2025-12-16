@@ -23,34 +23,34 @@ interface PostFormData {
 
 const EditPost = ({ post_id }: EditPostProps) => {
   const router = useRouter();
-  
+
   // State quản lý loading
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [content, setContent] = useState('');
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState<PostFormData>({
     title: '',
     summary: '',
     status: 'nhap'
-  });    
-  
+  });
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
         const res = await PostService.getPostByID(post_id);
         if (res.success && res.data) {
           const post = res.data;
-          
+
           setFormData({
             title: post.tieu_de,
             summary: post.tom_tat || '',
             status: post.trang_thai || 'nhap'
           });
           setContent(post.noi_dung || '');
-          
+
           if (post.anh_bia) {
             setThumbnailPreview(post.anh_bia);
           }
@@ -63,16 +63,16 @@ const EditPost = ({ post_id }: EditPostProps) => {
     }
     fetchPost();
   }, [post_id]);
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-  
+
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setThumbnailFile(file);      
+      setThumbnailFile(file);
       const objectUrl = URL.createObjectURL(file);
       setThumbnailPreview(objectUrl);
     }
@@ -82,30 +82,30 @@ const EditPost = ({ post_id }: EditPostProps) => {
 
   const handleUpdatePost = async () => {
     if (!formData.title.trim()) {
-      alert("Vui lòng nhập tiêu đề bài viết"); 
+      alert("Vui lòng nhập tiêu đề bài viết");
       return;
     }
 
     setIsLoading(true);
-    try {     
+    try {
       const data = new FormData();
       data.append('tieu_de', formData.title);
       data.append('tom_tat', formData.summary);
-      data.append('noi_dung', content); 
+      data.append('noi_dung', content);
       data.append('trang_thai', formData.status);
-            
+
       if (thumbnailFile) {
         data.append('anh_bia', thumbnailFile);
       }
-      
+
       const res = await PostService.updatePost(post_id, data);
 
       console.log('PAYLOAD: ', data);
-      
-      if (res.success) {        
+
+      if (res.success) {
         toast.success('Updated successfully!')
         // router.push('/posts'); 
-      } else {        
+      } else {
         alert(res.message || "Có lỗi xảy ra");
       }
     } catch (error) {
@@ -115,7 +115,7 @@ const EditPost = ({ post_id }: EditPostProps) => {
       setIsLoading(false);
     }
   }
- 
+
   if (isFetching) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -132,9 +132,9 @@ const EditPost = ({ post_id }: EditPostProps) => {
           <p className="text-white mt-2">Cập nhật nội dung, hình ảnh và trạng thái của bài viết.</p>
         </div>
         <div className="flex gap-2">
-           <Button 
-            variant="outline" 
-            onClick={() => router.back()} 
+          <Button
+            variant="outline"
+            onClick={() => router.back()}
             className="text-black bg-white hover:bg-gray-100 cursor-pointer rounded-[3px]"
           >
             <ArrowLeft size={16} className="mr-2" /> Quay lại
@@ -170,7 +170,7 @@ const EditPost = ({ post_id }: EditPostProps) => {
                   value={formData.summary}
                   onChange={handleChange}
                   placeholder="Mô tả ngắn gọn về bài viết..."
-                  className="h-24 !text-[15px] rounded-[3px] shadow-none border-gray-300 resize-none"
+                  className="h-[300px] !text-[15px] rounded-[3px] shadow-none border-gray-300 resize-none"
                 />
               </div>
 
@@ -178,7 +178,6 @@ const EditPost = ({ post_id }: EditPostProps) => {
               <div className="space-y-3">
                 <Label>Nội dung chi tiết</Label>
                 <div className="min-h-[400px]">
-                  {/* Truyền content khởi tạo vào Editor */}
                   <TiptapEditor
                     content={content}
                     onChange={setContent}
@@ -189,10 +188,9 @@ const EditPost = ({ post_id }: EditPostProps) => {
           </Card>
         </div>
 
-        {/* Cột phải: Cài đặt & Ảnh bìa */}
-        <div className="space-y-6">
-          <Card className="p-6 space-y-4 border-none shadow-sm">
-            <h3 className="font-semibold text-slate-900 border-b pb-2">Xuất bản & Cài đặt</h3>
+        <div className="sticky top-3 z-10 space-y-6 self-start">
+          <Card className=" p-6 space-y-4 border-none shadow-sm">
+            <h3 className="font-semibold text-slate-900 border-b pb-2">Cài đặt & Xuất bản</h3>
 
             {/* Ảnh bìa */}
             <div className="space-y-3">
@@ -204,14 +202,14 @@ const EditPost = ({ post_id }: EditPostProps) => {
                   onChange={handleThumbnailChange}
                   className="cursor-pointer rounded-[3px] shadow-none border-gray-300 file:text-blue-600 file:font-semibold"
                 />
-                
+
                 {thumbnailPreview ? (
                   <div className="relative w-full h-40 rounded-md overflow-hidden border border-slate-200 bg-slate-50">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
-                      src={thumbnailPreview} 
-                      alt="Thumbnail Preview" 
-                      className="w-full h-full object-contain" 
+                    <img
+                      src={thumbnailPreview}
+                      alt="Thumbnail Preview"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                 ) : (
@@ -239,17 +237,17 @@ const EditPost = ({ post_id }: EditPostProps) => {
 
             {/* Actions */}
             <div className="pt-4 flex flex-col gap-3">
-              <Button 
-                onClick={handleUpdatePost} 
-                className="bg-[#28538f] hover:bg-[#3667ac] w-full cursor-pointer rounded-[3px] shadow-none font-semibold" 
+              <Button
+                onClick={handleUpdatePost}
+                className="bg-[#28538f] hover:bg-[#3667ac] w-full cursor-pointer rounded-[3px] shadow-none font-semibold"
                 disabled={isLoading}
               >
                 {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang cập nhật...</> : "Lưu thay đổi"}
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => router.back()}
-                className="w-full cursor-pointer text-red-600 border-red-200 hover:bg-red-50 rounded-[3px] shadow-none" 
+                className="w-full cursor-pointer text-red-600 border-red-200 hover:bg-red-50 rounded-[3px] shadow-none"
                 disabled={isLoading}
               >
                 Hủy bỏ

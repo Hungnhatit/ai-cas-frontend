@@ -71,36 +71,34 @@ const SettingsPage = () => {
         </p>
       </div>
 
-      <Separator className="my-6" />
-
-      <Tabs defaultValue="profile" className="flex flex-col lg:flex-row gap-8">
+      <Tabs defaultValue="profile" className=" flex flex-col lg:flex-row justify-between gap-4">
         {/* Sidebar Navigation */}
-        <aside className="lg:w-1/5">
+        <aside className="p-4 lg:w-1/4">
           <TabsList className="flex flex-row lg:flex-col justify-start h-auto w-full bg-transparent p-0 gap-2">
             <TabsTrigger
               value="profile"
-              className="w-full justify-start px-3 py-2 h-10 data-[state=active]:bg-secondary data-[state=active]:text-primary font-medium"
+              className="w-full justify-start rounded-xs shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-gray-300 data-[state=active]:text-black font-medium"
             >
               <User className="mr-2 h-4 w-4" />
               Hồ sơ
             </TabsTrigger>
             <TabsTrigger
               value="account"
-              className="w-full justify-start px-3 py-2 h-10 data-[state=active]:bg-secondary data-[state=active]:text-primary font-medium"
+              className="w-full justify-start rounded-xs shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-gray-300 data-[state=active]:text-black font-medium"
             >
               <Settings className="mr-2 h-4 w-4" />
               Tài khoản
             </TabsTrigger>
             <TabsTrigger
               value="notifications"
-              className="w-full justify-start px-3 py-2 h-10 data-[state=active]:bg-secondary data-[state=active]:text-primary font-medium"
+              className="w-full justify-start rounded-xs shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-gray-300 data-[state=active]:text-black font-medium"
             >
               <Bell className="mr-2 h-4 w-4" />
               Thông báo
             </TabsTrigger>
             <TabsTrigger
               value="appearance"
-              className="w-full justify-start px-3 py-2 h-10 data-[state=active]:bg-secondary data-[state=active]:text-primary font-medium"
+              className="w-full justify-start rounded-xs shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-gray-300 data-[state=active]:text-black font-medium"
             >
               <Palette className="mr-2 h-4 w-4" />
               Giao diện
@@ -115,7 +113,7 @@ const SettingsPage = () => {
           <TabsContent value="profile" className="space-y-6 mt-0">
             <Card>
               <CardHeader>
-                <CardTitle>Thông tin cá nhân</CardTitle>
+                <CardTitle className="text-lg">Thông tin cá nhân</CardTitle>
                 <CardDescription>
                   Đây là thông tin hiển thị công khai trên hồ sơ học viên của bạn.
                 </CardDescription>
@@ -134,7 +132,7 @@ const SettingsPage = () => {
                         <Camera className="h-6 w-6 text-white" />
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full text-xs">Đổi ảnh</Button>
+                    <Button variant="outline" size="sm" className="w-full text-xs rounded-sm shadow-none cursor-pointer">Đổi ảnh</Button>
                   </div>
 
                   <div className="flex-1 space-y-4 w-full">
@@ -144,6 +142,7 @@ const SettingsPage = () => {
                         id="name"
                         value={profileData.name}
                         onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                        className="h-10 rounded-[3px] shadow-none border-gray-300"
                       />
                     </div>
                     <div className="grid gap-2">
@@ -151,7 +150,7 @@ const SettingsPage = () => {
                       <Textarea
                         id="bio"
                         placeholder="Ví dụ: Tôi là học viên khóa lập trình..."
-                        className="resize-none min-h-[100px]"
+                        className="resize-none min-h-[100px] rounded-[3px] shadow-none border-gray-300"
                         value={profileData.bio}
                         onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                       />
@@ -175,6 +174,7 @@ const SettingsPage = () => {
                       placeholder="VD: TP. Hồ Chí Minh"
                       value={profileData.location}
                       onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
+                      className="h-10 rounded-[3px] shadow-none border-gray-300"
                     />
                   </div>
                   <div className="space-y-2">
@@ -186,13 +186,14 @@ const SettingsPage = () => {
                       placeholder="https://..."
                       value={profileData.website}
                       onChange={(e) => setProfileData({ ...profileData, website: e.target.value })}
+                      className="h-10 rounded-[3px] shadow-none border-gray-300"
                     />
                   </div>
                 </div>
 
               </CardContent>
               <CardFooter className="flex justify-end border-t pt-6">
-                <Button onClick={handleSave} disabled={isLoading}>
+                <Button onClick={handleSave} disabled={isLoading} className="rounded-sm cursor-pointer">
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Lưu thay đổi
                 </Button>

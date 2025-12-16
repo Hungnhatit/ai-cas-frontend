@@ -1,6 +1,6 @@
 import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlarmClockCheck, CalendarCheck2, CircleFadingArrowUp, TrendingUp } from 'lucide-react'
+import { AlarmClockCheck, CalendarCheck2, CircleFadingArrowUp, FileCode, TrendingUp } from 'lucide-react'
 
 interface ImprovementProps {
   de_xuat_cai_thien?: string,
@@ -46,7 +46,6 @@ const Improvement = ({ de_xuat_cai_thien, huong_phat_trien, ke_hoach_ngan_han, k
                 </div>
                 <div>
                   <h5 className="font-medium text-gray-900 mb-1">{huong_phat_trien}</h5>
-                  {/* <p className="text-sm text-muted-foreground">{insight.description}</p> */}
                 </div>
               </div>
             </div>
@@ -96,8 +95,28 @@ const Improvement = ({ de_xuat_cai_thien, huong_phat_trien, ke_hoach_ngan_han, k
             </div>
           </CardContent>
         </Card>
-      </div>
 
+      </div>
+      <Card className='gap-3'>
+        <CardHeader>
+          <CardTitle className='text-lg'>Tài nguyên đề xuất</CardTitle>
+          <CardDescription></CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div>
+            <div className="p-4 rounded-[3px] bg-gray-50 border-l-4 border border-blue-400  ">
+              <div className="flex items-start gap-3">
+                <div className={`p-1 rounded-full `}>
+                  <FileCode className='text-orange-600' />
+                </div>
+                <div>
+                  <h5 className="font-medium text-gray-900 mb-1">{tai_nguyen_de_xuat}</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

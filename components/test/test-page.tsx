@@ -18,6 +18,9 @@ import { testAttemptService } from '@/services/test/testAttemptService';
 import { useAuth } from '@/providers/auth-provider';
 import { TestAttempt } from '@/types/interfaces/test';
 import { Separator } from '../ui/separator';
+import { Tabs } from '@radix-ui/react-tabs';
+import { TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Checkbox } from '../ui/checkbox';
 
 interface TestPageProps {
   test_id: number,
@@ -27,7 +30,9 @@ interface TestPageProps {
 const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
   const [test, setTest] = useState<Test | null>(null);
   const [session, setSession] = useState<TestSession | null>(null);
-  const [answers, setAnswers] = useState<Record<string, string | number>>({});
+  // const [answers, setAnswers] = useState<Record<number, number>>({});
+
+  const [answers, setAnswers] = useState<Record<number, number | string | number[]>>({});
   const [attempt, setAttempt] = useState<TestAttempt | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -36,10 +41,8 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
   const { id } = useParams();
   const { user } = useAuth();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<string>('');
 
-  /**
-   * handle load test
-   */
   useEffect(() => {
     if (!user) return;
     const loadTest = async () => {
@@ -51,6 +54,10 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
           throw new Error('Test not found');
         }
         setTest(testData.data);
+
+        if (testData.data.phan_kiem_tra.length > 0) {
+          setActiveTab(testData.data.phan_kiem_tra[0].ma_phan.toString());
+        }
 
         if (attempt_id) {
           const res = await testAttemptService.getTestAttempts(test_id, user?.ma_nguoi_dung);
@@ -105,10 +112,6 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
 
   const handleAnswerChange = async (question_id: number, answer: string | number) => {
     const newAnswers = { ...answers, [question_id]: answer } // object
-    // setAnswers(prev => ({
-    //   ...prev,
-    //   [question_id]: answer
-    // }));
     setAnswers(newAnswers);
     if (attempt_id) {
       try {
@@ -119,21 +122,59 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
     }
   };
 
+  const handleMultiSelectChange = async (question_id: number, option_id: number) => {
+    const currentAnswers = (answers[question_id] as number[]) || [];
+    let newAnswerForQuestion: number[];
+
+    if (currentAnswers.includes(option_id)) {
+      newAnswerForQuestion = currentAnswers.filter((id) => id !== option_id);
+    } else {
+      newAnswerForQuestion = [...currentAnswers, option_id];
+    }
+
+    const newAnswers = { ...answers, [question_id]: newAnswerForQuestion };
+    setAnswers(newAnswers);
+
+    if (attempt_id) {
+      try {
+        await testAttemptService.submitTestAnswers(attempt_id, newAnswers);
+      } catch (error) {
+        console.log('Failed to save answer: ', error);
+      }
+    }
+  }
+
   const handleSubmitTest = async () => {
     if (!test || !session) return;
 
+    const questionType: Record<string, string> = {};
+    test.phan_kiem_tra.forEach((section) => {
+      section.phan_kiem_tra_cau_hoi.forEach((question) => {
+        if (question.ma_cau_hoi && question.cau_hoi) {
+          questionType[question.ma_cau_hoi.toString()] = question.cau_hoi.loai_cau_hoi;
+        }
+      });
+    });
+
     try {
-      const userAnswers: UserAnswer[] = Object.entries(answers).map(([question_id, answer]) => ({
-        question_id,
-        answer,
-        timeSpent: 0
-      }));
+      const userAnswers: UserAnswer[] = Object.entries(answers).map(([question_id, answer]) => {
+        const timeSpent = (test.thoi_luong * 60) - timeRemaining;
+        const type = questionType[question_id] || 'unknown';
+        return {
+          question_type: type,
+          question_id,
+          answer,
+          timeSpent: timeSpent
+        }
+      });
 
-      const timeSpent = (test.thoi_luong * 60) - timeRemaining;
+      console.log('userAnswers: ', userAnswers)
+
       const result = await testAttemptService.submitTestAttempt(Number(attempt_id));
-      router.push(`/tests/${id}/result-overview?attempt=${attempt_id}`)
-      // localStorage.setItem('testResult', JSON.stringify(result));
+      
 
+      router.push(`/tests/${id}/result-overview?attempt=${attempt_id}`)
+      localStorage.setItem('testResult', JSON.stringify(result));
     } catch (error) {
       console.error('Failed to submit test:', error);
     }
@@ -162,17 +203,40 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
   }
 
   const scrollToQuestion = (question_id: number) => {
-    const element = questionRefs.current[question_id];
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!test) return;
+
+    let targetSectionId = '';
+
+    for (const section of test.phan_kiem_tra) {
+      const found = section.phan_kiem_tra_cau_hoi.find((q) => q.ma_cau_hoi === question_id || q.cau_hoi.ma_cau_hoi === question_id);
+      if (found) {
+        targetSectionId = section.ma_phan.toString();
+        break;
+      }
     }
+
+    const excuteScroll = () => {
+      const element = questionRefs.current[question_id];
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    if (targetSectionId && targetSectionId !== activeTab) {
+      setActiveTab(targetSectionId);
+
+      setTimeout(() => {
+        excuteScroll();
+      }, 100);
+    } else {
+      excuteScroll()
+    }
+
   };
 
   const getAnsweredCount = () => {
     return Object.keys(answers).length;
   };
-
-
 
   // if (loading) {
   //   return (
@@ -195,7 +259,6 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
     )
   }
 
-  // if (!test || !session) {
   if (!test) {
     return (
       <div className="text-center py-12">
@@ -206,8 +269,6 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
           Back to tests
         </Button>
       </div>
-      // <Layout currentPage="test" title="Test Not Found">
-      // </Layout>
     );
   }
 
@@ -218,7 +279,7 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
   };
 
   return (
-    <div className="max-w-8xl mx-auto px-4 py-4">
+    <div className="mx-auto px-4 py-4">
       <div className="flex gap-6 space-y-4 py-4">
         {/* Main Content */}
         <div className="flex-1 space-y-6">
@@ -240,15 +301,144 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
             <CardContent>
               <ProgressBar
                 current={getAnsweredCount()}
-                total={test?.cau_hoi?.length}
+                total={test.tong_so_cau_hoi}
                 label="Câu hỏi đã trả lời"
               />
             </CardContent>
           </Card>
 
           {/* All Questions */}
-          <div className="space-y-6 ">
-            {test?.cau_hoi?.map((question, index) => (
+          <div className="">
+            <Tabs
+              value={activeTab}
+              defaultValue={test.phan_kiem_tra[0].ma_phan.toString()}
+              className='space-y-4'
+              onValueChange={setActiveTab}
+            >
+              <TabsList className='rounded-[3px] bg-gray-200'>
+                {test.phan_kiem_tra?.map((section, index) => (
+                  <TabsTrigger key={index} value={section.ma_phan.toString()} className='rounded-[3px] bg-gray-200 cursor-pointer'>
+                    Phần {index + 1}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
+              {test.phan_kiem_tra?.map((section, index) => (
+                <TabsContent key={index} value={section.ma_phan.toString()} className='space-y-4'>
+                  {section.phan_kiem_tra_cau_hoi.map((question, index) => (
+                    <Card
+                      key={index}
+                      className="relative gap-10"
+                      ref={(el) => { questionRefs.current[question.cau_hoi.ma_cau_hoi] = el; }}
+                    >
+                      <CardHeader className='bg-gray-200 -my-6 gap-0 py-3'>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">
+                            Câu hỏi {index + 1}
+                          </CardTitle>
+                          <div className="flex items-center space-x-2">
+                            <Badge variant="outline" className='bg-blue-500 text-white'>{question.cau_hoi.diem} điểm</Badge>
+                            {question.cau_hoi.ma_cau_hoi && answers[question.cau_hoi.ma_cau_hoi] !== undefined && (
+                              <Badge variant="default" className="bg-green-100 text-green-800">
+                              Đã trả lời
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </CardHeader>
+
+                      <CardContent className="space-y-4">
+                        <div className="text-gray-900 leading-relaxed font-medium">
+                          {question.cau_hoi.tieu_de}
+                        </div>
+
+                        {question.cau_hoi.loai_cau_hoi === 'trac_nghiem' && (
+                          <RadioGroup
+                            value={answers[question.ma_cau_hoi]}
+                            onValueChange={(value) => question.ma_cau_hoi && handleAnswerChange(question.ma_cau_hoi, parseInt(value))}
+                            className=""
+                          >
+                            {question.cau_hoi.cau_hoi_trac_nghiem?.lua_chon_trac_nghiem?.map((option: any, optionIndex: number) => (
+                              <div key={option.ma_lua_chon} className="flex items-center space-x-3 p-3 text-md rounded-[3px] border border-gray-300 hover:bg-gray-100">
+                                <RadioGroupItem
+                                  value={option.ma_lua_chon}
+                                  id={`${question.ma_cau_hoi}-option-${optionIndex}`}
+                                  className='border-gray-300'
+                                />
+                                <Label
+                                  htmlFor={`${question.ma_cau_hoi}-option-${optionIndex}`}
+                                  className="flex-1 cursor-pointer text-sm leading-relaxed"
+                                >
+                                  {String.fromCharCode(65 + Number(optionIndex))}. {option.noi_dung}
+                                </Label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                        )}
+
+                        {question.cau_hoi.loai_cau_hoi === 'tu_luan' && (
+                          <div className="space-y-2">
+                            <Label htmlFor={`essay-${question.ma_cau_hoi}`} className="text-sm font-medium">
+                              Câu trả lời
+                            </Label>
+                            <Textarea
+                              id={`essay-${question.ma_cau_hoi}`}
+                              placeholder="Nhập câu trả lời của bạn tại đây..."
+                              value={question?.ma_cau_hoi && answers[question?.ma_cau_hoi]?.toString() || ''}
+                              onChange={(e) => question.ma_cau_hoi && handleAnswerChange(question.ma_cau_hoi, e.target.value)}
+                              className="min-h-[120px] resize-none rounded-[3px] border-gray-300 shadow-none"
+                            />
+                            <div className="text-xs text-gray-500">
+                              {(question.ma_cau_hoi && answers[question.ma_cau_hoi]?.toString() || '').length} characters
+                            </div>
+                          </div>
+                        )}
+
+                        {question.cau_hoi.loai_cau_hoi === 'nhieu_lua_chon' && (
+                          <div className='space-y-2'>
+                            {/* Không dùng RadioGroup ở đây nữa */}
+                            {question.cau_hoi.cau_hoi_nhieu_lua_chon?.lua_chon?.map((option: any, optionIndex: number) => {
+                              // Kiểm tra xem option này đã được chọn chưa
+                              const currentSelected = (answers[question.ma_cau_hoi] as number[]) || [];
+                              const isChecked = currentSelected.includes(option.ma_lua_chon);
+
+                              return (
+                                <div
+                                  key={option.ma_lua_chon}
+                                  className={cn(
+                                    "flex items-center space-x-3 p-3 text-md rounded-[3px] border hover:bg-gray-100 transition-colors",
+                                    isChecked ? "border-blue-500 bg-blue-50" : "border-gray-300"
+                                  )}
+                                >
+                                  <Checkbox
+                                    id={`${question.ma_cau_hoi}-option-${optionIndex}`}
+                                    checked={isChecked}
+                                    onCheckedChange={() => {
+                                      if (question.ma_cau_hoi) {
+                                        handleMultiSelectChange(question.ma_cau_hoi, option.ma_lua_chon);
+                                      }
+                                    }}
+                                    className='border-gray-400 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600'
+                                  />
+                                  <Label
+                                    htmlFor={`${question.ma_cau_hoi}-option-${optionIndex}`}
+                                    className="flex-1 cursor-pointer text-sm leading-relaxed font-normal"
+                                  >
+                                    {String.fromCharCode(65 + Number(optionIndex))}. {option.noi_dung}
+                                  </Label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </TabsContent>
+              ))}
+
+            </Tabs>
+            {/* {test?.cau_hoi?.map((question, index) => (
               <Card
                 key={question.ma_cau_hoi}
                 className="relative gap-10"
@@ -275,13 +465,13 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
                     {question.cau_hoi}
                   </div>
 
-                  {question.loai === 'trac_nghiem' && question.lua_chon && (
+                  {question.loai_cau_hoi === 'trac_nghiem' && question.lua_chon_trac_nghiem && (
                     <RadioGroup
-                      value={answers[question.ma_cau_hoi]?.toString() || ''}
+                      value={answers[question.ma_cau_hoi].toString() || ''}
                       onValueChange={(value) => handleAnswerChange(question.ma_cau_hoi, parseInt(value))}
                       className=""
                     >
-                      {question.lua_chon.map((option, optionIndex) => (
+                      {question.lua_chon_trac_nghiem.map((option, optionIndex) => (
                         <div key={optionIndex} className="flex items-center space-x-3 p-3 text-md rounded-[3px] border border-gray-300 hover:bg-gray-100">
                           <RadioGroupItem
                             value={optionIndex.toString()}
@@ -299,7 +489,7 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
                     </RadioGroup>
                   )}
 
-                  {question.loai === 'tu_luan' && (
+                  {question.loai_cau_hoi === 'tu_luan' && (
                     <div className="space-y-2">
                       <Label htmlFor={`essay-${question.ma_cau_hoi}`} className="text-sm font-medium">
                         Your Answer:
@@ -307,18 +497,18 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
                       <Textarea
                         id={`essay-${question.ma_cau_hoi}`}
                         placeholder="Type your answer here..."
-                        value={answers[question.ma_cau_hoi]?.toString() || ''}
+                        value={answers[question.ma_cau_hoi].toString() || ''}
                         onChange={(e) => handleAnswerChange(question.ma_cau_hoi, e.target.value)}
                         className="min-h-[120px] resize-none"
                       />
                       <div className="text-xs text-gray-500">
-                        {(answers[question.ma_cau_hoi]?.toString() || '').length} characters
+                        {(answers[question.ma_cau_hoi].toString() || '').length} characters
                       </div>
                     </div>
                   )}
                 </CardContent>
               </Card>
-            ))}
+            ))} */}
           </div>
 
           {/* Submit Section */}
@@ -355,35 +545,44 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
               <div>
                 <CardTitle className="text-lg">Điều hướng câu hỏi</CardTitle>
                 <p className="text-md text-gray-600">
-                  {getAnsweredCount()}/{test?.cau_hoi?.length} đã trả lời
+                  {getAnsweredCount()}/{test.tong_so_cau_hoi} đã trả lời
                 </p>
               </div>
-              <div className="grid grid-cols-5 gap-2">
-                {test?.cau_hoi?.map((question, index) => {
-                  const isAnswered = answers[question.ma_cau_hoi] !== undefined;
-                  return (
-                    <Button
-                      key={question.ma_cau_hoi}
-                      variant={isAnswered ? "default" : "outline"}
-                      size="sm"
-                      className={cn(
-                        "h-10 w-10 text-md font-medium rounded-[3px] shadow-none border-gray-400",
-                        isAnswered
-                          ? "bg-green-600 hover:bg-green-700 text-white"
-                          : "hover:bg-gray-100"
-                      )}
-                      onClick={() => scrollToQuestion(question.ma_cau_hoi)}
-                    >
-                      {index + 1}
-                    </Button>
-                  );
-                })}
+
+              <div className='grid grid-cols-1 gap-4'>
+                {test.phan_kiem_tra.map((section, index) => (
+                  <div key={section.ma_phan} className='flex flex-col gap-2'>
+                    Phần {index + 1}
+
+                    <div className="grid grid-cols-5 gap-2">
+                      {section?.phan_kiem_tra_cau_hoi?.map((question, index) => {
+                        const isAnswered = answers[question.ma_cau_hoi] !== undefined;
+                        return (
+                          <Button
+                            key={question.ma_cau_hoi}
+                            variant={isAnswered ? "default" : "outline"}
+                            size="sm"
+                            className={cn(
+                              "h-10 w-10 text-md font-medium rounded-[3px] shadow-none  cursor-pointer",
+                              isAnswered
+                                ? "bg-[#103e7f] hover:bg-[#687a93] text-white"
+                                : "hover:bg-gray-100"
+                            )}
+                            onClick={() => scrollToQuestion(question.ma_cau_hoi)}
+                          >
+                            {index + 1}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div className="space-y-2 text-xs text-gray-500">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-green-600 rounded"></div>
+                    <div className="w-3 h-3 bg-[#103e7f] rounded"></div>
                     <span className='text-sm'>Đã trả lời</span>
                   </div>
                   <span>{getAnsweredCount()}</span>
@@ -393,7 +592,7 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
                     <div className="w-3 h-3 border border-gray-300 rounded"></div>
                     <span className='text-sm'>Chưa trả lời</span>
                   </div>
-                  <span>{test?.cau_hoi?.length - getAnsweredCount()}</span>
+                  <span>{test.tong_so_cau_hoi - getAnsweredCount()}</span>
                 </div>
               </div>
 
@@ -426,8 +625,8 @@ const TestPage = ({ test_id, attempt_id }: TestPageProps) => {
         isOpen={showSubmitModal}
         onClose={() => setShowSubmitModal(false)}
         onConfirm={handleSubmitTest}
-        title="Submit Test"
-        description={`Are you sure you want to submit your test? You have answered ${getAnsweredCount()} out of ${test?.cau_hoi?.length} questions. This action cannot be undone.`}
+        title="Nộp bài thi"
+        description={`Bạn chắc chắn muốn nộp bài thi? Bạn đã trả lời ${getAnsweredCount()} trong tổng số ${test.tong_so_cau_hoi} câu hỏi. Hành động này không thể hoàn tác.`}
         confirmText="Submit Test"
         cancelText="Continue Test"
       />

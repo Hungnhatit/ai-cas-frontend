@@ -10,55 +10,61 @@ import HighlightedText from './HighlightText';
 const QuestionCard = ({ question, index, searchTerm }: { question: TestQuestion, index: number, searchTerm: string }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const getQuestionTypeLabel = (type: TestQuestion['loai']) => {
+  const getQuestionTypeLabel = (type: TestQuestion['loai_cau_hoi']) => {
     switch (type) {
       case 'trac_nghiem': return 'Trắc nghiệm';
       case 'tu_luan': return 'Tự luận';
-      case 'dung_sai': return 'Đúng/Sai';
+      case 'nhieu_lua_chon': return 'Nhiều lựa chọn';
       case 'tra_loi_ngan': return 'Trả lời ngắn';
       default: return 'Không xác định';
     }
-  };  
+  };
+
+  console.log('QUESTIONS: ', question);
 
   const renderAnswer = () => {
-    switch (question.loai) {
+    switch (question.cau_hoi?.loai_cau_hoi) {
       case 'trac_nghiem':
         return (
           <ul className="space-y-3 mt-4">
-            {question.lua_chon && question.lua_chon.map((option, index) => (
+            {question.cau_hoi?.cau_hoi_trac_nghiem && question.cau_hoi.cau_hoi_trac_nghiem.lua_chon_trac_nghiem?.map((option: any, index: number) => (
               <li key={index} className={
-                `flex items-center p-3 rounded-[3px] border border-gray-300 text-sm hover:bg-blue-50 cursor-pointer
-                 ${index.toString() === question.dap_an_dung?.toString()
-                && 'bg-blue-100 border-blue-500 dark:bg-blue-900/50 dark:border-blue-700'}`} >
+                `flex items-center p-3 rounded-[3px] border border-gray-300 text-sm cursor-pointer
+                  ${(option.la_dap_an_dung !== 1) && 'hover:bg-gray-100'}                 
+                 ${(option.la_dap_an_dung === 1) && '!bg-blue-100 !border-blue-500 hover:bg-blue-200'}`
+              }>
                 {String.fromCharCode(65 + index)}.
                 <span className="flex-grow">
-                  <HighlightedText text={option} highlight={searchTerm} />
+                  <HighlightedText text={`${option.noi_dung}`} highlight={searchTerm} />
                 </span>
-                {index.toString() === question.dap_an_dung?.toString() && <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" />}
+                {option.la_dap_an_dung === 1 && <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" />}
               </li>
-            ))
-            }
+            ))}
           </ul >
         );
-      case 'dung_sai':
+      case 'nhieu_lua_chon':
         return (
-          <div className="mt-4 space-y-3">
-            <div className={`flex items-center p-3 rounded-lg border text-sm ${question.dap_an_dung === true ? 'bg-green-50 border-green-500 dark:bg-green-900/50 dark:border-green-700' : 'bg-gray-50 border-gray-200 dark:bg-gray-700/50 dark:border-gray-600'}`}>
-              {question.dap_an_dung === true && <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0" />}
-              <span>Dung</span>
-            </div>
-            <div className={`flex items-center p-3 rounded-lg border text-sm ${question.dap_an_dung === false ? 'bg-green-50 border-green-500 dark:bg-green-900/50 dark:border-green-700' : 'bg-gray-50 border-gray-200 dark:bg-gray-700/50 dark:border-gray-600'}`}>
-              {question.dap_an_dung === false && <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0" />}
-              <span>Sai</span>
-            </div>
-          </div>
-        );
-      case 'tra_loi_ngan':
+          <div className=''>
+            <ul className="space-y-3 mt-4">
+              {question.cau_hoi?.cau_hoi_nhieu_lua_chon && question.cau_hoi.cau_hoi_nhieu_lua_chon?.lua_chon?.map((option: any, index: number) => (
+                <li key={option.ma_lua_chon} className={`flex items-center p-3 rounded-[3px] border border-gray-300 text-sm hover:bg-gray-100 cursor-pointer
+                 ${option.la_dap_an_dung
+                  && 'bg-blue-100 !border-blue-500 !hover:bg-blue-400'}`
+                }>
+                  <span className="flex-grow">
+                    <HighlightedText text={`${option.noi_dung}`} highlight={searchTerm} />
+                  </span>
+                  {(option.la_dap_an_dung === true || option.la_dap_an_dung === 1) && <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" />}
+                </li>
+              ))}
+            </ul>
+          </div >
+        )
       case 'tu_luan':
         return (
-          <div className="mt-4 p-4 rounded-lg bg-green-50 border border-green-500 dark:bg-green-900/50 dark:border-green-700">
-            <p className="text-sm font-semibold text-green-800 dark:text-green-300 mb-2">Dap an dung:</p>
-            <p className="text-sm text-gray-800 dark:text-gray-200"><HighlightedText text={String(question.dap_an_dung)} highlight={searchTerm} /></p>
+          <div className="mt-4 p-4 rounded-md bg-green-50 border border-green-500 dark:bg-green-900/50 dark:border-green-700">
+            <p className="text-sm font-semibold text-green-800 dark:text-green-300 mb-2">Đáp án mẫu:</p>
+            <p className="text-md text-gray-800 dark:text-gray-200"><HighlightedText text={String(question.cau_hoi.cau_hoi_tu_luan?.dap_an_mau)} highlight={searchTerm} /></p>
           </div>
         );
       default: return null;
@@ -73,8 +79,8 @@ const QuestionCard = ({ question, index, searchTerm }: { question: TestQuestion,
             Câu hỏi {index + 1}
           </h4>
           <div className="flex items-center gap-4">
-            <Badge variant="outline">{getQuestionTypeLabel(question.loai)}</Badge>
-            <Badge variant="default">{question.diem} điểm</Badge>
+            <Badge variant="outline" className='border-gray-400'>{getQuestionTypeLabel(question.cau_hoi.loai_cau_hoi)}</Badge>
+            <Badge variant="default">{question.cau_hoi?.diem} điểm</Badge>
           </div>
         </div>
         <Button
@@ -87,7 +93,7 @@ const QuestionCard = ({ question, index, searchTerm }: { question: TestQuestion,
       {isExpanded && (
         <CardContent className="space-y-4 px-4 py-4">
           <p className="text-gray-700 font-semibold dark:text-gray-300">
-            <HighlightedText text={question.cau_hoi} highlight={searchTerm} />            
+            <HighlightedText text={question.cau_hoi?.tieu_de} highlight={searchTerm} />
           </p>
           {renderAnswer()}
           <div className="mt-4 p-4 rounded-[3px] bg-gray-100 dark:bg-gray-700/50 border border-dashed border-gray-300 dark:border-gray-600">
@@ -95,8 +101,8 @@ const QuestionCard = ({ question, index, searchTerm }: { question: TestQuestion,
               Giải thích:
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {question.giai_thich
-                ? <HighlightedText text={question.giai_thich} highlight={searchTerm} />
+              {question.cau_hoi?.cau_hoi_trac_nghiem || question.cau_hoi?.cau_hoi_tu_luan
+                ? <HighlightedText text={question.cau_hoi.cau_hoi_trac_nghiem?.giai_thich_dap_an || question.cau_hoi.cau_hoi_tu_luan?.giai_thich} highlight={searchTerm} />
                 : 'Không có giải thích chi tiết cho câu hỏi này'}
             </p>
           </div>

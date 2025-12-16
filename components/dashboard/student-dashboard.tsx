@@ -35,13 +35,14 @@ export function StudentDashboard() {
       </div>
     )
   }
+  console.log(user);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-[#232f3e] -mx-4 -mt-4 p-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome back, {user?.name}!</h1>
-          <p className="text-white">Continue your learning journey</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Chào mừng quay trở lại, {user?.ten}!</h1>
+          <p className="text-white">Tiếp tục hành trình học tập của bạn</p>
         </div>
         <Button>
           <BookOpen className="mr-2 h-4 w-4" />

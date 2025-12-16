@@ -57,20 +57,20 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-[#232f3e] -mx-4 -mt-4 shadow-lg p-5">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-          <p className="text-white">Manage your account preferences and settings</p>
+          <h1 className="text-3xl mb-2 font-bold text-white">Cài đặt</h1>
+          <p className="text-white">Quản lý tùy chọn và cài đặt tài khoản của bạn</p>
         </div>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="privacy">Privacy</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsList className="h-10 grid w-full grid-cols-5 rounded-[3px] shadow-none border border-slate-300">
+          <TabsTrigger className="cursor-pointer rounded-[3px] shadow-none" value="profile">Tài khoản</TabsTrigger>
+          <TabsTrigger className="cursor-pointer rounded-[3px] shadow-none" value="notifications">Thông báo</TabsTrigger>
+          <TabsTrigger className="cursor-pointer rounded-[3px] shadow-none" value="privacy">Privacy</TabsTrigger>
+          <TabsTrigger className="cursor-pointer rounded-[3px] shadow-none" value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger className="cursor-pointer rounded-[3px] shadow-none" value="account">Account</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-4">
@@ -78,9 +78,11 @@ export function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Profile Information
+                Thông tin cá nhân
               </CardTitle>
-              <CardDescription>Update your personal information and profile details</CardDescription>
+              <CardDescription>
+                Cập nhật thông tin cá nhân và chi tiết hồ sơ của bạn
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center gap-6">
@@ -101,18 +103,21 @@ export function SettingsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name">Họ tên</Label>
                   <Input
                     id="name"
                     value={profileData.name}
+                    className="h-10 shadow-none border-gray-300 rounded-[3px]"
                     onChange={(e) => setProfileData((prev) => ({ ...prev, name: e.target.value }))}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
+                    disabled
                     id="email"
                     type="email"
+                    className="h-10 shadow-none border-gray-300 rounded-[3px]"
                     value={profileData.email}
                     onChange={(e) => setProfileData((prev) => ({ ...prev, email: e.target.value }))}
                   />
@@ -127,6 +132,7 @@ export function SettingsPage() {
                   value={profileData.bio}
                   onChange={(e) => setProfileData((prev) => ({ ...prev, bio: e.target.value }))}
                   rows={3}
+                  className="rounded-[3px] shadow-none border-gray-300"
                 />
               </div>
 
@@ -136,6 +142,7 @@ export function SettingsPage() {
                   <Input
                     id="location"
                     placeholder="City, Country"
+                    className="h-10 shadow-none border-gray-300 rounded-[3px]"
                     value={profileData.location}
                     onChange={(e) => setProfileData((prev) => ({ ...prev, location: e.target.value }))}
                   />
@@ -145,6 +152,7 @@ export function SettingsPage() {
                   <Input
                     id="website"
                     placeholder="https://yourwebsite.com"
+                    className="h-10 shadow-none border-gray-300 rounded-[3px]"
                     value={profileData.website}
                     onChange={(e) => setProfileData((prev) => ({ ...prev, website: e.target.value }))}
                   />

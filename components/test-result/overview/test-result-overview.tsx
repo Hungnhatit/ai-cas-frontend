@@ -13,8 +13,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
 import { testAttemptService } from "@/services/test/testAttemptService"
 import { testService } from "@/services/test/testService"
-import { Test, TestQuestion } from "@/types/interfaces/model"
-import { TestAttempt } from "@/types/interfaces/test"
+import { Test, TestAttempt, TestQuestion } from "@/types/interfaces/model"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface TestResultOverviewPageProps {
@@ -25,10 +24,14 @@ interface TestResultOverviewPageProps {
 // this component is used for the result page after submitting the quiz
 export function TestResultOverview({ test_id, testAttempt_id }: TestResultOverviewPageProps) {
   const [test, setTest] = useState<Test | null>(null)
-  const [attempt, setAttempt] = useState<TestAttempt | null>(null)
+  const [attempt, setAttempt] = useState<TestAttempt | null>(null);
+  const [scoreInfo, setScoreInfo] = useState(null);
   const [loading, setLoading] = useState(true)
   const router = useRouter();
   const { user } = useAuth();
+
+  console.log('INFO: ', scoreInfo);
+  console.log("ATTEMPT: ", attempt);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,7 +54,8 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
         }
 
         setTest(testData);
-        setAttempt(attemptData);
+        setAttempt(attemptData.attempt);
+        setScoreInfo(attemptData.info);
       } catch (error) {
         console.error("Failed to fetch quiz results:", error)
         // router.push("/tests")
@@ -94,7 +98,7 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
     return "F"
   }
 
-  console.log('TEST: ', test);
+  console.log('TEST.PHANKIEMTRA: ', test?.phan_kiem_tra);
 
   const getCorrectAnswers = () => {
     if (!test || !attempt) return 0;
@@ -116,15 +120,26 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
             correct++;
           }
         }
-        else if (question.loai_cau_hoi === "tu_luan") {
-          if (userAnswer === question.cau_hoi_trac_nghiem?.dap_an_dung) {
+        else if (question.cau_hoi.loai_cau_hoi === "tu_luan") {
+          if (userAnswer === question.cau_hoi_tu_luan?.dap_an_dung) {
             correct++;
           }
         }
-        else if (question.loai_cau_hoi === "dung_sai") {
-          if (userAnswer?.toString() === question.cau_hoi_trac_nghiem?.dap_an_dung?.toString()) {
-            correct++;
+        else if (question.cau_hoi.loai_cau_hoi === "nhieu_lua_chon") {
+          let userSelectedIds: number[] = [];
+          try {
+            if (userAnswer) {
+              userSelectedIds = JSON.parse(userAnswer).map((id: any) => Number(id));
+            }
+          } catch (error) {
+            userSelectedIds = [];
           }
+          const options = question.cau_hoi.cau_hoi_nhieu_lua_chon.lua_chon || [];
+          const correctOptionIds = options
+            .filter((option: any) => option.la_dap_an_dung === true || option.la_dap_an_dung === 1)
+            .map((opt: any) => Number(opt.ma_lua_chon));
+
+
         }
       });
     });
@@ -132,20 +147,35 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
     return correct;
   };
 
+  const parseMCQAnswer = (answer: string | any): number[] => {
+    if (Array.isArray(answer)) return answer;
+
+    if (!answer) return [];
+    try {
+      const parsed = JSON.parse(answer);
+      return Array.isArray(parsed) ? parsed.map(Number) : [];
+    } catch (e) {
+      return [];
+    }
+  }
 
   // render detail question
   const renderQuestionResult = (question: TestQuestion, index: number) => {
-    const userAnswers = attempt?.cau_tra_loi_hoc_vien.find((a: any) => a.ma_cau_hoi === question.ma_cau_hoi);
-    const userAnswer = userAnswers?.tra_loi;
-    const isCorrect = userAnswer === question.cau_hoi?.cau_hoi_trac_nghiem?.lua_chon_trac_nghiem?.find((c: any) => c.la_dap_an_dung === 1)?.ma_lua_chon.toString();
+    const userAnswerData = attempt?.cau_tra_loi_hoc_vien.find((a: any) => a.ma_cau_hoi === question.ma_cau_hoi);
+    const userAnswerRaw = userAnswerData?.tra_loi;
+    const achievedScore = userAnswerData?.diem || 0;
+    const maxScore = question.cau_hoi?.diem || 0;
+
+    const isPerpect = achievedScore === maxScore;
+    const hasScore = achievedScore > 0;
 
     return (
-      <Card key={question.ma_cau_hoi} className={`border-l-4 ${isCorrect ? "border-l-sky-600" : "border-l-red-500"} gap-0.5 py-4`}>
+      <Card key={question.ma_cau_hoi} className={`border-l-4 ${hasScore ? "border-l-sky-600" : "border-l-red-500"} gap-0.5 py-4`}>
         <CardHeader className="">
           <div className="flex items-start justify-between">
             <div className="space-y-1 flex-1">
               <CardTitle className="text-base flex items-center gap-2">
-                {isCorrect ? (
+                {hasScore ? (
                   <CheckCircle className="h-5 w-5 text-sky-600" />
                 ) : (
                   <XCircle className="h-5 w-5 text-red-600" />
@@ -155,8 +185,8 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
               <CardDescription className="text-md leading-relaxed">{question.cau_hoi?.tieu_de}</CardDescription>
             </div>
             <div className="text-right">
-              <Badge variant={isCorrect ? "default" : "destructive"}>
-                {isCorrect ? question.cau_hoi?.diem : 0}/{question.cau_hoi?.diem} điểm
+              <Badge variant={hasScore ? "default" : "destructive"}>
+                {achievedScore}/{maxScore} điểm
               </Badge>
             </div>
           </div>
@@ -165,12 +195,12 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
           {question.cau_hoi?.loai_cau_hoi === "trac_nghiem" && question.cau_hoi.cau_hoi_trac_nghiem?.lua_chon_trac_nghiem && (
             <div className="space-y-2">
               {question.cau_hoi.cau_hoi_trac_nghiem.lua_chon_trac_nghiem.map((option: any, optionIndex: number) => {
-                const isUserAnswer = userAnswer === option.ma_lua_chon.toString();
-                const isCorrectAnswer = option.la_dap_an_dung === 1;
+                const isUserAnswer = userAnswerRaw === option.ma_lua_chon.toString();
+                const isCorrectOption = option.la_dap_an_dung === 1;
                 return (
                   <div
                     key={option.ma_lua_chon}
-                    className={`p-2 rounded-[3px] border ${isCorrectAnswer
+                    className={`p-2 rounded-[3px] border ${isCorrectOption
                       ? "bg-sky-200 border-sky-200 text-blue-900"
                       : isUserAnswer
                         ? "bg-red-200/90 border-red-200 text-red-800"
@@ -179,8 +209,8 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        {isCorrectAnswer && <CheckCircle className="h-4 w-4 text-sky-600" />}
-                        {isUserAnswer && !isCorrectAnswer && <XCircle className="h-4 w-4 text-red-600" />}
+                        {isCorrectOption && <CheckCircle className="h-4 w-4 text-sky-600" />}
+                        {isUserAnswer && !isCorrectOption && <XCircle className="h-4 w-4 text-red-600" />}
                         {String.fromCharCode(65 + optionIndex)}
                         <span className="text-[15px]">{option.noi_dung}</span>
                       </div>
@@ -190,7 +220,7 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
                             Câu trả lời của bạn
                           </Badge>
                         )}
-                        {isCorrectAnswer && (
+                        {isCorrectOption && (
                           <Badge variant="outline" className="ml-auto text-xs border border-blue-600">
                             Đúng
                           </Badge>
@@ -203,17 +233,35 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
             </div>
           )}
 
-          {question.loai === "tra_loi_ngan" && (
+          {question.cau_hoi?.loai_cau_hoi === "tu_luan" && (
             <div className="space-y-2">
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-md font-medium mb-1">Your Answer:</p>
-                <p className="text-md">{userAnswer || "No answer provided"}</p>
+              <div className="p-3 bg-gray-100 rounded-lg">
+                <p className="text-md font-medium mb-1">Câu trả lời của bạn:</p>
+                <p className="text-md">{userAnswerRaw || "No answer provided"}</p>
               </div>
               <div className="p-3 bg-green-50 rounded-lg">
                 <p className="text-md font-medium mb-1">Correct Answer:</p>
                 <p className="text-md">{question.dap_an_dung}</p>
               </div>
             </div>
+          )}
+
+          {question.cau_hoi?.loai_cau_hoi === 'nhieu_lua_chon' && (
+            <div className=''>
+              <ul className="space-y-3 mt-4">
+                {question.cau_hoi?.cau_hoi_nhieu_lua_chon && question.cau_hoi.cau_hoi_nhieu_lua_chon?.lua_chon?.map((option: any, index: number) => (
+                  <li key={option.ma_lua_chon} className={`flex items-center p-3 rounded-[3px] border border-gray-300 text-sm hover:bg-gray-100 cursor-pointer
+                 ${option.la_dap_an_dung
+                    && 'bg-blue-100 !border-blue-500 !hover:bg-blue-400'}`
+                  }>
+                    <span className="flex-grow">
+                      {option.noi_dung}
+                    </span>
+                    {(option.la_dap_an_dung === true || option.la_dap_an_dung === 1) && <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" />}
+                  </li>
+                ))}
+              </ul>
+            </div >
           )}
         </CardContent>
       </Card>
@@ -244,7 +292,7 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
   const score = attempt?.diem || 0
   const total_points = test.tong_diem
   const percentage = Math.round((score / total_points) * 100)
-  const correctAnswers = getCorrectAnswers();
+  const correctAnswers = scoreInfo?.so_cau_dung;
   const totalSection = test.phan_kiem_tra.length;
   const totalQuestions = test.tong_so_cau_hoi;
   const timeTaken = getTimeTaken()
@@ -391,7 +439,7 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
       </Card>
 
       {/* Question-by-Question Review */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle className="text-lg">Đánh giá câu hỏi</CardTitle>
           <CardDescription className="text-md">Xem lại câu trả lời của bạn và xem các giải thích cho câu trả lời</CardDescription>
@@ -412,12 +460,12 @@ export function TestResultOverview({ test_id, testAttempt_id }: TestResultOvervi
                   <div key={index}>
                     {/* {question.loai_cau_hoi === 'trac_nghiem' && question.cau_hoi_trac_nghiem.map((question: any, index: number) => renderQuestionResult(question, index))}
                      */}
-                    {question.cau_hoi.loai_cau_hoi === 'trac_nghiem' && renderQuestionResult(question, index)}
+                    {/* {question.cau_hoi.loai_cau_hoi === 'trac_nghiem' && renderQuestionResult(question, index)} */}
+                    {renderQuestionResult(question, index)}
                   </div>
                 ))}
               </TabsContent>
             ))}
-
           </Tabs>
         </CardContent>
       </Card>

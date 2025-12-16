@@ -8,7 +8,6 @@ import {
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import ExamList from './ExamList';
-import CustomPagination from './CustomPagination';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { testService } from '@/services/test/testService';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
@@ -24,138 +23,6 @@ type ExamCategory =
   | 'Literature'
   | 'Programming';
 
-interface Exam {
-  id: string;
-  title: string;
-  description: string;
-  category: ExamCategory;
-  difficulty: ExamDifficulty;
-  numberOfQuestions: number;
-  durationMinutes: number;
-}
-
-const MOCK_EXAMS: Exam[] = [
-  {
-    id: '1',
-    title: 'Algebra Basics',
-    description:
-      'Test your fundamental knowledge of algebraic concepts, including variables, equations, and functions.',
-    category: 'Mathematics',
-    difficulty: 'Beginner',
-    numberOfQuestions: 20,
-    durationMinutes: 45,
-  },
-  {
-    id: '2',
-    title: 'World War II History',
-    description:
-      'A comprehensive review of the major events, figures, and battles of World War II.',
-    category: 'History',
-    difficulty: 'Intermediate',
-    numberOfQuestions: 50,
-    durationMinutes: 60,
-  },
-  {
-    id: '3',
-    title: 'Introduction to Physics',
-    description:
-      'Covering core concepts such as motion, force, energy, and thermodynamics.',
-    category: 'Science',
-    difficulty: 'Beginner',
-    numberOfQuestions: 30,
-    durationMinutes: 60,
-  },
-  {
-    id: '4',
-    title: 'Shakespearean Literature',
-    description: 'Analyze themes, characters, and language in Shakespeare’s most famous plays.',
-    category: 'Literature',
-    difficulty: 'Advanced',
-    numberOfQuestions: 40,
-    durationMinutes: 90,
-  },
-  {
-    id: '5',
-    title: 'Python Programming Fundamentals',
-    description:
-      'Assess your understanding of Python syntax, data structures, and control flow.',
-    category: 'Programming',
-    difficulty: 'Beginner',
-    numberOfQuestions: 25,
-    durationMinutes: 60,
-  },
-  {
-    id: '6',
-    title: 'Calculus I',
-    description:
-      'Test your knowledge of limits, derivatives, and basic integration.',
-    category: 'Mathematics',
-    difficulty: 'Intermediate',
-    numberOfQuestions: 30,
-    durationMinutes: 75,
-  },
-  {
-    id: '7',
-    title: 'The American Revolution',
-    description:
-      'Explore the key causes, major conflicts, and significant outcomes of the American Revolution.',
-    category: 'History',
-    difficulty: 'Intermediate',
-    numberOfQuestions: 40,
-    durationMinutes: 60,
-  },
-  {
-    id: '8',
-    title: 'Chemistry Essentials',
-    description:
-      'Questions on atomic structure, chemical bonding, and the periodic table.',
-    category: 'Science',
-    difficulty: 'Beginner',
-    numberOfQuestions: 35,
-    durationMinutes: 45,
-  },
-  {
-    id: '9',
-    title: 'Modern American Novels',
-    description:
-      'A deep dive into prominent American literary works from the 20th century.',
-    category: 'Literature',
-    difficulty: 'Intermediate',
-    numberOfQuestions: 25,
-    durationMinutes: 60,
-  },
-  {
-    id: '10',
-    title: 'JavaScript Algorithms',
-    description:
-      'Solve common algorithm challenges using JavaScript. Focus on efficiency and logic.',
-    category: 'Programming',
-    difficulty: 'Advanced',
-    numberOfQuestions: 15,
-    durationMinutes: 120,
-  },
-  {
-    id: '11',
-    title: 'Data Structures in C++',
-    description:
-      'Test your understanding of arrays, linked lists, stacks, queues, and trees.',
-    category: 'Programming',
-    difficulty: 'Intermediate',
-    numberOfQuestions: 30,
-    durationMinutes: 90,
-  },
-  {
-    id: '12',
-    title: 'Biology: Cell Structure',
-    description:
-      'An examination of organelles, cell membranes, and the differences between prokaryotic and eukaryotic cells.',
-    category: 'Science',
-    difficulty: 'Intermediate',
-    numberOfQuestions: 40,
-    durationMinutes: 60,
-  },
-];
-
 const EXAM_CATEGORIES: ExamCategory[] = [
   'Mathematics',
   'History',
@@ -163,45 +30,6 @@ const EXAM_CATEGORIES: ExamCategory[] = [
   'Literature',
   'Programming',
 ];
-
-const fetchExams = (
-  page: number,
-  limit: number,
-  query: string,
-  category: string,
-): Promise<{ data: Exam[]; total: number }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 1. Filter by category
-      let filteredExams = MOCK_EXAMS;
-      if (category !== 'all') {
-        filteredExams = MOCK_EXAMS.filter(
-          (exam) => exam.category === category,
-        );
-      }
-
-      // 2. Filter by search query
-      if (query) {
-        const lowerCaseQuery = query.toLowerCase();
-        filteredExams = filteredExams.filter(
-          (exam) =>
-            exam.title.toLowerCase().includes(lowerCaseQuery) ||
-            exam.description.toLowerCase().includes(lowerCaseQuery),
-        );
-      }
-
-      // 3. Get total count
-      const total = filteredExams.length;
-
-      // 4. Apply pagination
-      const start = (page - 1) * limit;
-      const end = start + limit;
-      const paginatedData = filteredExams.slice(start, end);
-
-      resolve({ data: paginatedData, total });
-    }, 800); // Simulate network delay
-  });
-};
 
 interface FilterControlsProps {
   searchQuery: string;
@@ -325,11 +153,9 @@ const TestLibrary = () => {
     router.push(`/test-library?page=${page}&query=${query}&category=${category}`)
   };
 
-
-
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="h-full flex flex-col mx-auto p-4 py-8 md:p-8">
+      <div className="container max-w-7xl h-full flex flex-col mx-auto p-4 py-8 md:p-8">
         {/* Header */}
         <header className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight md:text-4xl">

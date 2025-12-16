@@ -1,27 +1,46 @@
 "use client"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/components/ui/use-mobile"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { LanguageToggle } from "@/components/ui/language-toggle"
-import { useI18n } from "@/providers/i18n-provider"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { useAuth } from "@/providers/auth-provider"
 
 export function LandingHeader() {
   const router = useRouter()
   const isMobile = useIsMobile()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { t } = useI18n()
+  const { user, logout } = useAuth();
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
 
   const navigationItems = [
-    { name: t.features, href: "#features" },
-    { name: 'Đề thi', href: "/test-library" },
-    { name: 'Blog', href: "#about" },
-    { name: t.contact, href: "#contact" },
+    { name: 'Features', href: "#features", role: [] },
+    { name: 'Đề thi online', href: "/test-library", role: [] },
+    { name: 'Blog', href: "/post", role: [] },
+    { name: 'Liên hệ', href: "#contact", role: [] },
+    { name: 'Dashboard', href: "/dashboard", role: ['admin', 'instructor'] },
+    { name: 'Tài khoản', href: `/student/${user?.ma_nguoi_dung}/setting`, role: ['student'] },
+    { name: 'Về chúng tôi', href: '/about-us', role: [] }
   ]
+
+  const handleLogout = () => {
+    console.log("[v0] Logout clicked")
+    logout()
+  }
+
+  const visibleNav = navigationItems.filter((item) => {
+    if (item.role.length === 0) return true;
+
+    if (!user) return false;
+
+    return item.role.includes(user.vai_tro);
+  })
 
   return (
     <header className="top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -30,26 +49,41 @@ export function LandingHeader() {
         <div className="flex">
           <LanguageToggle />
           <ThemeToggle />
-          <Button
-            variant="ghost"
-            className="cursor-pointer rounded-[3px]"
-            onClick={() => {
-              router.push("/auth/login")
-              setMobileMenuOpen(false)
-            }}
-          >
-            Đăng nhập
-          </Button>
-          <Button
-            variant="ghost"
-            className="cursor-pointer rounded-[3px]"
-            onClick={() => {
-              router.push("/auth/register")
-              setMobileMenuOpen(false)
-            }}
-          >
-            Đăng ký
-          </Button>
+          {user && (
+            <Button
+              variant="ghost"
+              className="cursor-pointer rounded-[3px]"
+              onClick={handleLogout}
+            >
+              Đăng xuất
+            </Button>
+          )
+          }
+          {!user && (
+            <div>
+              <Button
+                variant="ghost"
+                className="cursor-pointer rounded-[3px]"
+                onClick={() => {
+                  router.push("/auth/login")
+                  setMobileMenuOpen(false)
+                }}
+              >
+                Đăng nhập
+              </Button>
+              <Button
+                variant="ghost"
+                className="cursor-pointer rounded-[3px]"
+                onClick={() => {
+                  router.push("/auth/register")
+                  setMobileMenuOpen(false)
+                }}
+              >
+                Đăng ký
+              </Button>
+            </div>
+          )
+          }
         </div>
 
       </div>
@@ -66,7 +100,7 @@ export function LandingHeader() {
         {/* Desktop Navigation */}
         {!isMobile && (
           <nav className="hidden md:flex items-center gap-6">
-            {navigationItems.map((item) => (
+            {visibleNav.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
@@ -131,7 +165,7 @@ export function LandingHeader() {
                           setMobileMenuOpen(false)
                         }}
                       >
-                        {t.signIn}
+                        Sign in
                       </Button>
                       <Button
                         className="justify-start cursor-pointer"
@@ -140,7 +174,7 @@ export function LandingHeader() {
                           setMobileMenuOpen(false)
                         }}
                       >
-                        {t.getStarted}
+                        Get started
                       </Button>
                     </div>
                   </div>

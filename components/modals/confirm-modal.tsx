@@ -15,15 +15,15 @@ const ConfirmModal = ({ children, title, description, onConfirm }: ConfirmModalP
         {children}
       </AlertDialogTrigger>
 
-      <AlertDialogContent>
+      <AlertDialogContent className='rounded-[3px]'>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-          <AlertDialogAction className='cursor-pointer' onClick={onConfirm}>Continue</AlertDialogAction>
+          <AlertDialogCancel className='cursor-pointer rounded-[3px]'>Huỷ</AlertDialogCancel>
+          <AlertDialogAction className='cursor-pointer rounded-[3px]' onClick={onConfirm}>Xác nhận</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

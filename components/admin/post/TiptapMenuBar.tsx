@@ -44,7 +44,7 @@ export function Toolbar({ editor }: Props) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true); // Bật loading
+    setIsUploading(true);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -154,15 +154,13 @@ export function Toolbar({ editor }: Props) {
         <ToolbarButton onClick={() => editor?.chain().focus().toggleBlockquote().run()} isActive={editor?.isActive("blockquote")} icon={Quote} label="Blockquote" />
       </div>
 
-      {/* --- INSERTS --- */}
       <div className="flex gap-1 px-2">
         <ToolbarButton onClick={setLink} isActive={editor?.isActive("link")} icon={LinkIcon} label="Link" />
 
-        {/* Nút Image đã được sửa lại logic */}
         <ToolbarButton
           onClick={handleImageClick}
           isActive={editor?.isActive("image")}
-          icon={isUploading ? Loader2 : ImageIcon} // Đổi icon khi loading
+          icon={isUploading ? Loader2 : ImageIcon}
           label="Image"
           disabled={isUploading}
         />

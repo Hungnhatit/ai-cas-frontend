@@ -9,9 +9,7 @@ import { useAuth } from "@/providers/auth-provider"
 import { competencyService } from "@/services/competency/competencyService"
 import { Competency } from "@/types/interfaces/model"
 import { formatDate } from "@/utils/formatDate"
-import { getDifficultyLabel } from "@/utils/test"
-import { getVisibilityIcon } from "@/utils/tests"
-import { Calendar, Info, Link, RotateCcw, SquarePen, Trash, Trash2 } from "lucide-react"
+import { Calendar, Info, Link, NotebookPen, RotateCcw, SquarePen, Trash, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
@@ -93,7 +91,7 @@ export const CompetencyApp = () => {
                   </TableCell>
 
                   <TableCell className="border-r">
-                    <span className={`px-2 py-1 text-wrap text-base line-clamp-3 leading-[23px]`}>
+                    <span className={`text-wrap text-base line-clamp-3 leading-[23px]`}>
                       {competency.mo_ta}
                     </span>
                   </TableCell>
@@ -161,8 +159,9 @@ export const CompetencyApp = () => {
 
       <Card className="shadow-none gap-2 bg-transparent rounded-none border-none">
         <CardHeader>
-          <CardTitle className="text-xl">            
-              Ghi chú: Chức năng quản lý Khung năng lực & Tiêu chí đánh giá       
+          <CardTitle className="flex items-center text-xl gap-2">
+            <NotebookPen size={20} className="text-slate-600" />
+            <p>Ghi chú: Chức năng quản lý Khung năng lực & Tiêu chí đánh giá</p>
           </CardTitle>
           <CardDescription></CardDescription>
         </CardHeader>

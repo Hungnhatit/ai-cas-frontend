@@ -16,7 +16,7 @@ interface Props {
 
 export function UserActions({ user, onEdit, onDelete, onForceDelete, onRestore }: Props) {
   return (
-    <div className="flex items-center space-x-2">
+    <div className="grid grid-cols-3">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -24,14 +24,22 @@ export function UserActions({ user, onEdit, onDelete, onForceDelete, onRestore }
               <Edit className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Edit</TooltipContent>
+          <TooltipContent>Sửa</TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
       {user.trang_thai === "dang_hoat_dong" && (
-        <Button variant="ghost" size="sm" onClick={() => onDelete(user.ma_nguoi_dung)} className="cursor-pointer">
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" onClick={() => onDelete(user.ma_nguoi_dung)} className="cursor-pointer">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Xoá</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
       )}
 
       {user.trang_thai === "ngung_hoat_dong" && (
@@ -43,7 +51,7 @@ export function UserActions({ user, onEdit, onDelete, onForceDelete, onRestore }
           <ConfirmModal
             onConfirm={() => onForceDelete(user.ma_nguoi_dung)}
             title="Xác nhận xóa vĩnh viễn người dùng?"
-            description={`Bạn có chắc chắn muốn xoá người dùng "${user.ten}" vĩnh viễn không? Hành động này không thể hoàn tác.`}
+            description={`Bạn có chắc chắn muốn xoá người dùng "${user.ten}"? Hành động này không thể hoàn tác.`}
           >
             <Button variant="ghost" size="sm" className="cursor-pointer">
               <Trash className="text-red-600" />

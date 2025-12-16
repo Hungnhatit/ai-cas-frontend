@@ -36,7 +36,7 @@ export function AuthGuard({ children, requiredRole, redirectTo = "/auth/login" }
             router.push("/dashboard")
             break
           default:
-            router.push("/dashboard")
+            router.push("/")
         }
         return
       }

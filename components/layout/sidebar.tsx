@@ -4,12 +4,14 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   BookOpen, Calendar, ChevronLeft, GraduationCap, Home, MessageSquare, Settings, Users, BarChart3, FileText, Award, Video, HelpCircle, BookType,
   ChartNoAxesCombined,
   Library,
   UsersRound,
+  Star,
+  Newspaper,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -70,9 +72,15 @@ const navItems: NavItem[] = [
     icon: MessageSquare,
   },
   {
-    title: "Manage users",
+    title: "Quản lý người dùng",
     href: "/admin/users",
     icon: UsersRound,
+    roles: ['admin']
+  },
+  {
+    title: "Khung năng lực",
+    href: "/admin/competency",
+    icon: Star,
     roles: ['admin']
   },
   {
@@ -82,15 +90,22 @@ const navItems: NavItem[] = [
     roles: ['instructor']
   },
   {
-    title: 'Your tests',
+    title: 'Bài kiểm tra',
     href: '/student/tests-management',
     icon: BookType,
     roles: ['student']
   },
   {
+    title: "Bài viết",
+    href: "/instructor/post",
+    icon: Newspaper,
+    roles: ['instructor', 'admin']
+  },
+  {
     title: "Manage library",
     href: "/library",
     icon: Library,
+    roles: ['instructor', 'admin']
   },
   // {
   //   title: "Assignments",
@@ -128,7 +143,7 @@ const navItems: NavItem[] = [
   },
 
   {
-    title: "Settings",
+    title: "Cài đặt",
     href: "/settings",
     icon: Settings,
   },
@@ -150,7 +165,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   });
   const pathname = usePathname()
   const { user } = useAuth()
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile();
+  const router = useRouter();
 
   const filteredNavItems = navItems.filter((item) => !item.roles || item.roles.includes(user?.vai_tro || "student"));
 
@@ -239,7 +255,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
               <span className="text-sidebar-primary-foreground font-bold text-sm">E</span>
             </div>
-            <span className="font-bold text-lg text-white text-nowrap">AI-CAS</span>
+            <span className="font-bold text-lg text-white text-nowrap cursor-pointer" onClick={() => { router.push('/') }}>AI-CAS</span>
           </div>
 
         )}

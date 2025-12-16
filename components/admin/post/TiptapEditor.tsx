@@ -9,6 +9,10 @@ import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
 import Highlight from "@tiptap/extension-highlight";
 import { Toolbar } from "./TiptapMenuBar";
+import Paragraph from "@tiptap/extension-paragraph";
+import Document from '@tiptap/extension-document'
+import Heading from '@tiptap/extension-heading'
+import Text from '@tiptap/extension-text'
 
 interface TiptapEditorProps {
   content: string;
@@ -16,13 +20,36 @@ interface TiptapEditorProps {
 }
 
 export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
-  const editor = useEditor({
+  const editor = useEditor({   
     extensions: [
       StarterKit.configure({
         heading: {
-            levels: [1, 2, 3] // Chỉ cho phép h1, h2, h3
-        }
+          levels: [1, 2, 3],
+        },
+        blockquote: {
+          HTMLAttributes: {
+            class: "border-l-4 border-slate-300 pl-4 italic text-slate-600 my-4",
+          },
+        },
+        bulletList: {
+          HTMLAttributes: {
+            class: "list-disc pl-5 space-y-1",
+          },
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: "list-decimal pl-5 space-y-1",
+          },
+        },
+        listItem: {
+          HTMLAttributes: {
+            class: "ml-1",
+          },
+        },
       }),
+      Document,
+      Paragraph,
+      Text,
       Underline,
       Highlight,
       Image.configure({
@@ -30,7 +57,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         allowBase64: true,
       }),
       Link.configure({
-        openOnClick: false, // Tắt mở link khi đang edit
+        openOnClick: false,
         autolink: true,
       }),
       TextAlign.configure({
@@ -43,21 +70,25 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm sm:prose-base max-w-none focus:outline-none min-h-[300px] px-4 py-3",
+          "prose prose-sm max-w-none focus:outline-none min-h-[300px] px-4 py-3 \
+           prose-h1:!text-3xl \
+           prose-h2:!text-2xl \
+           prose-h3:!text-xl"
       },
     },
     content: content,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
-    // Fix lỗi hydration mismatch của Next.js
-    immediatelyRender: false, 
+    immediatelyRender: false,
   });
 
   return (
     <div className="w-full border rounded-lg shadow-sm bg-white overflow-hidden">
       <Toolbar editor={editor} />
-      <EditorContent editor={editor} />
+      <div className="max-h-[500px] overflow-y-auto">
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }

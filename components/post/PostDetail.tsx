@@ -48,8 +48,6 @@ const PostDetail = ({ post_id }: PostDetailProps) => {
     )
   }
 
-  console.log('POST: ', post);
-
   return (
     <article className="min-h-screen bg-white pb-20">
       {/* Hero Header */}
@@ -93,9 +91,12 @@ const PostDetail = ({ post_id }: PostDetailProps) => {
         )}
 
         <div
-          className="prose prose-lg prose-slate max-w-none 
-            prose-headings:font-bold prose-headings:tracking-tight 
-            prose-a:text-blue-600 prose-img:rounded-xl"
+          className=" prose prose-slate max-w-none
+    prose-p:my-4
+    prose-p:leading-7
+    prose-img:rounded-xl
+    prose-img:shadow
+    prose-headings:font-bold"
           dangerouslySetInnerHTML={{ __html: post.noi_dung || "" }}
         />
 

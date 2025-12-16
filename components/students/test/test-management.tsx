@@ -18,16 +18,17 @@ import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
 import { quizService } from "@/services/quizService"
 import { useAuth } from "@/providers/auth-provider"
-import ConfirmModal from "@/components/ui/ConfirmModal"
 import { capitalizeFirstLetter } from "@/utils/string"
 import { testService } from "@/services/test/testService"
-import { Test } from "@/types/interfaces/model"
+import { Test, TestAttempt } from "@/types/interfaces/model"
 import { testAttemptService } from "@/services/test/testAttemptService"
 import { getStatusLabel, getVisibilityLabel } from "@/utils/test"
+import ConfirmModal from "@/components/modals/confirm-modal"
 
 const TestManagementPage = () => {
   const [tests, setTests] = useState<Test[]>([])
-  const [courses, setCourses] = useState<Course[]>([])
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [attempts, setAttempts] = useState<TestAttempt[]>([]);
   const [loading, setLoading] = useState(true)
   const [selectedTest, setSelectedTest] = useState<Quiz | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -47,7 +48,7 @@ const TestManagementPage = () => {
     const fetchData = async () => {
       try {
         const [testData] = await Promise.all([
-          testService.getAllTests()
+          testAttemptService.getTestsAttemptByStudent(user?.ma_nguoi_dung)
         ]);
         setTests(testData.data);
       } catch (error) {
@@ -59,6 +60,8 @@ const TestManagementPage = () => {
 
     fetchData()
   }, []);
+
+  console.log(tests);
 
   const handleCreateQuiz = async () => {
     try {
@@ -148,7 +151,7 @@ const TestManagementPage = () => {
     }
   }
 
-  const getQuizStats = () => {
+  const getTestStats = () => {
     const total = tests.length
     const active = tests.filter((q) => q.trang_thai === "hoat_dong").length
     const draft = tests.filter((q) => q.trang_thai === "ban_nhap").length
@@ -157,7 +160,7 @@ const TestManagementPage = () => {
     return { total, active, draft, archived }
   }
 
-  const stats = getQuizStats()
+  const stats = getTestStats()
 
   if (loading) {
     return (
@@ -231,7 +234,7 @@ const TestManagementPage = () => {
 
       <Tabs defaultValue="active" className="space-y-4">
         <TabsList className="">
-          <TabsTrigger value="active" className="cursor-pointer">Tất cả bài thi ({stats.active})</TabsTrigger>
+          <TabsTrigger value="active" className="cursor-pointer">Bài thi đã tham gia ({stats.active})</TabsTrigger>
           <TabsTrigger value="draft" className="cursor-pointer">Đã tham gia ({stats.draft})</TabsTrigger>
           <TabsTrigger value="archived" className="cursor-pointer">Được giao ({stats.archived})</TabsTrigger>
         </TabsList>
@@ -239,20 +242,19 @@ const TestManagementPage = () => {
         <TabsContent value="active" className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
             {tests
-              .filter((test) => test.trang_thai === "hoat_dong")
               .map((test) => (
                 <Card key={test.ma_kiem_tra} className="hover:shadow-md transition-shadow gap-2 py-4">
                   <CardHeader className="flex items-center justify-between">
                     <div className="flex items-center justify-start gap-2">
                       <div className="space-y-1">
                         <CardTitle className="text-lg mb-0">{test.tieu_de}</CardTitle>
-                        <CardDescription>{test.ma_khoa_hoc}</CardDescription>
+                        <CardDescription>Khoá học</CardDescription>
                       </div>
-                      <Badge variant="default">{getStatusLabel(test.trang_thai)}</Badge>
+                      {/* <Badge variant="default">{getStatusLabel(test.trang_thai)}</Badge> */}
                     </div>
                     <Button className="cursor-pointer bg-blue-600 text-white rounded-[3px]" variant="outline" size="sm" onClick={() => handleStartTest(test.ma_kiem_tra, user?.ma_nguoi_dung)}>
                       <Play />
-                      Vào thi
+                      Thi lại
                     </Button>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -269,11 +271,11 @@ const TestManagementPage = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <LayoutTemplate className="h-4 w-4" />
-                        {test.so_phan} phần
+                        {test.tong_so_phan} phần
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        {test?.cau_hoi_kiem_tra?.length} câu hỏi
+                        {test?.cau_hoi_trac_nghiem?.length} câu hỏi
                       </div>
                       <div className="flex items-center gap-1">
                         {test.pham_vi_hien_thi === 'cong_khai' && <Earth className="h-4 w-4" />}
@@ -318,7 +320,7 @@ const TestManagementPage = () => {
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <CardTitle className="text-lg">{test.tieu_de}</CardTitle>
-                        <CardDescription>{test.course}</CardDescription>
+                        <CardDescription>Course</CardDescription>
                       </div>
                       <Badge variant="secondary">{test.trang_thai}</Badge>
                     </div>
@@ -337,7 +339,7 @@ const TestManagementPage = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        {test?.cau_hoi_kiem_tra?.length} câu hỏi
+                        {test?.cau_hoi_trac_nghiem?.length} câu hỏi
                       </div>
                     </div>
 
@@ -386,7 +388,7 @@ const TestManagementPage = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        {test?.cau_hoi_kiem_tra?.length} câu hỏi
+                        {test?.cau_hoi_trac_nghiem?.length} câu hỏi
                       </div>
                     </div>
 

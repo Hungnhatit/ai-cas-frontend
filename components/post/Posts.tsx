@@ -11,6 +11,7 @@ import { Badge } from '../ui/badge';
 import PostDetailPage from '@/app/post/[id]/page';
 import PostPagination from './PostPagination';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { formatDate } from '@/utils/formatDate';
 
 const PostCard = ({ post, onClick }: { post: Post; onClick: () => void }) => {
   return (
@@ -36,10 +37,10 @@ const PostCard = ({ post, onClick }: { post: Post; onClick: () => void }) => {
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center gap-2 text-xs text-slate-500 mb-3">
           <Calendar className="h-3 w-3" />
-          <span>{new Date(post.ngay_tao).toLocaleDateString('vi-VN')}</span>
+          <span>{formatDate(post.ngay_tao)}</span>
           <span className="h-1 w-1 rounded-full bg-slate-300"></span>
           <Clock className="h-3 w-3" />
-          <span>5 min read</span>
+          <span>5 phút đọc</span>
         </div>
         <h3 className="mb-2 text-lg font-bold leading-tight text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">
           {post.tieu_de}
@@ -52,7 +53,7 @@ const PostCard = ({ post, onClick }: { post: Post; onClick: () => void }) => {
             <div className="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center">
               <User className="h-3 w-3" />
             </div>
-            <span>Tác giả #{post.ma_tac_gia}</span>
+            <span>Tác giả:  #{post.tac_gia.ten}</span>
           </div>
           <span className="text-xs text-blue-600 font-semibold group-hover:translate-x-1 transition-transform flex items-center">
             Đọc thêm <ChevronRight className="h-3 w-3 ml-1" />
@@ -80,7 +81,7 @@ const SearchInput = ({ defaultValue, onSearch }: { defaultValue: string, onSearc
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
       <Input
         placeholder="Tìm kiếm bài viết..."
-        className="pl-9"
+        className="pl-9 rounded-[3px] border-gray-300 shadow-none"
         value={value}
         onChange={(e: any) => setValue(e.target.value)}
       />

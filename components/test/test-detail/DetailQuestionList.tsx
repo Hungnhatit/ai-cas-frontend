@@ -12,7 +12,7 @@ interface QuestionListProps {
   searchTerm: string
 }
 const DetailQuestionList = ({ questions, searchTerm }: QuestionListProps) => {
-  console.log(questions);
+  console.log('questions: ', questions);
 
   const filteredQuestions = useMemo(() => {
     if (!searchTerm) return questions;
@@ -22,7 +22,7 @@ const DetailQuestionList = ({ questions, searchTerm }: QuestionListProps) => {
       return (
         q.cau_hoi?.toLowerCase().includes(lowercasedFilter) ||
         optionsText.toLowerCase().includes(lowercasedFilter) ||
-        (q.giai_thich && q.giai_thich.toLowerCase().includes(lowercasedFilter)) ||
+        (q.giai_thich_dap_an && q.giai_thich_dap_an.toLowerCase().includes(lowercasedFilter)) ||
         String(q.dap_an_dung).toLowerCase().includes(lowercasedFilter)
       );
     });
@@ -31,7 +31,7 @@ const DetailQuestionList = ({ questions, searchTerm }: QuestionListProps) => {
 
   return (
     <div>
-      {filteredQuestions.map((question, index) => (
+      {filteredQuestions?.map((question, index) => (
         <QuestionCard
           key={question.ma_cau_hoi}
           question={question}
