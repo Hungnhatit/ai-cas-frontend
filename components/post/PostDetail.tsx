@@ -6,6 +6,7 @@ import { Button } from '../ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { useRouter } from 'next/navigation';
+import { formatDate } from '@/utils/formatDate';
 
 interface PostDetailProps {
   post_id: number,
@@ -49,7 +50,7 @@ const PostDetail = ({ post_id }: PostDetailProps) => {
   }
 
   return (
-    <article className="min-h-screen bg-white pb-20">
+    <article className="">
       {/* Hero Header */}
       <div className="relative h-[400px] w-full bg-slate-900">
         <img
@@ -73,7 +74,7 @@ const PostDetail = ({ post_id }: PostDetailProps) => {
               <span>•</span>
               <span>{new Date(post.ngay_tao).toLocaleDateString('vi-VN')}</span>
               <span>•</span>
-              <span>Tác giả #{post.ma_tac_gia}</span>
+              <span>Tác giả:</span>
             </div>
             <h1 className="text-3xl font-bold leading-tight tracking-tighter text-white md:text-5xl lg:leading-[1.1]">
               {post.tieu_de}
@@ -83,21 +84,45 @@ const PostDetail = ({ post_id }: PostDetailProps) => {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto max-w-4xl px-6 py-12">
+      <div className="container shadow-xl mb-4 mx-auto max-w-4xl px-6 py-12 rounded-lg">
+        <div>
+          <p>{formatDate(post.ngay_tao)}</p>
+        </div>
         {post.tom_tat && (
-          <div className="mb-10 rounded-xl bg-slate-50 p-6 md:p-8 text-lg font-medium text-slate-700 italic border-l-4 border-blue-600">
+          <div className="mb-10 rounded-xl text-justify bg-slate-50 p-6 md:p-8 text-lg font-medium text-slate-700 italic border-l-4 border border-blue-600">
             {post.tom_tat}
           </div>
         )}
 
         <div
-          className=" prose prose-slate max-w-none
-    prose-p:my-4
-    prose-p:leading-7
-    prose-img:rounded-xl
-    prose-img:shadow
-    prose-headings:font-bold"
-          dangerouslySetInnerHTML={{ __html: post.noi_dung || "" }}
+          // className="prose prose-slate max-w-none [&_p]:min-h-[1.5rem]"
+          className="
+              prose prose-slate max-w-none p-4 bg-slate-50 rounded-xl
+              
+              /* Fix lỗi mất dòng khi enter (thẻ p rỗng) */
+              [&_p]:min-h-[1.5rem] text-[18px] 
+              
+              /* Tùy chỉnh Heading cho to và đậm hơn mặc định của prose nếu muốn */
+              prose-headings:font-bold prose-headings:text-slate-900
+
+              [&_h1]:text-3xl 
+              [&_h1]:mb-4
+              [&_h1]:font-bold
+
+              [&_h2]:text-2xl
+              [&_h2]:mt-6
+              [&_h2]:mb-4
+              
+              /* Tùy chỉnh ảnh */
+              [&_img]:rounded-lg
+              [&_img]:mb-2
+              
+              /* Tùy chỉnh link */
+              [&_a]:text-blue-500 
+              [&_a]:no-underline 
+              hover:[&_a]:underline
+              "
+          dangerouslySetInnerHTML={{ __html: post.noi_dung || '' }}
         />
 
         <div className="mt-12 flex items-center justify-between border-t border-slate-200 pt-8">
