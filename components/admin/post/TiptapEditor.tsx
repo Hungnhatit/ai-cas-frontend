@@ -11,8 +11,10 @@ import Highlight from "@tiptap/extension-highlight";
 import { Toolbar } from "./TiptapMenuBar";
 import Paragraph from "@tiptap/extension-paragraph";
 import Document from '@tiptap/extension-document'
-import Heading from '@tiptap/extension-heading'
+import Heading from '@tiptap/extension-heading';
 import Text from '@tiptap/extension-text'
+import { Color, FontFamily, TextStyleKit } from '@tiptap/extension-text-style'
+import { CustomImage } from "@/components/tiptap/image/CustomImage";
 
 interface TiptapEditorProps {
   content: string;
@@ -20,7 +22,7 @@ interface TiptapEditorProps {
 }
 
 export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
-  const editor = useEditor({   
+  const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: {
@@ -51,11 +53,14 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       Paragraph,
       Text,
       Underline,
+      TextStyleKit,
+      Color,
+      FontFamily,
       Highlight,
-      Image.configure({
-        inline: true,
-        allowBase64: true,
-      }),
+      // Image.configure({
+      //   inline: true,
+      //   allowBase64: true,
+      // }),
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -66,14 +71,21 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       Placeholder.configure({
         placeholder: "Nhập nội dung của bạn tại đây...",
       }),
+      CustomImage.configure({
+        inline: true,
+        allowBase64: true
+      })
     ],
     editorProps: {
       attributes: {
         class:
           "prose prose-sm max-w-none focus:outline-none min-h-[300px] px-4 py-3 \
-           prose-h1:!text-3xl \
+            [&_h1]:text-3xl \
+            [&_h1]:mb-4 \
+            [&_h1]:font-bold \
            prose-h2:!text-2xl \
-           prose-h3:!text-xl"
+           prose-h3:!text-xl \
+           "
       },
     },
     content: content,
@@ -86,7 +98,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   return (
     <div className="w-full border rounded-lg shadow-sm bg-white overflow-hidden">
       <Toolbar editor={editor} />
-      <div className="max-h-[500px] overflow-y-auto">
+      <div className="max-h-[1000px] overflow-y-auto">
         <EditorContent editor={editor} />
       </div>
     </div>
