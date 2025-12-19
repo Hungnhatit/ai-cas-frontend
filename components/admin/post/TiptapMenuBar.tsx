@@ -6,7 +6,8 @@ import {
   Bold, Italic, Strikethrough, Underline, Quote, List, ListOrdered,
   Heading1, Heading2, Heading3, Link as LinkIcon, Image as ImageIcon,
   AlignLeft, AlignCenter, AlignRight, AlignJustify, Undo, Redo, Highlighter,
-  Loader2 // Icon loading
+  Loader2, // Icon loading
+  Palette
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/axios";
@@ -16,8 +17,9 @@ type Props = {
 };
 
 export function Toolbar({ editor }: Props) {
-  const fileInputRef = useRef<HTMLInputElement>(null); // Ref để điều khiển input file
-  const [isUploading, setIsUploading] = useState(false); // State loading
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const colorInputRef = useRef<HTMLInputElement>(null);
 
   const setLink = useCallback(() => {
     if (!editor) {
@@ -34,12 +36,10 @@ export function Toolbar({ editor }: Props) {
     editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }, [editor]);
 
-  // 1. Hàm kích hoạt input file ẩn
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
 
-  // 2. Hàm xử lý khi người dùng chọn file
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -96,7 +96,7 @@ export function Toolbar({ editor }: Props) {
       }}
       disabled={disabled}
       className={cn(
-        "p-2 rounded-md hover:bg-slate-200 transition-colors disabled:opacity-50",
+        "p-2 rounded-md hover:bg-slate-200 transition-colors disabled:opacity-50 cursor-pointer",
         isActive ? "bg-slate-200 text-black font-bold" : "text-slate-600"
       )}
       title={label}
@@ -106,8 +106,26 @@ export function Toolbar({ editor }: Props) {
     </button>
   );
 
+  // --- HÀM XỬ LÝ MÀU SẮC ---
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    editor?.chain().focus().setColor(event.target.value).run();
+  };
+
+  const handleColorClick = () => {
+    colorInputRef.current?.click();
+  };
+
+  const handleFontChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    if (value === "default") {
+      editor?.chain().focus().unsetFontFamily().run();
+    } else {
+      editor?.chain().focus().setFontFamily(value).run();
+    }
+  };
+
   return (
-    <div className=" border-b bg-slate-50 p-2 flex flex-wrap gap-1 sticky top-0 z-10 items-center">
+    <div className="border-b bg-slate-50 p-2 flex flex-wrap gap-1 sticky top-0 z-10 items-center">
       {/* INPUT FILE ẨN - QUAN TRỌNG */}
       <input
         type="file"
@@ -117,10 +135,50 @@ export function Toolbar({ editor }: Props) {
         accept="image/*"
       />
 
+      <input
+        type="color"
+        ref={colorInputRef}
+        onChange={handleColorChange}
+        className="hidden"
+      />
+
       {/* --- HISTORY --- */}
       <div className="flex gap-1 pr-2 border-r border-slate-300">
         <ToolbarButton onClick={() => editor?.chain().focus().undo().run()} icon={Undo} label="Undo" />
         <ToolbarButton onClick={() => editor?.chain().focus().redo().run()} icon={Redo} label="Redo" />
+      </div>
+
+      {/* --- FONT STYLE & COLOR (NEW) --- */}
+      <div className="flex gap-1 px-2 border-r border-slate-300 items-center">
+        {/* Font Select Dropdown */}
+        <div className="relative mr-1">
+          <select
+            onChange={handleFontChange}
+            value={editor?.getAttributes('textStyle').fontFamily || "default"}
+            className="h-8 w-[100px] text-xs px-2 rounded-md border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-slate-400 cursor-pointer"
+          >
+            <option className="cursor-pointer" value="default">Default</option>
+            <option className="cursor-pointer" value="Arial">Arial</option>
+            <option className="cursor-pointer" value="Georgia">Georgia</option>
+            <option className="cursor-pointer" value="Times New Roman">Times New Roman</option>
+            <option className="cursor-pointer" value="Courier New">Courier New</option>
+            <option className="cursor-pointer" value="Verdana">Verdana</option>
+          </select>
+        </div>
+
+        {/* Color Button */}
+        <div className="relative flex items-center">
+          <ToolbarButton
+            onClick={handleColorClick}
+            icon={Palette}
+            label="Text Color"
+            isActive={!!editor?.getAttributes('textStyle').color}
+          />
+          <div
+            className="w-3 h-3 rounded-full border border-slate-300 ml-[-6px] pointer-events-none"
+            style={{ backgroundColor: editor?.getAttributes('textStyle').color || '#000' }}
+          />
+        </div>
       </div>
 
       {/* --- HEADINGS --- */}
