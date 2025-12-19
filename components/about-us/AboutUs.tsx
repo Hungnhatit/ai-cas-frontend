@@ -4,7 +4,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, Brain, GraduationCap, Users, Target, ShieldCheck, BadgeCheck } from "lucide-react";
+import { CheckCircle, Brain, GraduationCap, Users, Target, ShieldCheck, BadgeCheck, Album } from "lucide-react";
+import { GiSkills } from "react-icons/gi";
+import { GrDocumentMissing } from "react-icons/gr";
+import { MdOutlineModelTraining, MdOutlinePersonalInjury } from "react-icons/md";
+import { FcMindMap } from "react-icons/fc";
+
+const whyAIs = [
+  {
+    title: 'Đo lường kỹ năng thực tế',
+    description: 'Đánh giá khả năng sử dụng AI trong các tình huống học tập và công việc thực tế, không chỉ dựa trên lý thuyết',
+    icon: <GiSkills size={24} className="text-"/>
+  },
+  {
+    title: 'Phát hiện lỗ hổng kiến thức',
+    description: 'Xác định chính xác những điểm còn thiếu hoặc hiểu chưa đúng để người học cải thiện hiệu quả hơn',
+    icon: <GrDocumentMissing size={24} className="text-"/>
+  },
+  {
+    title: 'Chuẩn hóa theo tiêu chuẩn giáo dục',
+    description: 'Xây dựng hệ thống đánh giá dựa trên các nguyên tắc và chuẩn mực giáo dục hiện đại, minh bạch và đáng tin cậy',
+    icon: <Album size={24} className="text-"/>
+  },
+  {
+    title: 'Định hướng học tập cá nhân hóa',
+    description: 'Đề xuất lộ trình học tập phù hợp với năng lực, mục tiêu và trình độ của từng người học.',
+    icon: <MdOutlinePersonalInjury size={24} className="text-"/>
+  },
+  {
+    title: 'Đảm bảo đạo đức & trách nhiệm AI',
+    description: 'Nâng cao nhận thức về việc sử dụng AI một cách đúng đắn, có trách nhiệm và phù hợp với chuẩn mực xã hội.',
+    icon: <FcMindMap size={24} className="text-"/>
+  },
+  {
+    title: 'Hỗ trợ ra quyết định đào tạo',
+    description: 'Cung cấp dữ liệu và báo cáo rõ ràng để giáo viên, nhà trường và tổ chức đưa ra quyết định đào tạo hiệu quả.',
+    icon: <MdOutlineModelTraining size={24} className="text-"/>
+  },
+]
 
 export const AboutUs = () => {
   return (
@@ -14,7 +51,7 @@ export const AboutUs = () => {
         <div className="">
           <Badge variant="default" className="bg-slate-800 text-white text-[16px] px-4 py-1 mb-4">
             Hệ thống đánh giá năng lực sử dụng AI
-            <BadgeCheck className="h-5 w-5"/>
+            <BadgeCheck className="h-5 w-5" />
           </Badge>
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-slate-800 leading-tight">
@@ -34,7 +71,7 @@ export const AboutUs = () => {
       {/* Mission & Vision */}
       <section className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 gap-8">
-          <Card>
+          <Card className="rounded-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="text-sky-600" /> Sứ mệnh
@@ -48,7 +85,7 @@ export const AboutUs = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Brain className="text-sky-600" /> Tầm nhìn
@@ -76,11 +113,16 @@ export const AboutUs = () => {
           </p>
 
           <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {["Đo lường kỹ năng thực tế", "Phát hiện lỗ hổng kiến thức", "Chuẩn hóa theo tiêu chuẩn giáo dục", "Định hướng học tập cá nhân hóa", "Đảm bảo đạo đức & trách nhiệm AI", "Hỗ trợ ra quyết định đào tạo"].map((item, idx) => (
-              <Card key={idx} className="hover:shadow-md transition">
-                <CardContent className="flex gap-3 items-start pt-6">
-                  <CheckCircle className="text-sky-600 mt-1" />
-                  <p className="text-slate-600">{item}</p>
+            {whyAIs.map((item, idx) => (
+              <Card key={idx} className="rounded-md hover:shadow-md transition">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    {item.icon}
+                    <p className="text-slate-600">{item.title}</p>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="">
+                  <p>{item.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -92,7 +134,7 @@ export const AboutUs = () => {
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center text-slate-800">Giá trị cốt lõi</h2>
         <div className="mt-12 grid md:grid-cols-3 gap-8">
-          <Card>
+          <Card className="rounded-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <GraduationCap className="text-sky-600" /> Giáo dục làm trung tâm
@@ -104,7 +146,7 @@ export const AboutUs = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShieldCheck className="text-sky-600" /> Minh bạch & tin cậy
@@ -116,7 +158,7 @@ export const AboutUs = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="text-sky-600" /> Đồng hành phát triển
@@ -135,7 +177,7 @@ export const AboutUs = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-slate-800">Hệ thống của chúng tôi gồm những gì?</h2>
           <div className="mt-12 grid lg:grid-cols-2 gap-8">
-            <Card>
+            <Card className="rounded-md">
               <CardHeader>
                 <CardTitle>Bài đánh giá năng lực AI</CardTitle>
               </CardHeader>
@@ -150,7 +192,7 @@ export const AboutUs = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-md">
               <CardHeader>
                 <CardTitle>Báo cáo & lộ trình phát triển</CardTitle>
               </CardHeader>

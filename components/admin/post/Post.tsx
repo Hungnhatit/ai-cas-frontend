@@ -113,7 +113,7 @@ const Post = () => {
           <p className="text-white mt-2">Bảng điều khiển quản lý bài viết, giúp giảng viên theo dõi tình trạng, chỉnh sửa và quản lý nội dung học tập của mình một cách nhanh chóng và thuận tiện.</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => { router.push('/posts/create') }} className="bg-blue-600 hover:bg-blue-700 cursor-pointer rounded-[3px]">
+          <Button onClick={() => { router.push('/instructor/post/create') }} className="bg-blue-600 hover:bg-blue-700 cursor-pointer rounded-[3px]">
             + Tạo bài viết mới
           </Button>
         </div>

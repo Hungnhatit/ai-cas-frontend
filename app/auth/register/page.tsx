@@ -53,7 +53,7 @@ export default function RegisterPage() {
 
     try {
       await register(formData.email, formData.password, formData.name, formData.role);
-      router.push("/dashboard");
+      router.push("/auth/login");
     } catch (err) {
       setError("Registration failed. Please try again.")
     } finally {
@@ -101,7 +101,7 @@ export default function RegisterPage() {
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   required
-                  className="bg-muted/50"
+                  className="bg-muted/50 rounded-[3px] border-gray-300 shadow-none"
                 />
               </div>
 
@@ -114,7 +114,7 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   required
-                  className="bg-muted/50"
+                  className="bg-muted/50 rounded-[3px] border-gray-300 shadow-none"
                 />
               </div>
 
@@ -122,12 +122,12 @@ export default function RegisterPage() {
                 <Label htmlFor="role">Vai trò</Label>
                 <Select value={formData.role} onValueChange={(value) => handleInputChange("role", value)}>
                   <SelectTrigger className="bg-muted/50 rounded-[3px] shadow-none border-gray-300 cursor-pointer">
-                    <SelectValue placeholder="Select your role" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer" />
+                    <SelectValue placeholder="Vai trò" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer" />
                   </SelectTrigger>
                   <SelectContent className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">
-                    <SelectItem value="student" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">Student</SelectItem>
-                    <SelectItem value="instructor" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">Instructor</SelectItem>
-                    <SelectItem value="admin" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">Administrator</SelectItem>
+                    <SelectItem value="student" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">Học viên</SelectItem>
+                    <SelectItem value="instructor" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">Giảng viên</SelectItem>
+                    {/* <SelectItem value="admin" className="rounded-[3px] shadow-none border-gray-300 cursor-pointer">Administrator</SelectItem> */}
                   </SelectContent>
                 </Select>
               </div>
@@ -142,7 +142,7 @@ export default function RegisterPage() {
                     value={formData.password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
                     required
-                    className="bg-muted/50 pr-10"
+                    className="bg-muted/50 pr-10 rounded-[3px] border-gray-300 shadow-none"
                   />
                   <Button
                     type="button"
@@ -162,11 +162,11 @@ export default function RegisterPage() {
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
+                    placeholder="Xác nhận mật khẩu vừa nhập"
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                     required
-                    className="bg-muted/50 pr-10"
+                    className="bg-muted/50 pr-10 rounded-[3px] border-gray-300 shadow-none"
                   />
                   <Button
                     type="button"
@@ -180,17 +180,17 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full rounded-[3px] cursor-pointer" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Account
+                Tạo tài khoản
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Already have an account?{" "}
+                Đã có tài khoản?{" "}
                 <Link href="/auth/login" className="text-primary hover:underline">
-                  Sign in
+                  Đăng nhập ngay
                 </Link>
               </p>
             </div>

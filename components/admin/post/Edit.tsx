@@ -103,7 +103,7 @@ const EditPost = ({ post_id }: EditPostProps) => {
       console.log('PAYLOAD: ', data);
 
       if (res.success) {
-        toast.success('Updated successfully!')
+        toast.success('Cập nhật bài viết thành công!')
         // router.push('/posts'); 
       } else {
         alert(res.message || "Có lỗi xảy ra");

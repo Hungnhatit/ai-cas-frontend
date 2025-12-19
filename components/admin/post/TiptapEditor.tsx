@@ -15,6 +15,7 @@ import Heading from '@tiptap/extension-heading';
 import Text from '@tiptap/extension-text'
 import { Color, FontFamily, TextStyleKit } from '@tiptap/extension-text-style'
 import { CustomImage } from "@/components/tiptap/image/CustomImage";
+import TabKeyExtension from "@/components/tiptap/image/Tab";
 
 interface TiptapEditorProps {
   content: string;
@@ -72,19 +73,23 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         placeholder: "Nhập nội dung của bạn tại đây...",
       }),
       CustomImage.configure({
-        inline: true,
+        inline: false,
         allowBase64: true
-      })
+      }),
+      TabKeyExtension
     ],
     editorProps: {
       attributes: {
         class:
           "prose prose-sm max-w-none focus:outline-none min-h-[300px] px-4 py-3 \
-            [&_h1]:text-3xl \
-            [&_h1]:mb-4 \
-            [&_h1]:font-bold \
-           prose-h2:!text-2xl \
-           prose-h3:!text-xl \
+          [&_h1]:text-3xl \
+          [&_h1]:mb-4 \
+          [&_h1]:font-bold \
+          prose-h2:!text-2xl \
+          prose-h3:!text-xl \
+          [&_a]:font-bold\
+          [&_a]:text-blue-700\
+          [&_ul]:m-2\
            "
       },
     },
@@ -96,7 +101,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   });
 
   return (
-    <div className="w-full border rounded-lg shadow-sm bg-white overflow-hidden">
+    <div className="w-full border rounded-lg shadow-sm bg-white">
       <Toolbar editor={editor} />
       <div className="max-h-[1000px] overflow-y-auto">
         <EditorContent editor={editor} />
