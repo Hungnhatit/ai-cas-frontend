@@ -293,6 +293,18 @@ export interface Instructor {
   ngay_cap_nhat: string;     // updatedAt
 }
 
+export interface Attachment {
+  ma_dinh_kem: number;
+  ma_tai_lieu: number;
+  ten_tep: string;
+  duong_dan: string;
+  dung_luong?: number | null;
+  dinh_dang?: string | null;
+  ngay_tao: string;
+  ngay_cap_nhat: string;
+}
+
+
 export interface Post {
   ma_bai_viet: number;
   ma_tac_gia: number;
@@ -302,6 +314,8 @@ export interface Post {
   trang_thai?: "nhap" | "cho_duyet" | "da_dang";
   ngay_tao: string;
   ngay_cap_nhat: string;
+  anh_bia: string;
+  tac_gia: User
 }
 
 export interface Course {
