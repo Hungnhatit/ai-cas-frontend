@@ -5,7 +5,6 @@ import { AuthProvider } from "@/providers/auth-provider"
 import { ThemeProvider } from "@/providers/theme-provider"
 import { I18nProvider } from "@/providers/i18n-provider"
 import { Toaster } from "@/components/ui/toaster"
-import { Suspense } from "react"
 import "./globals.css"
 import ToasterProvider from "@/providers/toaster-provider"
 
@@ -25,12 +24,10 @@ export default function RootLayout({
       <body className={`font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <I18nProvider>
-            <AuthProvider>
-              <Suspense fallback={null}>
+            <AuthProvider>              
                 {children}
                 <Toaster />
-                <ToasterProvider />
-              </Suspense>
+                <ToasterProvider />              
             </AuthProvider>
           </I18nProvider>
         </ThemeProvider>
