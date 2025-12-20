@@ -21,15 +21,6 @@ import ConfirmModal from '../modals/confirm-modal';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
-interface Question {
-  id: string;
-  type: 'multiple-choice' | 'multiple-select' | 'essay';
-  question: string;
-  options?: string[];
-  correctAnswer?: string | string[];
-  userAnswer?: string | string[];
-}
-
 const TestManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -76,7 +67,7 @@ const TestManagement = () => {
   useEffect(() => {
     if (!user) return;
     const fetchTests = async () => {
-      setLoading(false);
+      setLoading(true);
       try {
         const [resTest] = await Promise.all([
           testService.getTestsByInstructorId(user?.ma_nguoi_dung)
