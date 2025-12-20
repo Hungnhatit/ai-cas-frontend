@@ -32,6 +32,7 @@ export interface Question {
 
 
 export interface UserAnswer {
+  question_type: string;
   question_id: string;
   answer: string | number;
   timeSpent: number;
