@@ -1,4 +1,5 @@
 import { api } from "@/lib/axios";
+import { ppid } from "process";
 
 interface CreatePostPayload {
   ma_tac_gia: number | string;
@@ -43,6 +44,15 @@ export const PostService = {
     }
   },
 
+  getPost: async (params: any) => {
+    try {
+      const res = await api.get('/post', {params});
+      return res.data;
+    } catch (error: any) {
+      throw error.res?.data || error.message;
+    }
+  },
+
   getPostByInstructorId: async (instructor_id: number, params: { page?: number; limit?: number; q?: string; trang_thai?: string }) => {
     try {
       const res = await api.get(`/post/instructor/${instructor_id}`, {
@@ -58,6 +68,36 @@ export const PostService = {
     } catch (error: any) {
       throw error.res?.data || error.message;
     }
-  }
+  },
 
+  getPostByID: async (post_id: number) => {
+    try {
+      const res = await api.get(`/post/${post_id}`);
+      return res.data;
+    } catch (error: any) {
+      throw error.res?.data || error.message;
+    }
+  },
+
+  updatePost: async (post_id: number, payload: any) => {
+    try {
+      const res = await api.patch(`/post/${post_id}`, payload, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+      return res.data;
+    } catch (error: any) {
+      throw error.res?.data || error.message;
+    }
+  },
+
+  deletePost: async (post_id: number) => {
+    try {
+      const res = await api.delete(`/post/${post_id}`);
+      return res.data;
+    } catch (error: any) {
+      throw error.res?.data || error.message;
+    }
+  }
 }
