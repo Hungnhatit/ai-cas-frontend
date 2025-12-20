@@ -12,13 +12,17 @@ export const userService = {
   },
 
   getUserById: async (user_id: number) => {
-    const res = await api.get(`/user/${user_id}`);
+    const res = await api.get(`/user/${user_id}/detail`);
     return res.data;
   },
 
-  updateUser: async (user_id: number, data: any) => {
-    const res = await api.patch(`/user/${user_id}`, data)
-    return res.data
+  updateUser: async (user_id: number, formData: FormData) => {
+    const res = await api.patch(`/user/${user_id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
   },
 
   softDeleteUser: async (user_id: number) => {
