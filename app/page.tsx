@@ -17,7 +17,7 @@ export default function HomePage() {
   const features = [
     {
       icon: <Brain className="h-6 w-6 text-indigo-600" />,
-      title: "Đánh giá thích ứng (Adaptive)",
+      title: "Đánh giá thích ứng",
       description: "Hệ thống tự động điều chỉnh độ khó câu hỏi dựa trên năng lực thực tế của người học, giúp đánh giá chính xác trình độ."
     },
     {
@@ -64,9 +64,6 @@ export default function HomePage() {
         <div className="absolute bottom-0 left-0 -z-10 w-[500px] h-[500px] bg-blue-100/50 rounded-full blur-3xl opacity-50 -translate-x-1/3 translate-y-1/4"></div>
 
         <div className="container mx-auto px-4 md:px-6 text-center">
-          <Badge variant="secondary" className="mb-4 text-indigo-700 border-indigo-100 bg-indigo-50">
-            <Sparkles className="w-3 h-3 mr-1" /> Phiên bản 2.0 đã ra mắt
-          </Badge>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6 max-w-4xl mx-auto leading-tight">
             Chuẩn hóa năng lực AI <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
@@ -77,10 +74,10 @@ export default function HomePage() {
             Hệ thống đánh giá toàn diện giúp người học định vị năng lực sử dụng Trí tuệ nhân tạo, từ đó xây dựng lộ trình phát triển sự nghiệp bền vững.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="rounded-full h-12 px-8 text-base w-full sm:w-auto shadow-indigo-200 shadow-xl hover:shadow-2xl hover:shadow-indigo-200 transition-all cursor-pointer">
-              Bắt đầu đánh giá <ArrowRight className="ml-2 h-4 w-4" />
+            <Button size="lg" className="rounded-lg bg-[#242F3E] hover:bg-[#637691] h-12 px-8 text-base w-full sm:w-auto shadow-indigo-200 shadow-xl hover:shadow-2xl hover:shadow-indigo-200 transition-all cursor-pointer">
+              Bắt đầu đánh giá <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="lg" className="rounded-full h-12 px-8 text-base w-full sm:w-auto bg-white/50 backdrop-blur-sm cursor-pointer">
+            <Button variant="outline" size="lg" className="rounded-lg h-12 px-8 text-base w-full sm:w-auto bg-white/50 backdrop-blur-sm cursor-pointer">
               Tìm hiểu quy trình
             </Button>
           </div>
@@ -93,12 +90,12 @@ export default function HomePage() {
         <div className="container mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-3xl font-bold mb-2">10k+</div>
-              <div className="text-muted-foreground text-sm">Active Students</div>
+              <div className="text-3xl font-bold mb-2">1000+</div>
+              <div className="text-muted-foreground text-sm">Học viên tham gia</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold mb-2">500+</div>
-              <div className="text-muted-foreground text-sm">Expert Instructors</div>
+              <div className="text-muted-foreground text-sm">Giảng viên chuyên gia</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold mb-2">1000+</div>
@@ -139,7 +136,7 @@ export default function HomePage() {
             <div className="space-y-6">
               <Badge variant="default" className="bg-indigo-100 px-3 py-1 text-[16px] text-[#4e33b9] border-none">Về chúng tôi</Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
-                Sứ mệnh phổ cập <span className="text-indigo-600">Năng lực AI</span> cho thế hệ trẻ Việt Nam
+                Sứ mệnh phổ cập năng lực AI cho thế hệ trẻ Việt Nam
               </h2>
               <p className="text-slate-600 text-lg leading-relaxed">
                 Trong kỷ nguyên số, AI không còn là công nghệ xa vời mà là kỹ năng sinh tồn. Hệ thống của chúng tôi ra đời nhằm xóa bỏ khoảng cách về kỹ năng số, cung cấp thước đo chuẩn xác để các cơ sở giáo dục và doanh nghiệp có tiếng nói chung.
@@ -169,11 +166,13 @@ export default function HomePage() {
       </section>
 
       {/* User Segment Tab */}
-      <section className="py-20 bg-slate-100/50">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center max-w-3xl mx-auto mb-10">
+      <section className="">
+        <div className="max-w-7xl space-y-6 bg-slate-200/80 mx-auto p-10 rounded-4xl">
+          <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">Giải pháp cho mọi đối tượng</h2>
-            <p className="text-xl text-slate-600">Hệ thống được thiết kế tùy biến để đáp ứng nhu cầu đặc thù của từng nhóm người dùng.</p>
+            <p className="text-xl text-slate-800">
+              Hệ thống được thiết kế tùy biến để đáp ứng nhu cầu đặc thù của từng nhóm người dùng
+            </p>
           </div>
 
           <Tabs defaultValue="student">
@@ -195,7 +194,7 @@ export default function HomePage() {
                   <p className="text-slate-600">
                     Sở hữu hồ sơ năng lực AI được chứng thực giúp bạn nổi bật trước nhà tuyển dụng. Hệ thống gợi ý các kỹ năng còn thiếu và cung cấp tài liệu học tập phù hợp.
                   </p>
-                  <ul className="space-y-2 text-sm text-slate-700">
+                  <ul className="space-y-2 text-slate-700">
                     <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-600 rounded-full"></div>Bài test nhanh 15 phút</li>
                     <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-600 rounded-full"></div>Phân tích điểm mạnh/yếu chi tiết</li>
                     <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-600 rounded-full"></div>Lộ trình học tập miễn phí</li>
@@ -215,7 +214,7 @@ export default function HomePage() {
                   <p className="text-slate-600">
                     Giúp giảng viên đánh giá nhanh trình độ của lớp học, từ đó điều chỉnh giáo án phù hợp. Tự động hóa việc chấm điểm và phân tích thống kê.
                   </p>
-                  <ul className="space-y-2 text-sm text-slate-700">
+                  <ul className="space-y-2 text-slate-700">
                     <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-600 rounded-full"></div>Tạo đề thi tự động bằng AI</li>
                     <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-600 rounded-full"></div>Báo cáo năng lực lớp học trực quan</li>
                     <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-600 rounded-full"></div>Kho ngân hàng câu hỏi phong phú</li>
@@ -242,23 +241,26 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <Card key={index} className="border-none shadow-lg bg-white hover:-translate-y-1 transition-transform duration-300">
-                <CardHeader>
-                  <div className="mb-4 bg-indigo-50 w-12 h-12 rounded-lg flex items-center justify-center">
-                    {feature.icon}
-                  </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base text-slate-600">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="flex justify-center">
+            <div className="max-w-7xl grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {features.map((feature, index) => (
+                <Card key={index} className="border-none rounded-lg shadow-lg bg-white hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-500 transition-all duration-300">
+                  <CardHeader>
+                    <div className="mb-4 bg-indigo-50 w-12 h-12 rounded-lg flex items-center justify-center">
+                      {feature.icon}
+                    </div>
+                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-base text-slate-600">
+                      {feature.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
+
         </div>
       </section>
 
