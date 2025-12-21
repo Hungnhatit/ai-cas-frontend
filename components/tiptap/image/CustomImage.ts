@@ -3,34 +3,63 @@ import { ReactNodeViewRenderer, mergeAttributes } from "@tiptap/react";
 import { ImageNodeView } from "./ImageNodeView";
 
 export const CustomImage = Image.extend({
-  name: "customImage", // Đặt tên mới để tránh xung đột nếu cần
+  name: "customImage",
+  group: 'block',
+  draggable: true,
 
-  // 1. Thêm thuộc tính caption
   addAttributes() {
     return {
       ...this.parent?.(),
       caption: {
         default: "",
-        // Khi render ra HTML (lưu vào DB), caption sẽ nằm trong attribute data-caption
-        // Tuy nhiên, logic renderHTML dưới đây sẽ quyết định cấu trúc chính
       },
     };
   },
 
-  // 2. Sử dụng Component React để hiển thị trong Editor
   addNodeView() {
     return ReactNodeViewRenderer(ImageNodeView);
   },
 
-  // 3. Cấu hình cách render ra HTML (để lưu vào DB và hiển thị ở Frontend)
+  parseHTML() {
+    return [
+      {
+        tag: "figure", 
+        getAttrs: (element) => {          
+          if (typeof element === "string") return {}; 
+
+          const img = element.querySelector("img");
+          const figcaption = element.querySelector("figcaption");
+         
+          return {
+            src: img?.getAttribute("src"),
+            alt: img?.getAttribute("alt"),
+            title: img?.getAttribute("title"),
+            caption: figcaption?.innerText || "", caption
+          };
+        },
+      },
+      {
+        tag: "img", 
+        getAttrs: (element) => {
+          if (typeof element === "string") return {};
+          return {
+            src: element.getAttribute("src"),
+            alt: element.getAttribute("alt"),
+            title: element.getAttribute("title"),
+            caption: element.getAttribute("data-caption") || "", 
+          }
+        },
+      },
+    ];
+  },
+
   renderHTML({ HTMLAttributes }) {
     const { caption, ...attributes } = HTMLAttributes;
 
-    // Nếu có caption, render cấu trúc <figure> <img/> <figcaption>...</figcaption> </figure>
     if (caption) {
       return [
         "figure",
-        { class: "image-wrapper text-center" }, // Class cho thẻ figure
+        { class: "image-wrapper text-center" },
         [
           "img",
           mergeAttributes(this.options.HTMLAttributes, attributes),
@@ -39,7 +68,6 @@ export const CustomImage = Image.extend({
       ];
     }
 
-    // Nếu không có caption, render thẻ img bình thường
     return [
       "img",
       mergeAttributes(this.options.HTMLAttributes, attributes),
