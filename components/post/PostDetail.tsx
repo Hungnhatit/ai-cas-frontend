@@ -6,7 +6,9 @@ import { Button } from '../ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { useRouter } from 'next/navigation';
-import { formatDate } from '@/utils/formatDate';
+import { FaQuoteLeft } from "react-icons/fa";
+import { FaQuoteRight } from "react-icons/fa";
+import ShareButton from '../share-post/ShareButton';
 
 interface PostDetailProps {
   post_id: number,
@@ -44,7 +46,7 @@ const PostDetail = ({ post_id }: PostDetailProps) => {
   if (!post) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4 bg-slate-50">
-        <h1 className="text-2xl font-bold">404 - Không tìm thấy</h1>
+        <h1 className="text-2xl font-bold">404 - Không tìm thấy trang</h1>
       </div>
     )
   }
@@ -61,50 +63,56 @@ const PostDetail = ({ post_id }: PostDetailProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent" />
 
         <div className="absolute bottom-0 left-0 w-full p-6 md:p-12">
-          <div className="container mx-auto max-w-4xl">
-            <Button
-              variant="link"
-              className="text-white hover:text-blue-300 pl-0 mb-4 transition cursor-pointer"
-              onClick={() => router.push('/post')}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại danh sách
-            </Button>
+          <div className="container mx-auto max-w-4xl space-y-4">
             <div className="flex items-center gap-3 text-slate-300 text-sm mb-4">
               <Badge className="bg-blue-600 text-white border-none">Technology</Badge>
-              <span>•</span>
-              <span>{new Date(post.ngay_tao).toLocaleDateString('vi-VN')}</span>
-              <span>•</span>
-              <span>Tác giả:</span>
             </div>
-            <h1 className="text-3xl font-bold leading-tight tracking-tighter text-white md:text-5xl lg:leading-[1.1]">
+            <h1 className="text-3xl text-center font-bold text-white md:text-5xl lg:leading-[1.1]">
               {post.tieu_de}
             </h1>
+            <div className='flex justify-center gap-20'>
+              <div className='flex items-center gap-3 text-white'>
+                <span>{new Date(post.ngay_tao).toLocaleDateString('vi-VN')}</span>
+                <span>•</span>
+                <span>Đăng bởi: {post.tac_gia.ten}</span>
+              </div>
+
+
+              <ShareButton
+                title={post.tieu_de}
+                description={post.tom_tat || ''}
+              />
+            </div>
+
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="container shadow-xl mb-4 mx-auto max-w-4xl px-6 py-12 rounded-lg">
-        <div>
-          <p>{formatDate(post.ngay_tao)}</p>
-        </div>
+      <div className="container shadow-xl mb-4 mx-auto max-w-4xl px-8 py-12 rounded-lg">
         {post.tom_tat && (
-          <div className="mb-10 rounded-xl text-justify bg-slate-50 p-6 md:p-8 text-lg font-medium text-slate-700 italic border-l-4 border border-blue-600">
-            {post.tom_tat}
+          <div className="relative mb-10 rounded-xl text-justify bg-slate-50 p-6 md:p-8 text-lg font-medium text-slate-700 italic border-l-4 border border-blue-600">
+            <FaQuoteLeft className="rotate-6 absolute top-4 left-4 text-blue-300 text-2xl" />
+
+            <p className="px-6 text-justify">
+              {post.tom_tat}
+            </p>
+
+            <FaQuoteRight className="rotate-6 absolute bottom-4 right-4 text-blue-300 text-2xl" />
           </div>
         )}
 
         <div
           // className="prose prose-slate max-w-none [&_p]:min-h-[1.5rem]"
           className="
-              prose prose-slate max-w-none p-4 bg-slate-50 rounded-xl
+              prose prose-slate max-w-none bg-slate-50 rounded-xl
               
               /* Fix lỗi mất dòng khi enter (thẻ p rỗng) */
               [&_p]:min-h-[1.5rem] text-[18px] 
               
-              /* Tùy chỉnh Heading cho to và đậm hơn mặc định của prose nếu muốn */
               prose-headings:font-bold prose-headings:text-slate-900
 
+              /* custom heading */
               [&_h1]:text-3xl 
               [&_h1]:mb-4
               [&_h1]:font-bold
@@ -113,27 +121,19 @@ const PostDetail = ({ post_id }: PostDetailProps) => {
               [&_h2]:mt-6
               [&_h2]:mb-4
               
-              /* Tùy chỉnh ảnh */
+              /* custom image */
               [&_img]:rounded-lg
               [&_img]:mb-2
               
-              /* Tùy chỉnh link */
-              [&_a]:text-blue-500 
+              /* custom link */
+              [&_a]:text-blue-700 
               [&_a]:no-underline 
               hover:[&_a]:underline
+
+              [&_ul]:m-2
               "
           dangerouslySetInnerHTML={{ __html: post.noi_dung || '' }}
-        />
-
-        <div className="mt-12 flex items-center justify-between border-t border-slate-200 pt-8">
-          <div className="text-slate-500 text-sm">
-            Cập nhật lần cuối: {new Date(post.ngay_cap_nhat).toLocaleDateString('vi-VN')}
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">Share</Button>
-            <Button variant="outline" size="sm">Save</Button>
-          </div>
-        </div>
+        />     
       </div>
     </article>
   );

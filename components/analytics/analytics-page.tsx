@@ -41,7 +41,7 @@ const courseCompletionData = [
 ]
 
 export function AnalyticsPage() {
-  const { courses } = useCourses()
+  const { courses } = useCourses();
   const { user } = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
   const [tests, setTests] = useState<Instructor[]>([]);

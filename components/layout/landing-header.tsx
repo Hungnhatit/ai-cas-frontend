@@ -20,7 +20,7 @@ export function LandingHeader() {
   if (!mounted) return null;
 
   const navigationItems = [
-    { name: 'Features', href: "#features", role: [] },
+    // { name: 'Features', href: "#features", role: [] },
     { name: 'Đề thi online', href: "/test-library", role: [] },
     { name: 'Blog', href: "/post", role: [] },
     { name: 'Liên hệ', href: "#contact", role: [] },
@@ -43,9 +43,9 @@ export function LandingHeader() {
   })
 
   return (
-    <header className="top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="bg-slate-200 px-8 flex items-center justify-between">
-        <div>Trường Đại học Sư phạm Kỹ thuật - Đại học Đà Nẵng</div>
+        <div className="font-medium">Trường Đại học Sư phạm Kỹ thuật - Đại học Đà Nẵng</div>
         <div className="flex">
           <LanguageToggle />
           <ThemeToggle />

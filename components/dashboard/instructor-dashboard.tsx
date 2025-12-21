@@ -60,7 +60,7 @@ export function InstructorDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">My Courses</CardTitle>
+              <CardTitle className="text-sm font-medium">Bài thi của tôi</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -104,20 +104,22 @@ export function InstructorDashboard() {
         </div>
 
         {/* quick access */}
-        <div>
-          <div>
-            <h1 className="text-2xl font-bold mb-1">Quick access</h1>
+        <div className="space-y-2">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold mb-1">Truy cập nhanh</h1>
             <p className="text-muted-foreground">Manage your courses and students</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card onClick={() => router.push('/create-quizzes')} className="hover:bg-gray-100 transition cursor-pointer">
+            <Card onClick={() => router.push('/tests/create')} className="hover:bg-gray-100 transition cursor-pointer">
               <CardHeader className="">
                 <div className="flex items-center justify-center mb-4">
                   <Image src={QuizIcon} alt="quiz-logo" width={32} height={32} />
                 </div>
                 <div>
-                  <CardTitle className="text-center mb-2">Create a quiz</CardTitle>
-                  <CardDescription className="text-center">Quickly build a custom quiz with questions and answers</CardDescription>
+                  <CardTitle className="text-center mb-2">Tạo bài thi mới</CardTitle>
+                  <CardDescription className="text-center">
+                    Tạo bài kiểm tra nhanh chóng với các câu hỏi và câu trả lời
+                  </CardDescription>
                 </div>
               </CardHeader>
             </Card>
@@ -161,7 +163,7 @@ export function InstructorDashboard() {
           {/* My Courses */}
           <Card>
             <CardHeader>
-              <CardTitle>My Courses</CardTitle>
+              <CardTitle>Bài thi của tôi</CardTitle>
               <CardDescription>Courses you're teaching</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

@@ -159,8 +159,10 @@ const PostsPage = ({ navigate }: { navigate: (path: string, id?: number) => void
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Bài Viết Mới Nhất</h1>
-            <p className="text-slate-500 mt-2">Cập nhật tin tức công nghệ và xu hướng mới.</p>
+            <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+              Bài viết mới nhất
+            </h1>
+            <p className="text-slate-500 text-lg mt-2">Cập nhật tin tức giáo dục và xu hướng AI mới</p>
           </div>
           <SearchInput defaultValue={currentSearch} onSearch={handleSearch} />
         </div>

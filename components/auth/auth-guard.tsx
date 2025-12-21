@@ -24,7 +24,6 @@ export function AuthGuard({ children, requiredRole, redirectTo = "/auth/login" }
       }
 
       if (requiredRole && user.vai_tro !== requiredRole) {
-        // Redirect based on user role
         switch (user.vai_tro) {
           case "admin":
             router.push("/admin")
@@ -42,14 +41,6 @@ export function AuthGuard({ children, requiredRole, redirectTo = "/auth/login" }
       }
     }
   }, [user, loading, router, requiredRole, redirectTo])
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
 
   if (!user) {
     return null

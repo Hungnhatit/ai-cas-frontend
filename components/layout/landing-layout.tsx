@@ -11,7 +11,7 @@ interface LandingLayoutProps {
 
 export function LandingLayout({ children }: LandingLayoutProps) {
   return (
-    <div className="flex flex-col bg-background">
+    <div className="flex flex-col bg-slate-50">
       <LandingHeader />
       <main className="flex-1">{children}</main>
       <LandingFooter />
