@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,53 +13,109 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import {
-  User, Bell, Lock, Palette, Settings, Camera, Loader2, Trash2, Globe, MapPin,
-  Link as LinkIcon
-} from "lucide-react"
-
-// Mock useAuth hook since external provider is missing
-const useAuth = () => {
-  return {
-    user: {
-      name: "Nguyễn Văn A",
-      email: "hocvien@example.com",
-      avatar: "https://github.com/shadcn.png",
-      vai_tro: "Học viên"
-    }
-  }
-}
+  Bell, Lock, Palette, Settings, Camera, Loader2, Trash2, Globe, MapPin,
+  Link as LinkIcon,
+  User2,
+  Info
+} from "lucide-react";
+import { User } from "@/types/interfaces/model"
+import { userService } from "@/services/admin/userService"
+import toast from "react-hot-toast";
+import { useAuth } from "@/providers/auth-provider"
 
 const SettingsPage = () => {
-  const { user } = useAuth()
-  const [isLoading, setIsLoading] = useState(false)
-
-  // State quản lý dữ liệu profile
+  const [isLoading, setIsLoading] = useState(false);
+  const [student, setStudent] = useState<User | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
   const [profileData, setProfileData] = useState({
-    name: user?.name || "Nguyễn Văn A",
-    email: user?.email || "hocvien@example.com",
+    ten: "",
+    email: "",
+    so_dien_thoai: "",
     bio: "Học viên đam mê công nghệ và thiết kế.",
-    location: "Hà Nội, Việt Nam",
-    website: "",
-    timezone: "UTC+7",
-  })
+    mat_khau: '',
+    anh_dai_dien: ''
+  });
 
-  // State quản lý thông báo
   const [notifications, setNotifications] = useState({
     emailNotifications: true,
     pushNotifications: false,
     courseUpdates: true,
     assignmentReminders: true,
     marketing: false,
-  })
+  });
 
-  const handleSave = () => {
-    setIsLoading(true)
-    // Giả lập call API
-    setTimeout(() => {
-      setIsLoading(false)
-      // Tại đây bạn có thể thêm Toast notification thành công
-      console.log("Đã lưu thay đổi:", profileData)
-    }, 1000)
+  useEffect(() => {
+    const fetchStudent = async () => {
+      if (!user?.ma_nguoi_dung) return;
+
+      try {
+        const res = await userService.getUserById(user.ma_nguoi_dung);
+        if (res.success && res.data) {
+          const u = res.data;
+          setProfileData(prev => ({
+            ...prev,
+            ten: u.ten || "",
+            email: u.email || "",
+            so_dien_thoai: u.so_dien_thoai || "",
+          }));
+          setAvatarUrl(u.anh_dai_dien || "");
+        }
+      } catch (error) {
+        console.error("Lỗi tải thông tin:", error);
+        toast.error('Cannot load user info');
+      }
+    }
+
+    fetchStudent();
+  }, [user, toast]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      setAvatarUrl(objectUrl);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleSave = async () => {
+    if (!user?.ma_nguoi_dung) return;
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('ten', profileData.ten);
+      formData.append('so_dien_thoai', profileData.so_dien_thoai);
+
+      if (avatarFile) {
+        formData.append('anh_dai_dien', avatarFile);
+      }
+
+      const res = await userService.updateUser(user.ma_nguoi_dung, formData);
+
+      if (res.success) {
+        toast.success('Cập nhật thành công');
+        setAvatarFile(null);
+
+        if (res.data && res.data.anh_dai_dien) {
+          setAvatarUrl(res.data.anh_dai_dien);
+        }
+      } else {
+        toast.error('Có lỗi xảy ra');
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error('Lỗi hệ thống khi cập nhật thông tin tài khoản');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -79,7 +135,7 @@ const SettingsPage = () => {
               value="profile"
               className="w-full justify-start rounded-xs shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-gray-300 data-[state=active]:text-black font-medium"
             >
-              <User className="mr-2 h-4 w-4" />
+              <User2 className="mr-2 h-4 w-4" />
               Hồ sơ
             </TabsTrigger>
             <TabsTrigger
@@ -123,16 +179,39 @@ const SettingsPage = () => {
                 {/* Avatar Section */}
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="flex flex-col items-center gap-3">
-                    <div className="relative group cursor-pointer">
-                      <Avatar className="h-24 w-24 border-2 border-border">
-                        <AvatarImage src={user?.avatar} alt={profileData.name} />
-                        <AvatarFallback className="text-2xl bg-muted">{profileData.name.charAt(0)}</AvatarFallback>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                      accept="image/*"
+                    />
+
+                    <div className="relative group cursor-pointer" onClick={triggerFileInput}>
+                      <Avatar className="h-28 w-28 border-2 border-border">
+                        <AvatarImage src={avatarUrl} alt={profileData.ten} className="object-cover" />
+                        <AvatarFallback className="text-2xl bg-muted">{profileData.ten.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <Camera className="h-6 w-6 text-white" />
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full text-xs rounded-sm shadow-none cursor-pointer">Đổi ảnh</Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-xs rounded-sm shadow-none cursor-pointer"
+                      onClick={triggerFileInput}
+                    >
+                      Đổi ảnh
+                    </Button>
+
+                    {/* {avatarFile && (
+                      <div className="flex items-start gap-1 text-amber-900 animate-pulse bg-amber-50 px-2 py-1 rounded text-xs font-medium border border-amber-200">
+                        <Info className="h-3 w-3" />
+                        <p className="text-wrap">Nhấn "Lưu thay đổi" <br /> để cập nhật</p>
+                      </div>
+                    )} */}
+
                   </div>
 
                   <div className="flex-1 space-y-4 w-full">
@@ -140,8 +219,17 @@ const SettingsPage = () => {
                       <Label htmlFor="name">Họ và tên</Label>
                       <Input
                         id="name"
-                        value={profileData.name}
-                        onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                        value={profileData.ten}
+                        onChange={(e) => setProfileData({ ...profileData, ten: e.target.value })}
+                        className="h-10 rounded-[3px] shadow-none border-gray-300"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="name">Số điện thoại</Label>
+                      <Input
+                        id="phone"
+                        value={profileData.so_dien_thoai}
+                        onChange={(e) => setProfileData({ ...profileData, so_dien_thoai: e.target.value })}
                         className="h-10 rounded-[3px] shadow-none border-gray-300"
                       />
                     </div>
@@ -170,24 +258,24 @@ const SettingsPage = () => {
                       <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
                       Địa điểm
                     </Label>
-                    <Input
+                    {/* <Input
                       placeholder="VD: TP. Hồ Chí Minh"
                       value={profileData.location}
                       onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
                       className="h-10 rounded-[3px] shadow-none border-gray-300"
-                    />
+                    /> */}
                   </div>
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2">
                       <LinkIcon className="h-3.5 w-3.5 text-muted-foreground" />
                       Website / Portfolio
                     </Label>
-                    <Input
+                    {/* <Input
                       placeholder="https://..."
                       value={profileData.website}
                       onChange={(e) => setProfileData({ ...profileData, website: e.target.value })}
                       className="h-10 rounded-[3px] shadow-none border-gray-300"
-                    />
+                    /> */}
                   </div>
                 </div>
 
