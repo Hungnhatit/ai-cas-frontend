@@ -241,8 +241,10 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
                   <TableCell className='border-r text-center border-gray-300'>
                     {calculateDuration(item.thoi_gian_bat_dau, item.thoi_gian_ket_thuc)}
                   </TableCell>
-                  <TableCell className='border-r border-gray-300 flex items-center justify-center'>
-                    <Check size={20} className='' />
+                  <TableCell className='border-r border-gray-300'>
+                    <div className='flex items-center justify-center'>
+                      <Check size={20} className='text-center' />
+                    </div>
                   </TableCell>
                   <TableCell className="text-center text-blue-600">
                     <Button
@@ -273,7 +275,7 @@ const TestResultsPage = ({ test_id }: TestResultsProps) => {
                 </PaginationItem>
 
                 {/* Render số trang */}
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {                  
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
                   if (totalPages > 7 && Math.abs(page - currentPage) > 2 && page !== 1 && page !== totalPages) {
                     if (Math.abs(page - currentPage) === 3) {
                       return <PaginationItem key={page}><PaginationEllipsis /></PaginationItem>

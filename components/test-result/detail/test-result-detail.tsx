@@ -112,16 +112,15 @@ const TestResultDetail = ({ test_id, attempt_id }: TestResultDetailProps) => {
 
   if (!test || !attempt) {
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 items-center justify-center">
+      <div className="flex h-screen items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Test Result Not Found</h1>
-          <p className="text-white">The test results you're looking for doesn't exist.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Không tìm thấy kết quả làm bài</h1>
+          <p className="">Kết quả làm bài bạn đang tìm kiếm không tồn tại</p>
         </div>
       </div>
     );
   }
-
-  // Calculate metrics from API data
+  
   const answers = attempt?.cau_tra_loi ? JSON.parse(attempt.cau_tra_loi) : {};
 
   const totalQuestions = test.tong_so_cau_hoi || 0;

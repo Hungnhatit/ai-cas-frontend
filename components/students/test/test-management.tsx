@@ -195,7 +195,7 @@ const TestManagementPage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold mb-2">{stats.total}</div>
-            <p className="text-[15px] text-base">Hiển thị tổng số bài thi mà bạn đang có trong hệ thống</p>
+            <p className="text-[15px] text-base">Hiển thị tổng số bài thi mà bạn đã làm trên hệ thống</p>
           </CardContent>
         </Card>
         <Card className="gap-3">
@@ -248,7 +248,6 @@ const TestManagementPage = () => {
                     <div className="flex items-center justify-start gap-2">
                       <div className="space-y-1">
                         <CardTitle className="text-lg mb-0">{test.tieu_de}</CardTitle>
-                        <CardDescription>Khoá học</CardDescription>
                       </div>
                       {/* <Badge variant="default">{getStatusLabel(test.trang_thai)}</Badge> */}
                     </div>

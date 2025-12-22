@@ -285,17 +285,15 @@ const TestEditor = ({ test_id }: TestEditProp) => {
         tong_diem: total_points,
         trang_thai: "hoat_dong",
         phan_kiem_tra: parsedSections,
-      };
-
-      console.log("Updating test with payload:", updatedData);
+      };      
 
       await testService.updateTest(test_id, updatedData);
 
-      toast.success("Test updated!");
+      toast.success("Cập nhật bài thi thành công!");
 
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update test");
+      toast.error("Lỗi khi cập nhật bài thi!");
     }
   };
 

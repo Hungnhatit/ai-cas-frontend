@@ -72,13 +72,13 @@ export const AboutUs = () => {
         {/* Mission & Vision */}
         <section className="container mx-auto px-4 py-16">
           <div className="grid md:grid-cols-2 gap-8">
-            <Card className="rounded-md">
+            <Card className="rounded-md gap-3">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-xl">
                   <Target className="text-sky-600" /> Sứ mệnh
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-slate-600 leading-relaxed">
+              <CardContent className="text-slate-800 leading-relaxed">
                 Sứ mệnh của chúng tôi là giúp học sinh, sinh viên, giáo viên và người đi làm
                 <strong> hiểu đúng – dùng đúng – dùng hiệu quả AI</strong>.
                 Hệ thống không chỉ đánh giá kiến thức, mà còn tập trung vào tư duy phản biện,
@@ -86,13 +86,13 @@ export const AboutUs = () => {
               </CardContent>
             </Card>
 
-            <Card className="rounded-md">
+            <Card className="rounded-md gap-3">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-xl">
                   <Brain className="text-sky-600" /> Tầm nhìn
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-slate-600 leading-relaxed">
+              <CardContent className="text-slate-800 leading-relaxed">
                 Trở thành nền tảng đánh giá năng lực AI đáng tin cậy hàng đầu trong giáo dục,
                 được sử dụng rộng rãi tại các trường học, trung tâm đào tạo và doanh nghiệp,
                 góp phần hình thành lực lượng lao động có trách nhiệm với AI.
@@ -102,7 +102,7 @@ export const AboutUs = () => {
         </section>
 
         {/* Why AI Competency */}
-        <section className="bg-sky-100 px-8 py-16 rounded-lg">
+        <section className="bg-sky-100 px-8 py-16 rounded-4xl">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center text-slate-800">
               Vì sao cần đánh giá năng lực sử dụng AI?
@@ -115,7 +115,7 @@ export const AboutUs = () => {
 
             <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {whyAIs.map((item, idx) => (
-                <Card key={idx} className="rounded-md hover:shadow-lg transition">
+                <Card key={idx} className="rounded-md gap-3 shadow-lg hover:shadow-2xl transition">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-3">
                       {item.icon}
