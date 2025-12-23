@@ -99,6 +99,10 @@ const PostsPage = ({ navigate }: { navigate: (path: string, id?: number) => void
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const filtered = data.filter((post) =>
+    [post.tieu_de, post.tom_tat].some(field => field?.toLowerCase().includes(search.toLowerCase()))
+  )
+
   const currentPage = Number(searchParams.get('page')) || 1;
   const currentSearch = searchParams.get('q') || '';
   const limit = 9;
@@ -164,17 +168,25 @@ const PostsPage = ({ navigate }: { navigate: (path: string, id?: number) => void
             </h1>
             <p className="text-slate-500 text-lg mt-2">Cập nhật tin tức giáo dục và xu hướng AI mới</p>
           </div>
-          <SearchInput defaultValue={currentSearch} onSearch={handleSearch} />
+          <div className='relative w-full max-w-sm'>
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              placeholder="Tìm kiếm bài viết..."
+              className="pl-9 rounded-[3px] border-gray-300 shadow-none"
+              value={search}
+              onChange={(e: any) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
 
         {loading ? (
           <div className="flex h-64 items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-900"></div>
           </div>
-        ) : data.length > 0 ? (
+        ) : filtered.length > 0 ? (
           <>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {data.map((post) => (
+              {filtered.map((post) => (
                 <PostCard
                   key={post.ma_bai_viet}
                   post={post}
