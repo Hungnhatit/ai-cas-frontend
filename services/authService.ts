@@ -3,7 +3,7 @@ import axios from 'axios';
 export const authService = {
   login: async (email: string, mat_khau: string) => {
     const res = await api.post(`/auth/login`, { email, mat_khau });
-    console.log(res);
+    console.log(res.data)
     return res.data;
   },
 
@@ -25,4 +25,14 @@ export const authService = {
     });
     return res.data;
   },
+
+  forgotPassword: async (email: string) => {
+    const res = await api.post('/auth/forgot-password', { email });
+    return res.data;
+  },
+
+  resetPassword: async (payload: any) => {
+    const res = await api.post('/auth/reset-password', payload);
+    return res.data;
+  }
 };
