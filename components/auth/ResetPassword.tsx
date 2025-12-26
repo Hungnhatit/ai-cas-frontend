@@ -8,6 +8,7 @@ import { Input } from '../ui/input';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { api } from '@/lib/axios';
+import { authService } from '@/services/authService';
 
 const ResetPassword = () => {
   const searchParams = useSearchParams();
@@ -48,12 +49,12 @@ const ResetPassword = () => {
 
     setLoading(true);
     try {
-      const res = await api.post("/auth/reset-password", {
+      const res = await authService.resetPassword({
         token,
         new_password: password
       });
 
-      if (res.data.success) {
+      if (res.success) {
         toast.success("Đổi mật khẩu thành công! Đang chuyển hướng...");
         setTimeout(() => {
           router.push("/auth/login");
