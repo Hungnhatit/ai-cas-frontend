@@ -46,7 +46,16 @@ export const PostService = {
 
   getPost: async (params: any) => {
     try {
-      const res = await api.get('/post', {params});
+      const res = await api.get('/post', { params });
+      return res.data;
+    } catch (error: any) {
+      throw error.res?.data || error.message;
+    }
+  },
+
+  getRelatedPosts: async (post_id: number) => {
+    try {
+      const res = await api.get(`/post/${post_id}/related`);
       return res.data;
     } catch (error: any) {
       throw error.res?.data || error.message;
