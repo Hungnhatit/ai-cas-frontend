@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { FileText, GraduationCap, Menu, Search } from "lucide-react"
+import { FileText, GraduationCap, Menu, Search, Settings, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/components/ui/use-mobile"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
@@ -17,6 +17,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import Link from "next/link"
 import { Card, CardContent } from "../ui/card"
 import { formatDate } from "@/utils/formatDate"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { Badge } from "../ui/badge"
 
 export function LandingHeader() {
   const [results, setResults] = useState<{ posts: any[]; exams: any[] }>({ posts: [], exams: [] });
@@ -24,6 +27,7 @@ export function LandingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [search, setSearch] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const router = useRouter()
   const isMobile = useIsMobile();
@@ -63,13 +67,31 @@ export function LandingHeader() {
     { name: 'Blog', href: "/post", role: [] },
     { name: 'Liên hệ', href: "#contact", role: [] },
     { name: 'Dashboard', href: "/dashboard", role: ['admin', 'instructor'] },
-    { name: 'Tài khoản', href: `/student/${user?.ma_nguoi_dung}/setting`, role: ['student'] },
+    // { name: 'Tài khoản', href: `/student/${user?.ma_nguoi_dung}/setting`, role: ['student'] },
     { name: 'Về chúng tôi', href: '/about-us', role: [] }
   ]
 
   const handleLogout = () => {
     console.log("[v0] Logout clicked")
     logout()
+  }
+
+  const handleProfileClick = () => {
+    console.log("[v0] Profile clicked")
+    router.push(`/student/${user?.ma_nguoi_dung}/setting`)
+    setDropdownOpen(false)
+  }
+
+  const handleSettingsClick = () => {
+    console.log("[v0] Settings clicked")
+    router.push("/settings")
+    setDropdownOpen(false)
+  }
+
+  const handleLogoutClick = () => {
+    console.log("[v0] Logout clicked")
+    logout()
+    setDropdownOpen(false)
   }
 
   const visibleNav = navigationItems.filter((item) => {
@@ -80,6 +102,8 @@ export function LandingHeader() {
     return item.role.includes(user.vai_tro);
   });
 
+  console.log("USER: ", user);
+
   return (
     <header className="flex flex-col gap-3 top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div>
@@ -88,7 +112,7 @@ export function LandingHeader() {
           <div className="flex">
             <LanguageToggle />
             <ThemeToggle />
-            {user && (
+            {/* {user && (
               <Button
                 variant="ghost"
                 className="cursor-pointer rounded-[3px]"
@@ -97,8 +121,8 @@ export function LandingHeader() {
                 Đăng xuất
               </Button>
             )
-            }
-            {!user && (
+            } */}
+            {/* {!user && (
               <div>
                 <Button
                   variant="ghost"
@@ -122,12 +146,12 @@ export function LandingHeader() {
                 </Button>
               </div>
             )
-            }
+            } */}
           </div>
 
         </div>
 
-        <div className=" bg-[#232f3e] flex h-16 items-center justify-between px-8">
+        <div className=" bg-[#232f3e] flex h-16 items-center justify-between px-4">
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center ">
@@ -136,7 +160,7 @@ export function LandingHeader() {
             <span className="font-bold text-white bg-transparent text-lg md:text-xl  text-shadow-indigo-50 hover:text-shadow-xs hover:text-shadow-indigo-200 transition-all">AI-CAS</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-6">
             {/* Desktop Navigation */}
             {!isMobile && (
               <nav className="hidden md:flex items-center gap-6">
@@ -151,6 +175,48 @@ export function LandingHeader() {
                 ))}
               </nav>
             )}
+
+            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative h-8 w-8 md:h-10 md:w-10 rounded-full cursor-pointer"
+                  onClick={() => {
+                    console.log("[v0] Dropdown trigger clicked")
+                    setDropdownOpen(!dropdownOpen)
+                  }}
+                >
+                  <Avatar className="h-8 w-8 md:h-10 md:w-10 border-4 border-sky-400">
+                    <AvatarImage src={user?.anh_dai_dien || "/placeholder.svg"} alt={user?.name} />
+                    <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" sideOffset={5}>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user?.name}</p>
+                    <p className="text-sm leading-none text-muted-foreground">{user?.email}</p>
+                    <Badge variant="secondary" className="w-fit mt-1 capitalize">
+                      {user?.vai_tro}
+                    </Badge>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleProfileClick} className="cursor-pointer">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Hồ sơ</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSettingsClick} className="cursor-pointer">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Trang cá nhân</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogoutClick} className="cursor-pointer">
+                  <span>Đăng xuất</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
 
@@ -158,7 +224,7 @@ export function LandingHeader() {
           {isMobile && (
             <div className="flex items-center gap-2">
               {/* <LanguageToggle />
-          <ThemeToggle /> */}
+                <ThemeToggle /> */}
 
               {/* {!isMobile && (
             <div className="hidden md:flex items-center gap-2">
@@ -196,7 +262,6 @@ export function LandingHeader() {
                         {item.name}
                       </a>
                     ))}
-
                     <div className="border-t pt-4 mt-4">
                       <div className="flex flex-col gap-2">
                         <Button
@@ -239,7 +304,7 @@ export function LandingHeader() {
         <DialogContent className="sm:max-w-xl rounded-md border-8">
           <DialogHeader>
             <DialogTitle>
-Tìm kiếm bài viết, bài thi
+              Tìm kiếm bài viết, bài thi
             </DialogTitle>
             <DialogDescription>
 
