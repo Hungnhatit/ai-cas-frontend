@@ -78,8 +78,6 @@ const EditPost = ({ post_id }: EditPostProps) => {
     }
   };
 
-  console.log('THUMBNAIL: ', thumbnailFile);
-
   const handleUpdatePost = async () => {
     if (!formData.title.trim()) {
       alert("Vui lòng nhập tiêu đề bài viết");

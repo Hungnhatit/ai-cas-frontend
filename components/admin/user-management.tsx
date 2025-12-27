@@ -188,8 +188,8 @@ export function UserManagement() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-2xl rounded-[3px]">
           <DialogHeader>
-            <DialogTitle>Cập nhật người dùng</DialogTitle>
-            <DialogDescription>Thay đổi thông tin người dùng</DialogDescription>
+            <DialogTitle>Cập nhật thông tin người dùng</DialogTitle>
+            {/* <DialogDescription>Thay đổi thông tin người dùng</DialogDescription> */}
           </DialogHeader>
           {selectedUser && (
             <div className="grid gap-4 py-4">

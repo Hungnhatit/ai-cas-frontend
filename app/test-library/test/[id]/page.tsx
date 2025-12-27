@@ -1,4 +1,5 @@
 import ClientLayout from '@/components/layout/client-layout';
+import { LandingLayout } from '@/components/layout/landing-layout';
 import DocumentDetailPage from '@/components/library/detail';
 import { useParams } from 'next/navigation';
 import React from 'react'
@@ -9,9 +10,9 @@ interface PageProps {
 
 const TestLibraryDetailPage = ({ params }: PageProps) => {
   return (
-    <ClientLayout>
+    <LandingLayout>
       <DocumentDetailPage test_id={params.id} />
-    </ClientLayout>
+    </LandingLayout>
   )
 }
 

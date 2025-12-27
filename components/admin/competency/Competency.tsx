@@ -40,9 +40,7 @@ export const CompetencyApp = () => {
     if (user?.ma_nguoi_dung) {
       fetchCompetency();
     }
-  }, [user?.ma_nguoi_dung]);
-
-  console.log('COMPETENCY: ', competencies);
+  }, [user?.ma_nguoi_dung]);  
 
   const handleEdit = async () => {
     try {

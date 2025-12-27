@@ -74,7 +74,7 @@ export default function HomePage() {
             Hệ thống đánh giá toàn diện giúp người học định vị năng lực sử dụng Trí tuệ nhân tạo, từ đó xây dựng lộ trình phát triển sự nghiệp bền vững.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="rounded-lg bg-[#242F3E] hover:bg-[#637691] h-12 px-8 text-base w-full sm:w-auto shadow-indigo-200 shadow-xl hover:shadow-2xl hover:shadow-indigo-200 transition-all cursor-pointer">
+            <Button size="lg" className="rounded-lg bg-[#242F3E] hover:bg-[#637691] h-12 px-8 text-base w-full sm:w-auto shadow-indigo-50 shadow-xl hover:shadow-2xl hover:shadow-indigo-200 transition-all cursor-pointer">
               Bắt đầu đánh giá <ArrowRight className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="lg" className="rounded-lg h-12 px-8 text-base w-full sm:w-auto bg-white/50 backdrop-blur-sm cursor-pointer">
