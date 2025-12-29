@@ -5,12 +5,18 @@ import { useRouter } from "next/navigation"
 import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 
+export const STORAGE_KEYS = {
+  TOKEN: 'access_token',
+  USER: 'user_data'
+}
+
 interface User {
   ma_nguoi_dung: number
   email: string
   name: string
   vai_tro: "student" | "instructor" | "admin"
   avatar?: string
+  anh_dai_dien?: string
 }
 
 interface AuthContextType {
@@ -29,35 +35,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check for existing session
-    const savedUser = localStorage.getItem("lms-user")
-    if (savedUser) {
-      setUser(JSON.parse(savedUser))
+    // const savedUser = localStorage.getItem("lms-user")
+    const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
+    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
+
+    if (savedUser && token) {
+      try {
+        setUser(JSON.parse(savedUser))
+      } catch (e) {
+        localStorage.removeItem(STORAGE_KEYS.USER)
+        localStorage.removeItem(STORAGE_KEYS.TOKEN)
+      }
     }
     setLoading(false)
   }, [])
 
   const login = async (email: string, password: string) => {
-    // setLoading(true)
-    // // Mock authentication - replace with real API
-    // const mockUser: User = {
-    //   user_id: "1",
-    //   email,
-    //   name: email.split("@")[0],
-    //   vai_tro: email.includes("admin") ? "admin" : email.includes("instructor") ? "instructor" : "student",
-    //   avatar: `/placeholder.svg?height=40&width=40&query=avatar`,
-    // }
-    // setUser(mockUser)
-    // localStorage.setItem("lms-user", JSON.stringify(mockUser))
-    // setLoading(false)
     setLoading(true);
     try {
-      const { token, user } = await authService.login(email, password);
+      const res = await authService.login(email, password);
+      const token = res.token || res.data?.token;
+      const userData = res.user || res.data?.user;
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("lms-user", JSON.stringify(user));
+      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
 
-      setUser(user); // cập nhật context
+      setUser(userData);
+    } catch (error) {
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -73,21 +78,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         vai_tro: vai_tro as 'student' | 'instructor' | 'admin'
       });
 
-      const { user, token } = res;
-      setUser(user);
-      localStorage.setItem("lms-user", JSON.stringify(user))
-      localStorage.setItem("lms-token", token);
-      return user;
+      const token = res.token || res.data?.token;
+      const userData = res.user || res.data?.user;
+
+      if (token && userData) {
+        setUser(userData);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData))
+        localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      }
     } catch (error) {
+      throw error;
+    } finally {
       setLoading(false)
     }
   }
 
   const logout = () => {
     setUser(null)
-    localStorage.removeItem("lms-user");
-    localStorage.removeItem("token");
-    router.push('/auth/login')
+    localStorage.removeItem(STORAGE_KEYS.USER);
+    localStorage.removeItem(STORAGE_KEYS.TOKEN);
+    window.location.href = '/auth/login'
   }
 
   return <AuthContext.Provider value={{ user, login, logout, register, loading }}>{children}</AuthContext.Provider>
