@@ -16,7 +16,7 @@ import { formatDate } from '@/utils/formatDate';
 const PostCard = ({ post, onClick }: { post: Post; onClick: () => void }) => {
   return (
     <div
-      className="group relative flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
+      className="group relative flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white transition-all shadow-xl hover:shadow-2xl cursor-pointer"
       onClick={onClick}
     >
       <div className="aspect-video w-full overflow-hidden bg-slate-100 relative">
@@ -49,7 +49,7 @@ const PostCard = ({ post, onClick }: { post: Post; onClick: () => void }) => {
           {post.tom_tat}
         </p>
         <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-700">
+          <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
             <div className="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center">
               <User className="h-3 w-3" />
             </div>
@@ -81,7 +81,7 @@ const SearchInput = ({ defaultValue, onSearch }: { defaultValue: string, onSearc
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
       <Input
         placeholder="Tìm kiếm bài viết..."
-        className="pl-9 rounded-[3px] border-gray-300 shadow-none"
+        className="bg-white pl-9 rounded-lg border-gray-300 shadow-none"
         value={value}
         onChange={(e: any) => setValue(e.target.value)}
       />
@@ -172,7 +172,7 @@ const PostsPage = ({ navigate }: { navigate: (path: string, id?: number) => void
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="Tìm kiếm bài viết..."
-              className="pl-9 rounded-[3px] border-gray-300 shadow-none"
+              className="bg-white pl-9 rounded-sm border-gray-200 shadow-none"
               value={search}
               onChange={(e: any) => setSearch(e.target.value)}
             />

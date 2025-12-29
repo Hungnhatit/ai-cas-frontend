@@ -22,6 +22,7 @@ import { User } from "@/types/interfaces/model"
 import { userService } from "@/services/admin/userService"
 import toast from "react-hot-toast";
 import { useAuth } from "@/providers/auth-provider"
+import { MdOutlineManageAccounts } from "react-icons/md"
 
 const SettingsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +35,7 @@ const SettingsPage = () => {
     ten: "",
     email: "",
     so_dien_thoai: "",
-    bio: "Học viên đam mê công nghệ và thiết kế.",
+    tieu_su: "Học viên đam mê công nghệ và thiết kế.",
     mat_khau: '',
     anh_dai_dien: ''
   });
@@ -93,6 +94,7 @@ const SettingsPage = () => {
       const formData = new FormData();
       formData.append('ten', profileData.ten);
       formData.append('so_dien_thoai', profileData.so_dien_thoai);
+      formData.append('tieu_su', profileData.tieu_su);
 
       if (avatarFile) {
         formData.append('anh_dai_dien', avatarFile);
@@ -119,42 +121,45 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto py-10 px-4 md:px-6">
-      <div className="space-y-0.5 mb-8">
-        <h2 className="text-2xl font-bold tracking-tight">Cài đặt tài khoản</h2>
-        <p className="text-muted-foreground">
+    <div className="container max-w-6xl mx-auto pb-10 px-4 md:px-6">
+      <div className="space-y-2 mb-8">
+        <div className="flex items-center gap-2">
+          <MdOutlineManageAccounts size={32} className="text-blue-800" />
+          <h2 className="text-4xl font-bold tracking-tight">Cài đặt tài khoản</h2>
+        </div>
+        <p className="text-lg">
           Quản lý thông tin cá nhân, tùy chọn hiển thị và bảo mật.
         </p>
       </div>
 
-      <Tabs defaultValue="profile" className=" flex flex-col lg:flex-row justify-between gap-4">
+      <Tabs defaultValue="profile" className=" flex flex-col lg:flex-row justify-between gap-8">
         {/* Sidebar Navigation */}
-        <aside className="p-4 lg:w-1/4">
-          <TabsList className="flex flex-row lg:flex-col justify-start h-auto w-full bg-transparent p-0 gap-2">
+        <aside className="lg:w-1/4">
+          <TabsList className="bg-white shadow-lg p-4 flex flex-row lg:flex-col justify-start h-auto w-full gap-2">
             <TabsTrigger
               value="profile"
-              className="w-full justify-start rounded-xs shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-gray-300 data-[state=active]:text-black font-medium"
+              className="w-full justify-start rounded-sm shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-[#3012b5]/5 transition-all data-[state=active]:text-black data-[state=active]:shadow-none font-medium"
             >
               <User2 className="mr-2 h-4 w-4" />
               Hồ sơ
             </TabsTrigger>
             <TabsTrigger
               value="account"
-              className="w-full justify-start rounded-xs shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-gray-300 data-[state=active]:text-black font-medium"
+              className="w-full justify-start rounded-sm shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-[#3012b5]/5 transition-all data-[state=active]:text-black data-[state=active]:shadow-none font-medium"
             >
               <Settings className="mr-2 h-4 w-4" />
               Tài khoản
             </TabsTrigger>
             <TabsTrigger
               value="notifications"
-              className="w-full justify-start rounded-xs shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-gray-300 data-[state=active]:text-black font-medium"
+              className="w-full justify-start rounded-sm shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-[#3012b5]/5 transition-all data-[state=active]:text-black data-[state=active]:shadow-none font-medium"
             >
               <Bell className="mr-2 h-4 w-4" />
               Thông báo
             </TabsTrigger>
             <TabsTrigger
               value="appearance"
-              className="w-full justify-start rounded-xs shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-gray-300 data-[state=active]:text-black font-medium"
+              className="w-full justify-start rounded-sm shadow-none cursor-pointer px-3 py-2 h-10 data-[state=active]:bg-[#3012b5]/5 transition-all data-[state=active]:text-black data-[state=active]:shadow-none font-medium"
             >
               <Palette className="mr-2 h-4 w-4" />
               Giao diện
@@ -162,16 +167,13 @@ const SettingsPage = () => {
           </TabsList>
         </aside>
 
-        {/* Content Area */}
-        <div className="flex-1 lg:max-w-3xl">
-
-          {/* TAB: HỒ SƠ */}
+        <div className="flex-1">
           <TabsContent value="profile" className="space-y-6 mt-0">
-            <Card>
+            <Card className="rounded-xl shadow-xl border-none">
               <CardHeader>
-                <CardTitle className="text-lg">Thông tin cá nhân</CardTitle>
+                <CardTitle className="text-xl">Thông tin cá nhân</CardTitle>
                 <CardDescription>
-                  Đây là thông tin hiển thị công khai trên hồ sơ học viên của bạn.
+                  Đây là thông tin hiển thị công khai trên hồ sơ học viên của bạn
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
@@ -221,7 +223,7 @@ const SettingsPage = () => {
                         id="name"
                         value={profileData.ten}
                         onChange={(e) => setProfileData({ ...profileData, ten: e.target.value })}
-                        className="h-10 rounded-[3px] shadow-none border-gray-300"
+                        className="h-10 rounded-md shadow-none border-gray-300"
                       />
                     </div>
                     <div className="grid gap-2">
@@ -230,7 +232,7 @@ const SettingsPage = () => {
                         id="phone"
                         value={profileData.so_dien_thoai}
                         onChange={(e) => setProfileData({ ...profileData, so_dien_thoai: e.target.value })}
-                        className="h-10 rounded-[3px] shadow-none border-gray-300"
+                        className="h-10 rounded-md shadow-none border-gray-300"
                       />
                     </div>
                     <div className="grid gap-2">
@@ -238,9 +240,9 @@ const SettingsPage = () => {
                       <Textarea
                         id="bio"
                         placeholder="Ví dụ: Tôi là học viên khóa lập trình..."
-                        className="resize-none min-h-[100px] rounded-[3px] shadow-none border-gray-300"
-                        value={profileData.bio}
-                        onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                        className="resize-none min-h-[100px] rounded-md shadow-none border-gray-300"
+                        value={profileData.tieu_su}
+                        onChange={(e) => setProfileData({ ...profileData, tieu_su: e.target.value })}
                       />
                       <p className="text-[0.8rem] text-muted-foreground">
                         Viết ngắn gọn về mục tiêu học tập hoặc sở thích của bạn.
@@ -291,7 +293,7 @@ const SettingsPage = () => {
 
           {/* TAB: TÀI KHOẢN */}
           <TabsContent value="account" className="space-y-6 mt-0">
-            <Card>
+            <Card className="rounded-xl border-none shadow-xl">
               <CardHeader>
                 <CardTitle>Thông tin đăng nhập</CardTitle>
                 <CardDescription>
@@ -302,7 +304,7 @@ const SettingsPage = () => {
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email đăng nhập</Label>
                   <div className="flex gap-2">
-                    <Input id="email" value={profileData.email} disabled className="bg-muted" />
+                    <Input id="email" value={profileData.email} disabled className="bg-gray-200" />
                     <Button variant="outline" size="icon" title="Email không thể thay đổi">
                       <Lock className="h-4 w-4" />
                     </Button>
@@ -321,7 +323,7 @@ const SettingsPage = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-destructive/20 shadow-none">
+            <Card className="rounded-xl border-none shadow-xl">
               <CardHeader>
                 <CardTitle className="text-destructive">Vùng nguy hiểm</CardTitle>
                 <CardDescription>
@@ -345,7 +347,7 @@ const SettingsPage = () => {
 
           {/* TAB: THÔNG BÁO */}
           <TabsContent value="notifications" className="space-y-6 mt-0">
-            <Card>
+            <Card className="rounded-xl border-none shadow-xl">
               <CardHeader>
                 <CardTitle>Tùy chọn thông báo</CardTitle>
                 <CardDescription>
@@ -354,11 +356,11 @@ const SettingsPage = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Kênh thông báo</h4>
+                  <h4 className="text-lg font-medium">Kênh thông báo</h4>
                   <div className="flex items-center justify-between space-x-2">
-                    <Label htmlFor="email-notif" className="flex flex-col space-y-1 cursor-pointer">
+                    <Label htmlFor="email-notif" className="flex flex-col items-start space-y-1 cursor-pointer">
                       <span>Email</span>
-                      <span className="font-normal text-xs text-muted-foreground">Nhận thông báo qua địa chỉ email đăng ký.</span>
+                      <span className="font-normal text-sm text-muted-foreground">Nhận thông báo qua địa chỉ email đăng ký.</span>
                     </Label>
                     <Switch
                       id="email-notif"
@@ -368,9 +370,9 @@ const SettingsPage = () => {
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between space-x-2">
-                    <Label htmlFor="push-notif" className="flex flex-col space-y-1 cursor-pointer">
+                    <Label htmlFor="push-notif" className="flex flex-col items-start space-y-1 cursor-pointer">
                       <span>Thông báo trình duyệt</span>
-                      <span className="font-normal text-xs text-muted-foreground">Nhận thông báo pop-up trên trình duyệt web.</span>
+                      <span className="font-normal text-sm text-muted-foreground">Nhận thông báo pop-up trên trình duyệt web.</span>
                     </Label>
                     <Switch
                       id="push-notif"
@@ -381,18 +383,18 @@ const SettingsPage = () => {
                 </div>
 
                 <div className="space-y-4 pt-4">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Loại nội dung</h4>
+                  <h4 className="text-lg font-medium">Loại nội dung</h4>
                   <div className="flex items-center justify-between space-x-2">
-                    <Label htmlFor="course-update" className="flex flex-col space-y-1">
+                    <Label htmlFor="course-update" className="flex flex-col items-start space-y-1">
                       <span>Cập nhật khóa học</span>
-                      <span className="font-normal text-xs text-muted-foreground">Khi có bài học mới hoặc tài liệu mới.</span>
+                      <span className="font-normal text-sm text-muted-foreground">Khi có bài học mới hoặc tài liệu mới.</span>
                     </Label>
                     <Switch checked={notifications.courseUpdates} onCheckedChange={(v) => setNotifications({ ...notifications, courseUpdates: v })} />
                   </div>
                   <div className="flex items-center justify-between space-x-2">
-                    <Label htmlFor="reminder" className="flex flex-col space-y-1">
+                    <Label htmlFor="reminder" className="flex flex-col items-start space-y-1">
                       <span>Nhắc nhở bài tập</span>
-                      <span className="font-normal text-xs text-muted-foreground">Sắp đến hạn nộp bài hoặc lịch thi.</span>
+                      <span className="font-normal text-sm text-muted-foreground">Sắp đến hạn nộp bài hoặc lịch thi.</span>
                     </Label>
                     <Switch checked={notifications.assignmentReminders} onCheckedChange={(v) => setNotifications({ ...notifications, assignmentReminders: v })} />
                   </div>

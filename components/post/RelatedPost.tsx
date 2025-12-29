@@ -7,7 +7,7 @@ import { PostService } from "@/services/postService";
 import {
   Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,
 } from "../ui/carousel";
-import { IoNewspaperOutline } from "react-icons/io5";
+import { SiApplenews } from "react-icons/si";
 
 interface RelatedPostsProps {
   current_post_id: number;
@@ -38,13 +38,11 @@ export const RelatedPosts = ({ current_post_id }: RelatedPostsProps) => {
 
   if (!loading && posts.length === 0) return null;
 
-  console.log(posts);
-
   return (
     <Card className="gap-2 rounded-xl shadow-xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-3">
-          <IoNewspaperOutline className="text-orange-600 h-8 w-8" />
+          <SiApplenews className="text-orange-600 h-6 w-6" />
           <p className="text-xl">Bài viết đề xuất</p>
         </CardTitle>
       </CardHeader>
